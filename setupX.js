@@ -1,6 +1,10 @@
 "use strict";
 
 
+tp.addDirective("description", function(arr, params) {
+  return params.tpItem.getDescription();
+});
+
 tp.addDirective("attire", function(arr, params) {
   const garments = params.tpItem.getWearingVisible ? params.tpItem.getWearingVisible() : params.tpItem.getClothing();
   return formatList(garments, {article:INDEFINITE, lastJoiner:" and ", nothing:"nothing"}); 

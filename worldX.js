@@ -34,16 +34,17 @@ createItem("cleavage", BODY_PART(-1, false, /cleavage/), {
 
 // For the head, it is moderately intimate to be touched, but generally people are happy to have it exposed
 createItem("neck", BODY_PART(4, false, /neck/), {
-  getExposureRating:function(char) { return 0; }
+  getExposureRating:function(char) { return 0; },
 });
 createItem("head", BODY_PART(3, false, /head/), {
-  getExposureRating:function(char) { return 0; }
+  getExposureRating:function(char) { return 0; },
 });
 createItem("nose", BODY_PART(3, false, /nose/), {
-  getExposureRating:function(char) { return 0; }
+  getExposureRating:function(char) { return 0; },
 });
 createItem("mouth", BODY_PART(3, false, /mouth|lips?/), {
-  getExposureRating:function(char) { return 0; }
+  getExposureRating:function(char) { return 0; },
+  canBePenetrated:true,
 });
 
 // These body parts are not in the garment slots, which use chest, buttock, groin, groin and crotch
@@ -53,6 +54,7 @@ createItem("tit", BODY_PART(8, true, /tits?|boobs?|breasts?|gazongas?|mammary|ma
 });
 createItem("ass", BODY_PART(8, false, /ass|arse|backside|bottom|tush|rump|butt/), {
   getSlot:function() { return "buttock"; },
+  canBePenetrated:true,
 });
 createItem("bollock", GENITALS(9, true, /bollocks?|balls?|testicles?/), {
   modestyBoost:true,
@@ -73,6 +75,7 @@ createItem("pussy", GENITALS(10, false, /pussy|cunt|vagina|slit/), {
     msg("You can't suck off a pussy!");
   },
   getSlot:function(toHandle) { return toHandle ? "crotch" : "groin"; },
+  canBePenetrated:true,
 });
 
 
@@ -95,50 +98,6 @@ for (let key in w) {
 
 
 
-
-
-
-function cmdRemoveGarment(char, target, garment) {
-  console.log(char.name + " to remove " + garment.name + " from " + target.name);
-  if (!char.isHere()) {
-    msg(nounVerb(char, "be", true) + " not here.");
-    return FAILED;
-  }
-  if (!target.isHere()) {
-    msg(nounVerb(target, "be", true) + " not here.");
-    return FAILED;
-  }
-  if (!garment.worn || !garment.isAtLoc(target)) {
-    msg(nounVerb(target, "be", true) + " not wearing " + garment.byname({article:INDEFINITE}) + ".");
-    return FAILED;
-  }
-  if (!char.getAgreement(posture.cmd)) {
-    // The getAgreement should give the response
-    return FAILED;
-  }
-  if (char === target) {
-    const res = garment.wear(false, char);
-    return res ? SUCCESS : FAILED;
-  }
-  const blocker = garment.getWearRemoveBlocker(target, false);
-  if (blocker) {
-    msg(nounVerb(char, "can", true) + " not remove " + garment.byname({article:DEFINITE}) + " whilst " + target.byname({article:DEFINITE}) + " is wearing " + blocker.byname({article:INDEFINITE}) + ".");
-    return FAILED; 
-  }
-  // By now we have a character, char, willing to try to remove an item, garment, from a different character, target
-  
-  if (!target.canWearRemove(garment, false)) {
-    // target cannot wear or remove thing him/herself, so presumably cannot stop this happened
-    
-    
-  }
-  else {
-    
-    
-  }
-    
-  return SUCCESS
-}
 
 
 

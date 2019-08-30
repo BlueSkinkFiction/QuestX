@@ -1,7 +1,71 @@
 "use strict";
 
+/*
 
 
+Postures
+
+(KNEEL|BEND OVER|CRAWL|SIT|LIE BACK|LIE FACE DOWN)
+(BEND OVER|STRADLE) <furniture>
+
+
+
+Interacting with bodyparts
+
+(GROPE|FINGER|LICK|KISS|SMACK|SUCK) <character>'s (LEFT|RIGHT)? <bodypart>
+(GROPE|FINGER|LICK|KISS|SMACK|SUCK) MY (LEFT|RIGHT)? <bodypart>
+JERK OFF
+JERK OFF <character>
+SUCK OFF <character>
+GO DOWN ON <character>
+CUNNILINGUS <character>
+KISS <character>
+
+The commands are all understood, but need work on the responses
+
+
+Fuck (all to do)
+
+FUCK <character>
+FACE FUCK <character>
+ASS FUCK <character>
+FUCK <character>'s <bodypart>
+
+PUSH <sextoy> IN  <character>
+PUSH <sextoy> IN  <character>'s <bodypart>
+FUCK <character> WITH <sextoy>
+ASS FUCK <character> WITH <sextoy>
+FUCK <character>'s <bodypart> WITH <sextoy>
+
+
+
+
+Clothing (the first two are in the vanilla Quest 6)
+
+TAKE OFF MY <garment> [b]
+TAKE MY <garment> OFF [b]
+REMOVE <character>'s <garment>
+TAKE OFF <character>'s <garment>
+TAKE <character>'s <garment> OFF
+REMOVE <garment> FROM <character>
+UNDRESS <character>
+STRIP
+
+
+
+Others (to do)
+```
+CHAIN <character>
+CHAIN <character> TO <device>
+SMACK <character>
+SMACK <character>'s <bodypart>
+
+```
+Note that several commands use 's. **This is not optional**, as Quest uses 's to separate the different terms. This means you may run into problems with items that have 's is their name. And it is not going to translate into other languages, sorry about that.
+
+
+
+*/
 
 //----  Interactions ----
 
@@ -10,7 +74,9 @@ erotica.ACTIONS = [
   {
     name:'grope',
     pattern:'grope|feel|caress|finger|massage',
-    mustBeBase:false,
+    mustBeBare:false,
+    intimateRating:3,
+    defaultBodyPart:"buttock",
     action:function(char, object, bodypart, side) {
       let targetName;
       if (bodypart.paired) {
@@ -37,16 +103,21 @@ erotica.ACTIONS = [
   {
     name:'suck',
     pattern:'suck off|suck|blow off|blow',
-    mustBeBase:true,
+    mustBeBare:true,
+    intimateRating:10,
+    bodypartCheck(bp) {
+      return ["cock", "ball", "tit"].includes(bp.name);
+    },
     action:function(char, object, bodypart, side) {
       msg("Doing suck");
-    }
+    },
   },
 
   {
     name:'lick',
     pattern:'lick|taste',
-    mustBeBase:true,
+    mustBeBare:true,
+    intimateRating:8,
     action:function(char, object, bodypart, side) {
       msg("Doing lick");
       msg(bodypart.getProtection(object));      
@@ -55,7 +126,9 @@ erotica.ACTIONS = [
 
   {
     name:'kiss',
-    mustBeBase:true,
+    mustBeBare:true,
+    intimateRating:7,
+    defaultBodyPart:"mouth",
     action:function(char, object, bodypart, side) {
       msg("Doing kiss");
     }
@@ -64,7 +137,9 @@ erotica.ACTIONS = [
   {
     name:'smack',
     pattern:'smack|slap',
-    mustBeBase:false,
+    mustBeBare:false,
+    intimateRating:1,
+    defaultBodyPart:"buttock",
     action:function(char, object, bodypart, side) {
       msg("Doing smack");
     }
@@ -93,18 +168,8 @@ commands.unshift(new Cmd('SexActionsMy', {
   ],
   useThisScriptForNpcs:true,
   script:function(objects) {
-    let char;
-    if (this.forNpc) {
-      char = objects[0][0];
-      if (!char.npc) {
-        msg(NOT_NPC(char));
-        return FAILED; 
-      }
-      objects.shift();
-    }
-    else {
-      char = game.player;
-    }
+    const char = extractChar(this, objects)
+    if (!char) return FAILED;
     return cmdInteract(objects[0], char, game.player, objects[2][0], objects[1]);
   },
 }));
@@ -115,109 +180,263 @@ commands.unshift(new Cmd("SexActions", {
   regex:new RegExp("^(" + erotica.ACTIONS_LIST.join('|') + ") (.+)'s (left |right |)(.+)$"),
   objects:[
     {text:true},
-    {scope:isPresent},
+    {scope:isNpcAndHere},
     {text:true},
     {scope:isBodyPart}
   ],
   useThisScriptForNpcs:true,
   script:function(objects) {
-    let char;
-    if (this.forNpc) {
-      char = objects[0][0];
-      if (!char.npc) {
-        msg(NOT_NPC(char));
-        return FAILED; 
-      }
-      objects.shift();
-    }
-    else {
-      char = game.player;
-    }
+    const char = extractChar(this, objects)
+    if (!char) return FAILED;
     return cmdInteract(objects[0], char, objects[1][0], objects[3][0], objects[2]);
   },
 }));
 
-function cmdInteract(action, char, object, bodypart, side) {
-  if (!bodypart.isBodyPart) {
-    metamsg("I was expecting a body part at the end of that. Quite the disappointment!");
-    return FAILED;
-  }
-  if (!bodypart.paired && side !== '') {
-    metamsg("I was not expecting that body part to have a left and right!");
-    return FAILED;
-  }
-  if (!char.canManipulate()) {
-    return FAILED;
-  }
-  if (!char.getAgreement(action, object)) {
-    // The getAgreement should give the response
-    return FAILED;
-  }
-  if (!object.hasBodyPart(bodypart)) {
-    msg(nounVerb(object, "don't", true) + " have " + bodypart.none() + ".");
-    return FAILED;
-  }
-  else {
-    const regex = new RegExp("\\b" + action + "\\b");
+function cmdInteract(actionName, char, object, bodypart, side, altName) {
+    const regex = new RegExp("\\b" + actionName + "\\b");
     let verb = false;
     for (let i = 0; i < erotica.ACTIONS.length; i++) {
       if (erotica.ACTIONS[i].pattern) {
         if (regex.test(erotica.ACTIONS[i].pattern)) verb = erotica.ACTIONS[i];
       }
       else {
-        if (action === erotica.ACTIONS[i].name) verb = erotica.ACTIONS[i];
+        if (actionName === erotica.ACTIONS[i].name) verb = erotica.ACTIONS[i];
       }
     }
     if (!verb) {
-      errormsg("Failed to find an action, despite it being recognised. Odd.");
+      errormsg("Failed to find an action, " + actionName + ", despite it being recognised. Odd.");
       return FAILED;
     }
+
+  if (!bodypart.isBodyPart) {
+    if (verb.defaultBodyPart) {
+      object = bodypart
+      bodypart = w[verb.defaultBodyPart]
+    }
+    else {
+      metamsg("I was expecting a body part at the end of that. Quite the disappointment!");
+      return FAILED;
+    }
+  }
+  if (!bodypart.paired && side !== '') {
+    metamsg("I was not expecting that body part to have a left and right!");
+    return FAILED;
+  }
+  if (verb.bodypartCheck && !verb.bodypartCheck(bodypart)) {
+    metamsg("That is not a body part you can do that with, is it?");
+    return FAILED;
+  }
+  if (!char.canManipulate()) {
+    return FAILED;
+  }
+  if (!char.getAgreement("Interact", object, verb, bodypart, altName ? altName : actionName)) {
+    // The getAgreement should give the response
+    return FAILED;
+  }
+  if (!object.hasBodyPart(bodypart)) {
+    failedmsg(nounVerb(object, "don't", true) + " have " + bodypart.none() + ".");
+    return FAILED;
+  }
+  else {
     const garment = bodypart.getProtection(object);
     if (verb.mustBeBare && garment) {
-      msg(nounVerb(char, "can't", true) + " do that when " + object.byname({article:DEFINITE}) + " is wearing " + garment.byname({article:DEFINITE}) + ".");
+      failedmsg(nounVerb(char, "can't", true) + " do that when " + object.byname({article:DEFINITE}) + " is wearing " + garment.byname({article:DEFINITE}) + ".");
       return FAILED;
     }
     
     // At this point, we have a success. The target may react badly, but the action is performed
-    if (!object["count_" + action + "_" + bodypart.name]) object["count_" + action + "_" + bodypart.name] = 0;
-    object["count_" + action + "_" + bodypart.name]++;
+    if (!object["count_" + verb.name + "_" + bodypart.name]) object["count_" + verb.name + "_" + bodypart.name] = 0;
+    object["count_" + verb.name + "_" + bodypart.name]++;
     
     // something specific to the target?
-    if (object["response_" + action + "_" + bodypart.name]) {
-      object["response_" + action + "_" + bodypart.name](char, side);
+    if (object["response_" + verb.name + "_" + bodypart.name]) {
+      object["response_" + verb.name + "_" + bodypart.name](char, side, altName ? altName : actionName);
       return SUCCESS;
     }
 
     // something specific to the bodypart?
-    if (bodypart["response_" + action]) {
-      bodypart["response_" + action](char, object, side);
+    if (bodypart["response_" + verb.name]) {
+      bodypart["response_" + verb.name](char, object, side, altName ? altName : actionName);
       return SUCCESS;
     }
 
-    return verb.action(char, object, bodypart, side);
+    return verb.action(char, object, bodypart, side, altName ? altName : actionName);
 
   }
 }
 
 
-
-
-
-
-
-
-
-commands.unshift(new Cmd('testnpc', {
-  regex:/^npc (.+)$/,
+erotica.wankScript = function(objects) {
+  const char = extractChar(this, objects)
+  if (!char) return FAILED;
+  const verb = objects[0];
+  let target
+  if (this.name.indexOf("Self") === -1) {
+    target = objects[1][0];
+  }
+  else {
+    target = char
+  }
+  //console.log(verb);
+  if (target.hasBodyPart("cock") && !verb.startsWith("jill")) {
+    return cmdInteract("grope", char, target, w.cock, '', verb)
+  }
+  if (target.hasBodyPart("pussy") && !verb.startsWith("jerk") && !verb.startsWith("jack")) {
+    return cmdInteract("grope", char, target, w.pussy, '', verb)
+  }
+  if (verb.startsWith("jill")) {
+    metamsg("You can only jill off character's with pussies.")
+    return FAILED
+  }
+  if (verb.startsWith("jerk")) {
+    metamsg("You can only jerk off character's with dicks.")
+    return FAILED
+  }
+  if (verb.startsWith("jack")) {
+    metamsg("You can only jack off character's with dicks.")
+    return FAILED
+  }
+  metamsg("You can only masturbate character's with genitals.")
+  return FAILED
+}
+commands.unshift(new Cmd('MasturbateOff', {
+  npcCmd:true,
+  useThisScriptForNpcs:true,
+  regex:/^(masturbate|wank|jerk off|jerk|jack off|jack|jill off|jill) (.+)$/,
   objects:[
-    {scope:isInWorld}
+    {text:true},
+    {scope:isNpcAndHere},
   ],
-  script:function(objects) {
-    console.log(w.cock.getProtection(objects[0][0]));
-    console.log(w.buttocks.getProtection(objects[0][0]));
-    console.log(w.thighs.getProtection(objects[0][0]));
-    return SUCCESS;
-  },
+  script:erotica.wankScript,
+}));
+commands.unshift(new Cmd('Masturbate', {
+  npcCmd:true,
+  useThisScriptForNpcs:true,
+  regex:/^(wank|jerk|jack|jill) (.+) off$/,
+  objects:[
+    {text:true},
+    {scope:isNpcAndHere},
+  ],
+  script:erotica.wankScript,
+}));
+commands.unshift(new Cmd('MasturbateSelf', {
+  npcCmd:true,
+  useThisScriptForNpcs:true,
+  regex:/^(masturbate|wank|jerk off|jerk|jack off|jack|jill off|jill)$/,
+  objects:[
+    {text:true},
+    {scope:isNpcAndHere},
+  ],
+  script:erotica.wankScript,
+}));
+
+
+
+
+
+erotica.blowJobScript = function(objects) {
+  const char = extractChar(this, objects)
+  if (!char) return FAILED;
+  const target = objects[1][0];
+  if (target.hasBodyPart("cock")) {
+    return cmdInteract("suck", char, target, w.cock, '')
+  }
+  else {
+    metamsg("You can only suck off character's with dicks.")
+    return FAILED
+  }
+}
+commands.unshift(new Cmd('Fellatio', {
+  npcCmd:true,
+  useThisScriptForNpcs:true,
+  regex:/^(suck off|suck|fellato|perform fellatio on|perform fellatio|fellatio|give blow job to|blow job|blow) (.+)$/,
+  objects:[
+    {text:true},
+    {scope:isNpcAndHere},
+  ],
+  script:erotica.blowJobScript,
+}));
+commands.unshift(new Cmd('FellatioOff', {
+  npcCmd:true,
+  useThisScriptForNpcs:true,
+  regex:/^(suck) (.+) off$/,
+  objects:[
+    {text:true},
+    {scope:isNpcAndHere},
+  ],
+  script:erotica.blowJobScript,
+}));
+
+
+
+erotica.goDownScript = function(objects) {
+  const char = extractChar(this, objects)
+  if (!char) return FAILED;
+  const target = objects[1][0];
+  if (target.hasBodyPart("cock")) {
+    return cmdInteract("suck", char, target, w.cock, '')
+  }
+  if (target.hasBodyPart("pussy")) {
+    return cmdInteract("lick", char, target, w.pussy, '')
+  }
+  metamsg("You can only go down on character's with genitals.")
+  return FAILED
+}
+commands.unshift(new Cmd('GoDownOn', {
+  npcCmd:true,
+  useThisScriptForNpcs:true,
+  regex:/^(go down on|go down) (.+)$/,
+  objects:[
+    {text:true},
+    {scope:isNpcAndHere},
+  ],
+  script:erotica.goDownScript,
+}));
+
+
+
+erotica.cunnilingusScript = function(objects) {
+  const char = extractChar(this, objects)
+  if (!char) return FAILED;
+  const target = objects[1][0];
+  if (target.hasBodyPart("pussy")) {
+    return cmdInteract("lick", char, target, w.pussy, '')
+  }
+  metamsg("You can only do cunnilingus on character's with a pussy.")
+  return FAILED
+}
+commands.unshift(new Cmd('Cunnilingus', {
+  npcCmd:true,
+  useThisScriptForNpcs:true,
+  regex:/^(perform cunnilingus|cunnilingus) (.+)$/,
+  objects:[
+    {text:true},
+    {scope:isNpcAndHere},
+  ],
+  script:erotica.cunnilingusScript,
+}));
+
+
+
+erotica.teabagScript = function(objects) {
+  const char = extractChar(this, objects)
+  if (!char) return FAILED;
+  const target = objects[1][0];
+  if (target.hasBodyPart("bollock")) {
+    return cmdInteract("suck", char, target, w.bollock, '')
+  }
+  metamsg("You can only teabag character's with balls.")
+  return FAILED
+}
+commands.unshift(new Cmd('Teabag', {
+  npcCmd:true,
+  useThisScriptForNpcs:true,
+  regex:/^(teabag) (.+)$/,
+  objects:[
+    {text:true},
+    {scope:isNpcAndHere},
+  ],
+  script:erotica.teabagScript,
 }));
 
 
@@ -228,25 +447,26 @@ commands.unshift(new Cmd('testnpc', {
 
 
 
-commands.unshift(new Cmd('BendOverF', {
+
+
+
+commands.unshift(new Cmd('BendOverFurniture', {
   npcCmd:true,
-  rules:[cmdRules.charCanPostureRule],
   regex:/^(bend over) (.+)$/,
   attName:"bendover",
   objects:[
     {ignore:true},
-    {scope:isHere},
+    {scope:isHere, attName:"assumePosture"},
   ],
   defmsg:CANNOT_BEND_OVER,
 }));
 commands.unshift(new Cmd('Straddle', {
   npcCmd:true,
-  rules:[cmdRules.charCanPostureRule],
   regex:/^(straddle) (.+)$/,
   attName:"straddle",
   objects:[
     {ignore:true},
-    {scope:isHere},
+    {scope:isHere, attName:"assumePosture"},
   ],
   defmsg:CANNOT_STADDLE,
 }));
@@ -282,6 +502,7 @@ erotica.POSITIONS_LIST = [
 for (let i = 0; i < erotica.POSITIONS_LIST.length; i++) {
   commands.unshift(new Cmd('Position_' + erotica.POSITIONS_LIST[i].cmd, {
     npcCmd:true,
+    //cmdCategory:sentenceCase(erotica.POSITIONS_LIST[i].cmd),
     regex:new RegExp("^" + (erotica.POSITIONS_LIST[i].pattern ? erotica.POSITIONS_LIST[i].pattern : erotica.POSITIONS_LIST[i].cmd) + "$"),
     objects:[
     ],
@@ -295,7 +516,7 @@ for (let i = 0; i < erotica.POSITIONS_LIST.length; i++) {
       if (this.forNpc) {
         char = objects[0][0];
         if (!char.npc) {
-          msg(NOT_NPC(char));
+          failedmsg(NOT_NPC(char));
           return FAILED; 
         }
         objects.shift();
@@ -310,7 +531,7 @@ for (let i = 0; i < erotica.POSITIONS_LIST.length; i++) {
       if (!char.canPosture()) {
         return FAILED;
       }
-      if (!char.getAgreement(posture.cmd)) {
+      if (!char.getAgreement("Posture", posture.cmd)) {
         // The getAgreement should give the response
         return FAILED;
       }
@@ -331,98 +552,211 @@ for (let i = 0; i < erotica.POSITIONS_LIST.length; i++) {
 
 //---- Undressing ----
 
+
+
+commands.unshift(new Cmd('Undress', {
+  regex:/^(undress|strip)$/,
+  objects:[
+    {ignore:true},
+  ],
+  script:function(objects) {
+    return cmdUndress(game.player);
+  },
+}))
+
+
+commands.unshift(new Cmd('NpcUndress1', {
+  regex:/^(.+), ?(undress|strip)$/,
+  cmdCategory:"Remove",
+  objects:[
+    {scope:isNpcAndHere},
+    {ignore:true},
+  ],
+  script:function(objects) {
+    const npc = objects[0][0];
+    if (!npc.npc) {
+      failedmsg(NOT_NPC(npc));
+      return FAILED; 
+    }
+    return cmdUndress(npc);
+  },
+}))
+
+commands.unshift(new Cmd('NpcUndress2', {
+  regex:/^tell (.+) to ?(undress|strip)$/,
+  cmdCategory:"Remove",
+  objects:[
+    {scope:isNpcAndHere},
+    {ignore:true},
+  ],
+  script:function(objects) {
+    const npc = objects[0][0];
+    if (!npc.npc) {
+      failedmsg(NOT_NPC(npc));
+      return FAILED; 
+    }
+    return cmdUndress(npc);
+  },
+}))
+
+
+function cmdUndress(char) {
+  if (char.isNaked()) {
+    failedmsg(nounVerb(char, "be", true) + " already naked.");
+    return FAILED;
+  }
+  const garment = char.firstToRemove();
+  if (!char.canManipulate(garment, "Remove")) {
+    // The getAgreement should give the response
+    return FAILED;
+  }
+  if (!char.getAgreement("Remove", garment)) {
+    // The getAgreement should give the response
+    return FAILED;
+  }
+  const res = garment.remove(false, char);
+  return res ? SUCCESS : FAILED;
+}
+
+
+commands.unshift(new Cmd('UndressOther', {
+  npcCmd:true,
+  regex:/^(undress|strip) (.+)$/,
+  objects:[
+    {ignore:true},
+    {scope:isNpcAndHere},
+  ],
+  script:function(objects) {
+    const char = extractChar(this, objects)
+    if (!char) return FAILED;
+    const target = objects[0][0];
+    if (!target.isHere()) {
+      // char not here (this is checked in cmdRemoveGarment, but should be before naked check
+      failedmsg(nounVerb(target, "be", true) + " not here.");
+      return FAILED;
+    }
+    if (target.isNaked()) {
+      failedmsg(nounVerb(target, "be", true) + " already naked.");
+      return FAILED;
+    }
+    return cmdRemoveGarment(char, target, target.firstToRemove());
+  },
+}));
+
+
 commands.unshift(new Cmd("TakeOffFrom", {
   npcCmd:true,
+  cmdCategory:'TakeOffFrom',
   regex:/^(remove|take off) (.+)'s (.+)$/,
   objects:[
     {ignore:true},
-    {scope:isNpcHere},
+    {scope:isNpcAndHere},
     {scope:isWornByChar},
   ],
   useThisScriptForNpcs:true,
   script:function(objects) {
-    let char;
-    if (this.forNpc) {
-      char = objects[0][0];
-      if (!char.npc) {
-        msg(NOT_NPC(char));
-        return FAILED; 
-      }
-      objects.shift();
-    }
-    else {
-      char = game.player;
-    }
+    const char = extractChar(this, objects)
+    if (!char) return FAILED;
     return cmdRemoveGarment(char, objects[0][0], objects[1][0]);
   },
 }));
 commands.unshift(new Cmd("TakeOffFrom2", {
   npcCmd:true,
+  cmdCategory:'TakeOffFrom',
   regex:/^take (.+)'s (.+) off(| him| her)$/,
   objects:[
-    {scope:isNpcHere},
+    {scope:isNpcAndHere},
     {scope:isWornByChar},
     {ignore:true},
   ],
   useThisScriptForNpcs:true,
   script:function(objects) {
-    let char;
-    if (this.forNpc) {
-      char = objects[0][0];
-      if (!char.npc) {
-        msg(NOT_NPC(char));
-        return FAILED; 
-      }
-      objects.shift();
-    }
-    else {
-      char = game.player;
-    }
+    const char = extractChar(this, objects)
+    if (!char) return FAILED;
     return cmdRemoveGarment(char, objects[0][0], objects[1][0]);
   },
 }));
+commands.unshift(new Cmd("TakeOffFrom3", {
+  npcCmd:true,
+  cmdCategory:'TakeOffFrom',
+  regex:/^(take|remove) (.+) (from|off) (.+)$/,
+  objects:[
+    {ignore:true},
+    {scope:isWornByChar},
+    {ignore:true},
+    {scope:isNpcAndHere},
+  ],
+  useThisScriptForNpcs:true,
+  script:function(objects) {
+    const char = extractChar(this, objects)
+    if (!char) return FAILED;
+    return cmdRemoveGarment(char, objects[1][0], objects[0][0]);
+  },
+}));
+
+
 
 
 
 
 
 function cmdRemoveGarment(char, target, garment) {
-  console.log(char.name + " to remove " + garment.name + " from " + target.name);
   if (!char.isHere()) {
-    msg(nounVerb(char, "be", true) + " not here.");
+    // char not here
+    failedmsg(nounVerb(char, "be", true) + " not here.");
     return FAILED;
   }
+  
   if (!target.isHere()) {
-    msg(nounVerb(target, "be", true) + " not here.");
+    // target not here
+    failedmsg(nounVerb(target, "be", true) + " not here.");
     return FAILED;
   }
+  
   if (!garment.worn || !garment.isAtLoc(target)) {
-    msg(nounVerb(target, "be", true) + " not wearing " + garment.byname({article:INDEFINITE}) + ".");
+    // garment not worn by target
+    failedmsg(nounVerb(target, "be", true) + " not wearing " + garment.byname({article:INDEFINITE}) + ".");
     return FAILED;
   }
-  if (!char.getAgreement(posture.cmd)) {
-    // The getAgreement should give the response
-    return FAILED;
+
+  const blocker = garment.getWearRemoveBlocker(target, false);
+  if (blocker) {
+    failedmsg(nounVerb(char, "can", true) + " not remove " + garment.byname({article:DEFINITE}) + " whilst " + target.byname({article:DEFINITE}) + " is wearing " + blocker.byname({article:INDEFINITE}) + ".");
+    return FAILED; 
   }
+
   if (char === target) {
+    if (!char.getAgreement("Remove", garment)) {
+      // The getAgreement should give the response
+      return FAILED;
+    }
     const res = garment.wear(false, char);
     return res ? SUCCESS : FAILED;
   }
-  const blocker = garment.getWearRemoveBlocker(target, false);
-  if (blocker) {
-    msg(nounVerb(char, "can", true) + " not remove " + garment.byname({article:DEFINITE}) + " whilst " + target.byname({article:DEFINITE}) + " is wearing " + blocker.byname({article:INDEFINITE}) + ".");
-    return FAILED; 
+  
+  const targetWilling = target.getWillingToRemove(garment);
+  const targetNoChoice = !target.canManipulate(garment, "remove");
+  if (!char.getAgreement("RemoveOther", garment, target, targetWilling, targetNoChoice)) {
+    // The getAgreement should give the response
+    // Count as success as an action has been taken
+    return SUCCESS;
   }
+
   // By now we have a character, char, willing to try to remove an item, garment, from a different character, target
   
-  if (!target.canWearRemove(garment, false)) {
-    // target cannot wear or remove thing him/herself, so presumably cannot stop this happened
-    
-    
+  if (targetNoChoice) {
+    target.respondToUndressNoChoice(char, garment);
+    garment.loc = char.loc;
+    //garment.damage("rip");
+    garment.worn = false;
+  }
+  else if (targetWilling) {
+    target.respondToUndressWilling(char, garment);
+    garment.loc = char.name;
+    garment.worn = false;
   }
   else {
-    
-    
+    target.respondToUndressRefusal(char, garment);
   }
     
   return SUCCESS
@@ -431,3 +765,123 @@ function cmdRemoveGarment(char, target, garment) {
 
 
 
+
+
+
+
+
+function cmdRestrain (char, target, item) {
+  if (!item) {
+    const objs = scope(isBondageDeviceHere)
+    if (objs.length === 0) {
+      failedmsg("Nothing to restrain someone with here.");
+      return FAILED;
+    }
+    if (objs.length > 1) {
+      failedmsg("You will have to specify how you want to restrain someone when more than one device is present.");
+      return FAILED;
+    }
+    item = objs[0]
+  }
+  if (target.restraint || item.victim) {
+    failedmsg(nounVerb(target, "be", true) + " already " + w[target.restraint].situation + ".");
+    return FAILED;
+  }
+  item.restrain(char, target)
+  return SUCCESS;
+}
+
+function cmdRelease (char, target) {
+}
+
+commands.unshift(new Cmd("RestrainWith", {
+  npcCmd:true,
+  cmdCategory:'Restrain',
+  rules:[cmdRules.isHere, cmdRules.canManipulate],
+  regex:/^(manacle|chain|tie) (.+) to (.+)$/,
+  objects:[
+    {ignore:true},
+    {scope:isNpcAndHere},
+    {scope:isHere, attName:"bondage"},
+  ],
+  useThisScriptForNpcs:true,
+  script:function(objects) {
+    const char = extractChar(this, objects)
+    if (!char) return FAILED;
+    return cmdRestrain(char, objects[0][0], objects[1][0]);
+  },
+}));
+commands.unshift(new Cmd("Restrain", {
+  npcCmd:true,
+  cmdCategory:'Restrain',
+  rules:[cmdRules.isHere, cmdRules.canManipulate],
+  regex:/^(restrain|manacle|chain|tie up|tie) (.+)$/,
+  objects:[
+    {ignore:true},
+    {scope:isNpcAndHere},
+  ],
+  useThisScriptForNpcs:true,
+  script:function(objects) {
+    const char = extractChar(this, objects)
+    if (!char) return FAILED;
+    return cmdRestrain(char, objects[0][0]);
+  },
+}));
+commands.unshift(new Cmd("Restrain2", {
+  npcCmd:true,
+  cmdCategory:'Restrain',
+  rules:[cmdRules.isHere, cmdRules.canManipulate],
+  regex:/^(chain|tie) (.+) up$/,
+  objects:[
+    {ignore:true},
+    {scope:isNpcAndHere},
+  ],
+  useThisScriptForNpcs:true,
+  script:function(objects) {
+    const char = extractChar(this, objects)
+    if (!char) return FAILED;
+    return cmdRestrain(char, objects[0][0]);
+  },
+}));
+
+commands.unshift(new Cmd("Release", {
+  npcCmd:true,
+  cmdCategory:'Release',
+  rules:[cmdRules.isHere, cmdRules.canManipulate],
+  regex:/^(free|release) (.+)$/,
+  objects:[
+    {ignore:true},
+    {scope:isNpcAndHere},
+  ],
+  useThisScriptForNpcs:true,
+  script:function(objects) {
+    const char = extractChar(this, objects)
+    if (!char) return FAILED;
+    const target = objects[0][0]
+    if (!target.restraint) {
+      failedmsg(nounVerb(target, "do", true) + " not need to be released.");
+      return FAILED;
+    }
+    w[target.restraint].release(char, target)
+    return SUCCESS;
+  },
+}));
+
+function isBondageDeviceHere (item) {
+  return item.isAtLoc(game.player.loc) && item.bondage;
+}
+
+
+
+commands.unshift(new Cmd('testnpc', {
+  regex:/^npc (.+)$/,
+  objects:[
+    {scope:isInWorld}
+  ],
+  script:function(objects) {
+    console.log(w.cock.getProtection(objects[0][0]));
+    console.log(w.buttocks.getProtection(objects[0][0]));
+    console.log(w.thighs.getProtection(objects[0][0]));
+    return SUCCESS;
+  },
+}));

@@ -1,17 +1,25 @@
 
+// This file is optional
 
-  /*
-  Creates a clone of the given prototype. The word "black" in the prototype is replaced
-  by colour, which, if a string list, is picked at random
-  */
-createGarment = function(proto, loc, colour) {
-  o = cloneObject(proto, loc);
-  if (colour) {
-    if (typeof colour !== "string") colour = randomFromArray(colour);
-    o.alias = o.alias.replace("black", colour.toLowerCase());
-    if (o.image) o.image = o.image.replace("black", colour.toLowerCase());
-    o.listalias = o.alias.replace("Black", colour);
-    o.examine = o.examine.replace("black", colour.toLowerCase());
+
+erotica.createGarment = function(proto, loc, color, ...otherOptions) {
+  if (typeof proto === "string") proto = w[proto]
+  o = cloneObject(proto, loc)
+  if (!color) color = proto.colors
+  if (Array.isArray(color)) color = randomFromArray(color)
+  if (o.variFunc) {
+    o.variFunc(color, otherOptions)
+  }
+  else if (color) {
+    o.alias = o.alias.replace("black", color.toLowerCase());
+    if (o.image) o.image = o.image.replace("black", color.toLowerCase());
+    o.listalias = o.alias.replace("Black", sentenceCase(color));
+    if (o.examine) {
+      o.examine = o.examine.replace("black", color.toLowerCase());
+    }
+    else {
+      console.log("No examine for " + proto.name)
+    }
   }
   if (w[loc].npc) o.worn = true;
   return o;
@@ -19,162 +27,159 @@ createGarment = function(proto, loc, colour) {
 
 
 
-
-
-//---- THONGS ----
-
-
-createItem("thong_sequined", MADE_OF(materials.cloth), THONG(),
-  {
-    alias:"sequined thong",
-    examine:"The thong is rather small and covered in sequins - as if there is any more need to draw the eye -  with lacing along the three sides of the triangle.",
-    image:"thong_black",
-    showwear:true,
+erotica.createBikini = function(loc) {
+  color = randomFromArray(erotica.colorListSwimwearF)
+  if (randomChance(1)) {
+    erotica.createGarment(w.halter_us, loc)
+    erotica.createGarment(w.briefs_us, loc)
   }
-);
-
-createItem("thong_black", MADE_OF(materials.cloth), THONG(),
-  {
-    alias:"black thong",
-    examine:"The thong is black, and rather small, with lacing along the three sides of the triangle.",
-    colours:"black;white",
-    image:"thong_black",
-    swimwear:true,
+  else if (randomChance(3)) {
+    erotica.createGarment(w.halter_minimal_black, loc, color)
+    erotica.createGarment(w.thong_black_sw, loc, color)
   }
-);
-
-createItem("thong_fuckme_black", MADE_OF(materials.cloth), THONG(),
-  {
-    alias:"black \"Fuck me\" thong",
-    examine:"The thong is black, and rather small, with \"Fuck me\" across the triangle.",
-    colours:"black;white",
-    image:"thong_black",
+  else if (randomChance(30)) {
+    erotica.createGarment(w.bandeau_black, loc, color)
+    erotica.createGarment(w.briefs_black, loc, color)
   }
-);
-
-createItem("thong_loveheart", MADE_OF(materials.cloth), THONG(),
-  {
-    alias:"loveheart thong",
-    examine:"Someone's idea of romance is apparently to stick a loveheart on a tiny item of underwear.",
-    image:"thong_black",
+  else {
+    erotica.createGarment(w.halter_black, loc, color)
+    erotica.createGarment(w.briefs_black, loc, color)
   }
-);
+}
 
-createItem("leather_thong", MADE_OF(materials.leather), THONG(),
-  {
-    alias:"leather thong",
-    examine:"The thong is made of soft black black, and where one might have expected a triangle of leather to preserve her modesty at least a little there is merely two straps, with studs at each end.",
-    image:"thong_leather",
-    getRevealing:function() { return 3; },
+
+erotica.createSwimwear = function(loc, addExtras) {
+  if (w[loc].isFemale) {
+    erotica.createSwimwearF(loc, addExtras)
   }
-);
-
-
-//---- HALTERS ----
-
-
-createItem("halter_leopard", MADE_OF(materials.cloth), BRA(),
-  {
-    alias:"leopard-skin halter",
-    examine:"A halter made of fake leopard-skin.",
-    image:"halter_black",
+  else {
+    erotica.createSwimwearM(loc, addExtras)
   }
-);
+}    
 
-createItem("leather_halter", MADE_OF(materials.leather), BRA(),
-  {
-    alias:"leather halter",
-    examine:"The halter is made of soft black leather; three thin bands crossed each breast, offering minimal coverage.",
-    wearMsg:function(char) {
-      return nounVerb(char, "pull", true) + " on the halter, fastening it at the back, then adjusting the bands to cover " + char.pronouns.poss_adj + " nipples.";
-    },
-    image:"halter_leather",
+
+erotica.createSwimwearF = function(loc, addExtras) {
+  if (randomChance(65)) {
+    erotica.createBikini(loc);
+    if (addExtras && randomChance(20)) {
+      erotica.createGarment(w.daisy_dukes, loc)
+    }
+    if (addExtras && randomChance(30)) {
+      erotica.createGarment(w.teeshirt_black, loc)
+    }
   }
-);
-
-
-
-//---- CASUAL WEAR ----
-
-
-createItem("teeshirt_black", MADE_OF(materials.cloth), TEE_SHIRT(),
-  {
-    alias:"black tee-shirt",
-    examine:"A plain black tee-shirt.",
-    colours:"black;white",
-    image:"teeshirt_white",
+  else if (randomChance(1)) {
+    erotica.createGarment(w.sling_black, loc)
   }
-);
-
-
-createItem("teeshirt_slut_black", MADE_OF(materials.cloth), TEE_SHIRT(true),
-  {
-    alias:"black \"Slut\" tee-shirt",
-    examine:"A black tee-shirt with the word \"Slut\" emblazoned across the chest.",
-    colours:"black;white",
-    image:"teeshirt_white",
+  else if (randomChance(3)) {
+    erotica.createGarment(w.swimsuit_yellow_panel, loc)
   }
-);
-
-
-createItem("teeshirt_ripped", MADE_OF(materials.cloth), TEE_SHIRT(),
-  {
-    alias:"ripped tee-shirt",
-    examine:"A white tee-shirt, with pretty much all the lower half ripped away.",
-    colours:"black;white",
-    image:"teeshirt_white",
-    slots:["chest", "cleavage", "nipple", "upperback", "shoulder"],
+  else if (randomChance(25)) {
+    erotica.createGarment(w.swimsuit_black, loc)
+    if (addExtras && randomChance(35)) {
+      erotica.createGarment(w.teeshirt_black, loc)
+    }
+    else if (addExtras && randomChance(20)) {
+      erotica.createGarment(w.skirt_black, loc)
+    }
   }
-);
-
-createItem("skirt_floral", MADE_OF(materials.cloth), SKIRT(["groin", "thigh", "hip"]),
-  {
-    alias:"floral skirt",
-    examine:"A loose, wrap around skirt, knee-length, with red and yellow flowers on it.",
-    wrapSkirt:true,
+  else {
+    erotica.createGarment(w.swimsuit_black_scooped, loc)
+    if (addExtras && randomChance(25)) {
+      erotica.createGarment(w.teeshirt_black, loc)
+    }
   }
-);
+}
 
-createItem("denim_skirt", MADE_OF(materials.cloth), SKIRT(["groin", "thigh", "hip"]),
-  {
-    alias:"denim skirt",
-    examine:"A short, tight skirt, frayed along the bottom.",
-    image:"skirt_floral",
+
+
+erotica.createSwimwearM = function(loc, addExtras) {
+  if (randomChance(1)) {
+    erotica.createGarment(w.posing_pouch, loc)
   }
-);
-
-createItem("daisy_dukes", MADE_OF(materials.cloth), SHORTS(),
-  {
-    alias:"Daisy Dukes",
-    examine:"Jean shorts, cut very short.",
-    image:"daisydukes",
+  else if (randomChance(20)) {
+    erotica.createGarment(w.shorts_black, loc)
   }
-);
-
-createItem("leather_mini_skirt", MADE_OF(materials.leather), SKIRT(2, ["groin", "thigh", "hip"]),
-  {
-    alias:"leather mini-skirt",
-    examine:"A tight black leather skirt, hardly covering the legs at all",
+  else {
+    erotica.createGarment(w.briefs_black_m, loc)
   }
-);
-
-createItem("mini_skirt", MADE_OF(materials.cloth), SKIRT(["groin", "thigh", "hip"]),
-  {
-    alias:"mini-skirt",
-    examine:"A tight black skirt, falling to mid-thigh",
-    image:"skirt_floral",
+  if (addExtras && randomChance(15)) {
+    erotica.createGarment(w.teeshirt_black, loc)
   }
-);
+}
 
-createItem("croptop_pink", MADE_OF(materials.cloth), VEST_TOP(true),
-  {
-    alias:"pink vest-top",
-    examine:"A rather short, pink vest-top.",
-    image:"vest_pink",
+
+
+
+// https://digitalsynopsis.com/design/color-thesaurus-correct-names-of-shades/
+erotica.colorList = [
+  "white", "ivory-colored", "cream",
+  "tan", "fawn", "beige",
+  "yellow", "lemon", "mustard", "gold-colored",
+  "orange", "amber", 
+  "red", "ruby red", "cherry red",
+  "pink", "fuscia", "coral", "magenta", "salmon pink",
+  "purple", "mauve", "violet",
+  "blue", "navy blue", "sky blue", "cerulean",
+  "green", "chartreuse", "sage", "olive", "mint green",
+  "brown", "tawny", "cinnamon",
+  "grey", "charcoal grey", "flint grey", "dark grey",
+  "black", "black", "black", "black",
+]
+
+erotica.colorListSwimwearF = [
+  "white",
+  "yellow", "gold-colored",
+  "orange", "amber", 
+  "red", "ruby red",
+  "pink", "fuscia", "coral", "magenta", "salmon pink",
+  "purple", "mauve", "violet",
+  "blue", "navy blue", "sky blue", "cerulean",
+  "green",
+  "grey",
+  "black", "black", "black", "black",
+]
+
+erotica.colorListUnderwear = [
+  "white",
+  "red", "ruby red",
+  "pink", "fuscia", "coral", "magenta", "salmon pink",
+  "black", "black", "black", "black",
+]
+
+erotica.colorListSwimwearM = [
+  "white",
+  "yellow", "gold-colored",
+  "orange", "amber", 
+  "red", "ruby red",
+  "purple", "mauve", "violet",
+  "blue", "navy blue", "sky blue", "cerulean",
+  "blue", "navy blue", "sky blue", "cerulean",
+  "green",
+  "grey",
+  "black", "black", "black", "black",
+  "black", "black", "black", "black",
+]
+
+
+
+erotica.canWearRemoveWithSize = function(char, toWear) {
+  if (toWear && char.size && char.size > this.size) {
+    failedmsg("No way is " + char.byname({article:DEFINITE}) + " getting into something that small!");
+    return false;
   }
-);
-
-
+  const garment = this.getWearRemoveBlocker(char, toWear);
+  if (garment) {
+    if (toWear) {
+      failedmsg(CANNOT_WEAR_OVER(char, this, garment));
+    }
+    else {
+      failedmsg(CANNOT_REMOVE_UNDER(char, this, garment));
+    }
+    return false;
+  }
+  return true;
+};
 
 
 
@@ -212,98 +217,172 @@ createItem("heels", MADE_OF(materials.leather), SHOES(),
 
 
 
-//---- SWIMWEAR ----
 
-createItem("shorts_black", MADE_OF(materials.cloth), SWIM_SHORTS(true),
+//---- UNDERWEAR ----
+
+
+
+createItem("thong_black", MADE_OF(materials.cloth), THONG(),
   {
-    alias:"black swimshorts",
-    examine:"A pair of baggy black, knee-length shorts.",
-    colours:"black;blue;red",
-    image:"shorts_black",
+    alias:"black thong",
+    examine:"The thong is black, and rather small, with lacing along the three sides of the triangle.",
+    colors:erotica.colorListUnderwear,
+    image:"thong_black",
+    underwear:true,
+  }
+);
+
+createItem("thong_fuckme_black", MADE_OF(materials.cloth), THONG(),
+  {
+    alias:"black \"Fuck me\" thong",
+    examine:"The thong is black, and rather small, with \"Fuck me\" across the triangle.",
+    colors:"black;white",
+    image:"thong_black",
+    underwear:true,
+  }
+);
+
+createItem("thong_loveheart", MADE_OF(materials.cloth), THONG(),
+  {
+    alias:"loveheart thong",
+    examine:"Someone's idea of romance is apparently to stick a loveheart on a tiny item of underwear.",
+    image:"thong_black",
+    underwear:true,
   }
 );
 
 
-createItem("swimsuit_black", MADE_OF(materials.cloth), SWIMSUIT(0),
-  {
-    alias:"black swimsuit",
-    examine:"The swimsuit is black; it had a scooped back and high legs.",
-    colours:"black;blue;red",
-  }
-);
 
-createItem("swimsuit_purple_panel", MADE_OF(materials.cloth), SWIMSUIT(1),
+createItem("bra", MADE_OF(materials.cloth), BRA(),
   {
-    alias:"purplepanelled swimsuit",
-    examine:"The swimsuit is black with a purple panel down the front; it leaves half the back bare and has high legs.",
-  }
-);
-
-createItem("halter_black", MADE_OF(materials.cloth), HALTER(),
-  {
-    alias:"halter_black",
-    colours:"black;blue;red;yellow;white",
+    alias:"black bra",
+    examine:"A lacy black bra.",
     image:"halter_black",
+    colors:erotica.colorListUnderwear,
+    underwear:true,
   }
 );
 
-createItem("bandeau_black", MADE_OF(materials.cloth), HALTER(),
+
+
+
+
+//---- CASUAL WEAR ----
+
+
+createItem("teeshirt_black", MADE_OF(materials.cloth), TEE_SHIRT(),
   {
-    alias:"black bandeau bikini halter",
-    colours:"black;blue;red;white;yellow",
-    image:"bandeau_black",
+    alias:"black tee-shirt",
+    examine:"A plain black tee-shirt.",
+    colors:erotica.colorList,
+    image:"teeshirt_white",
   }
 );
 
-createItem("briefs_black", MADE_OF(materials.cloth), BRIEFS(),
+createItem("teeshirt_black_with_logo", MADE_OF(materials.cloth), TEE_SHIRT(),
   {
-    alias:"black bikini briefs",
-    colours:"black;blue;red;white;yellow",
-    image:"briefs_black",
-    pullsoff:true,
+    alias:"black tee-shirt with logo",
+    examine:"A black tee-shirt with logo across the chest.",
+    colors:erotica.colorListSwimwearF,
+    logos:["a rock band logo", "a stylized sunbust"],
+    image:"teeshirt_white",
+    variFunc:function() {
+      const color = randomFromArray(this.colors)
+      const logo = randomFromArray(this.logos)
+      this.alias = this.alias.replace("black", color.toLowerCase());
+      if (this.image) this.image = this.image.replace("black", color);
+      this.listalias = this.alias.replace("Black", sentenceCase(color));
+      this.examine = this.examine.replace("black", color);
+      this.examine = this.examine.replace("logo", logo);
+    },
   }
 );
 
-createItem("sling_black", MADE_OF(materials.cloth), WEARABLE(1, ["crotch", "groin", "nipple"]),
+createItem("teeshirt_slut_black", MADE_OF(materials.cloth), TEE_SHIRT(true),
   {
-    alias:"black sling bikini",
-    examine:"A rather revealing one-piece, this is little more than a 'V', from from crotch, over the shoulders.",
-    colours:"black;red",
-    swimwear:true,
+    alias:"black \"Slut\" tee-shirt",
+    examine:"A black tee-shirt with the word \"Slut\" emblazoned across the chest.",
+    colors:erotica.colorList,
+    image:"teeshirt_white",
   }
 );
 
-createItem("swimsuit_yellow_panel", MADE_OF(materials.cloth), SWIMSUIT(0),
+
+createItem("teeshirt_ripped", MADE_OF(materials.cloth), TEE_SHIRT(),
   {
-    alias:"yellow-panelled swimsuit",
-    examine:"The swimsuit is black with a yellow panel down the front; it had a scooped back and high legs.",
+    alias:"ripped tee-shirt",
+    examine:"A white tee-shirt, with pretty much all the lower half ripped away.",
+    colors:erotica.colorList,
+    image:"teeshirt_white",
+    slots:["chest", "cleavage", "nipple", "upperback", "shoulder"],
   }
 );
 
-createItem("halter_minimal_black", MADE_OF(materials.cloth), HALTER(),
+
+
+createItem("skirt_floral", MADE_OF(materials.cloth), SKIRT(2),
   {
-    alias:"indecent black bikini halter",
-    examine:"Two black strips that would only cover the middle third of each breast, with some thin straps to keep them in place.",
-    image:"halter_black",
+    alias:"floral skirt",
+    examine:"A loose, wrap-around skirt, knee-length, with red and yellow flowers on it.",
+    wrapSkirt:true,
   }
 );
 
-createItem("halter_us", MADE_OF(materials.cloth), HALTER(),
+createItem("skirt_black", MADE_OF(materials.cloth), SKIRT(1),
   {
-    alias:"USA bikini halter",
-    examine:"One cup of the halter is red and white stripes, the other white stars on blue.",
-    image:"halter_black",
+    alias:"black skirt",
+    examine:"A black, wrap-around skirt that covers most of the thigh.",
+    colors:erotica.colorList,
+    wrapSkirt:true,
   }
 );
 
-createItem("briefs_us", MADE_OF(materials.cloth), BRIEFS(),
+createItem("denim_skirt", MADE_OF(materials.cloth), SKIRT(1),
   {
-    alias:"USA bikini briefs",
-    examine:"The bikini briefs are striped red and white, like the lower half of the US flag.",
-    image:"briefs_black",
-    pullsoff:true,
+    alias:"denim skirt",
+    examine:"A short, tight skirt, frayed along the bottom.",
+    image:"skirt_floral",
   }
 );
+
+createItem("daisy_dukes", MADE_OF(materials.cloth), SHORTS(),
+  {
+    alias:"Daisy Dukes",
+    examine:"Jean shorts, cut very short.",
+    image:"daisydukes",
+  }
+);
+
+createItem("mini_skirt", MADE_OF(materials.cloth), SKIRT(1),
+  {
+    alias:"mini-skirt",
+    examine:"A tight black skirt, falling to mid-thigh",
+    image:"skirt_floral",
+  }
+);
+
+createItem("micro_skirt", MADE_OF(materials.cloth), SKIRT(0),
+  {
+    alias:"mini-skirt",
+    examine:"A tight black skirt, barely decent.",
+    image:"skirt_floral",
+  }
+);
+
+createItem("croptop_black", MADE_OF(materials.cloth), VEST_TOP(true),
+  {
+    alias:"black vest-top",
+    examine:"A rather short, black vest-top.",
+    image:"vest_pink",
+    colors:erotica.colorList,
+  }
+);
+
+
+
+
+
+
 
 
 
@@ -311,66 +390,59 @@ createItem("briefs_us", MADE_OF(materials.cloth), BRIEFS(),
 
 //---- DRESSES ----
 
-createItem("dress_leather", MADE_OF(materials.leather), DRESS(["chest", "nipple", "upperback", "lowerback", "midriff", "hip", "groin", "buttock", "thigh"]),
+
+
+createItem("dress_strapless", MADE_OF(materials.cloth), DRESS(["chest", "cleavage", "nipple", "upperback", "lowerback", "midriff", "hip", "groin", "buttock", "thigh"]),
   {
-    alias:"black leather dress",
-    examine:function() {
-      if (this.worn) {
-        msg("Now she has it on, Lucy realises the black leather dress is even shorter at the back, and does not actually reach her crotch. The six inch hole over her cleavage also makes her feel rather exposed.");
-      }
-      else {
-        msg("The black leather dress is so short it would barely be decent. It has a high neckline, but a gaping hole, six inches across, over the cleavage.");
-      }
-    },
-    image:"dress_leather",
+    alias:"short, black, strapless dress",
+    examine:"A short, strapless dress, in black.",
+    image:"dress_strapless_black",
   }
 );
+
+createItem("dress_micro", MADE_OF(materials.cloth), DRESS(["chest", "nipple", "lowerback", "midriff", "hip", "groin", "buttock", "thigh"]),
+  {
+    alias:"very short black dress",
+    examine:"The black dress is so short it is barely decent. Spaghetti straps held it up.",
+    image:"dress_micro_black",
+    colors:erotica.colorListSwimwearF,
+  }
+);
+
+createItem("dress_short", MADE_OF(materials.cloth), DRESS(["chest", "nipple", "lowerback", "midriff", "hip", "groin", "buttock", "thigh"]),
+  {
+    alias:"short dress",
+    examine:"The black dress is laced up across the neck line, which went down to the naval.",
+    image:"dress_short_black",
+    colors:erotica.colorListSwimwearF,
+  }
+);
+
+createItem("dress_side", MADE_OF(materials.cloth), DRESS(["chest", "nipple", "upperback", "lowerback", "midriff", "hip", "groin", "buttock", "thigh", "calf"]),
+  {
+    alias:"black, side-open dress",
+    examine:"This long black dress is open all down the left, with just a series of short chains pulling the two halves together; it had a single strap over the left shoulder.",
+    image:"dress_side_blue",
+    colors:erotica.colorListSwimwearF,
+  }
+);
+
+createItem("dress_split", MADE_OF(materials.cloth), DRESS(["chest", "cleavage", "nipple", "lowerback", "midriff", "hip", "groin", "buttock", "thigh", "calf"]),
+  {
+    alias:"long black dress",
+    examine:"This silky black dress had a low neckline, and a long skirt split all the way ip the left side.",
+    image:"dress_split_black",
+    colors:erotica.colorListSwimwearF,
+  }
+);
+
+
 
 createItem("dress_goth", MADE_OF(materials.cloth), DRESS(["chest", "nipple", "upperback", "lowerback", "midriff", "hip", "groin", "buttock", "thigh"]),
   {
     alias:"goth dress",
     examine:"A strapless, black dress, the body ribbed like a corset, while the skirt is slightly flared, and trimmed with lace.",
     image:"dress_goth",
-  }
-);
-
-createItem("dress_strapless_black", MADE_OF(materials.cloth), DRESS(["chest", "cleavage", "nipple", "upperback", "lowerback", "midriff", "hip", "groin", "buttock", "thigh"]),
-  {
-    alias:"short, strapless dress",
-    examine:"A short, strapless dress, in black.",
-    image:"dress_strapless_black",
-  }
-);
-
-createItem("dress_micro_black", MADE_OF(materials.cloth), DRESS(["chest", "nipple", "lowerback", "midriff", "hip", "groin", "buttock", "thigh"]),
-  {
-    alias:"very short dress",
-    examine:"The black dress is so short it is barely decent. Spaghetti straps held it up.",
-    image:"dress_micro_black",
-  }
-);
-
-createItem("dress_short_black", MADE_OF(materials.cloth), DRESS(["chest", "nipple", "lowerback", "midriff", "hip", "groin", "buttock", "thigh"]),
-  {
-    alias:"short dress",
-    examine:"The black dress is laced up across the neck line, which went down to the naval.",
-    image:"dress_short_black",
-  }
-);
-
-createItem("dress_side_blue", MADE_OF(materials.cloth), DRESS(["chest", "nipple", "upperback", "lowerback", "midriff", "hip", "groin", "buttock", "thigh", "calf"]),
-  {
-    alias:"side-open dress",
-    examine:"This long blue dress is open all down the left, with just a series of short chains pulling the two halves together; it had a single strap over the left shoulder.",
-    image:"dress_side_blue",
-  }
-);
-
-createItem("dress_split_black", MADE_OF(materials.cloth), DRESS(["chest", "cleavage", "nipple", "lowerback", "midriff", "hip", "groin", "buttock", "thigh", "calf"]),
-  {
-    alias:"long dress",
-    examine:"This silky black dress had a low neckline, and a long skirt split all the way ip the left side.",
-    image:"dress_split_black",
   }
 );
 
@@ -414,21 +486,8 @@ createItem("dress_gauze", MADE_OF(materials.cloth), DRESS(["chest", "nipple", "l
   }
 );
 
-createItem("dress_micro_yellow", MADE_OF(materials.cloth), DRESS(["chest", "nipple", "lowerback", "midriff", "hip", "groin", "buttock", "thigh"]),
-  {
-    alias:"very short dress",
-    examine:"The yellow dress is so short it is barely decent. Spaghetti straps held it up.",
-    image:"dress_micro_black",
-  }
-);
 
-createItem("dress_side_black", MADE_OF(materials.cloth), DRESS(["chest", "nipple", "upperback", "lowerback", "midriff", "hip", "groin", "buttock", "thigh", "calf"]),
-  {
-    alias:"side-open dress",
-    examine:"This long blue dress is open all down the left, with just a series of short chains pulling the two halves together; it had a single strap over the left shoulder.",
-    image:"dress_side_blue",
-  }
-);
+
 
 createItem("maid_outfit", MADE_OF(materials.cloth), DRESS(["chest", "nipple", "lowerback", "midriff", "hip", "groin", "buttock"]),
   {
@@ -437,6 +496,152 @@ createItem("maid_outfit", MADE_OF(materials.cloth), DRESS(["chest", "nipple", "l
     image:"dress_short_black",
   }
 );
+
+
+
+
+
+//---- SWIMWEAR ----
+
+createItem("posing_pouch", MADE_OF(materials.cloth), WEARABLE(2, ["crotch", "groin"]),
+  {
+    alias:"black posing-pouch",
+    examine:"A black posing-pouch, it leaving nothing to the imasgination...",
+    colors:["black", "red", "leopard-pattern"],
+  }
+);
+
+createItem("shorts_black", MADE_OF(materials.cloth), SWIM_SHORTS(true),
+  {
+    alias:"black swimshorts",
+    examine:"A pair of baggy black, knee-length shorts.",
+    colors:erotica.colorListSwimwearM,
+    image:"shorts_black",
+  }
+);
+
+createItem("briefs_black_m", MADE_OF(materials.cloth), BRIEFS(),
+  {
+    alias:"black swimbriefs",
+    colors:erotica.colorListSwimwearM,
+    examine:"A pair of black swim briefs.",
+    image:"briefs_black",
+    pullsoff:true,
+  }
+);
+
+
+createItem("swimsuit_black_scooped", MADE_OF(materials.cloth), SWIMSUIT(0),
+  {
+    alias:"black scooped swimsuit",
+    examine:"The swimsuit is black; it had a scooped back and high legs.",
+    colors:erotica.colorListSwimwearF,
+  }
+);
+
+createItem("thong_black_sw", MADE_OF(materials.cloth), THONG(),
+  {
+    alias:"black thong",
+    examine:"The thong is black, and rather small.",
+    colors:erotica.colorListSwimwearF,
+    image:"thong_black",
+    swimwear:true,
+  }
+);
+
+createItem("swimsuit_black", MADE_OF(materials.cloth), SWIMSUIT(1),
+  {
+    alias:"black swimsuit",
+    examine:"The black swimsuit is relatively modest, with a lower leg cut, and most of the back covered.",
+  }
+);
+
+createItem("swimsuit_yellow_panel", MADE_OF(materials.cloth), SWIMSUIT(0),
+  {
+    alias:"yellow-panelled swimsuit",
+    examine:"The swimsuit is black with a yellow panel down the front; it had a scooped back and high legs.",
+    variFunc:function() {
+      let color = randomFromArray(erotica.colorListSwimwearF)
+      while (color === "black") {
+        color = randomFromArray(erotica.colorListSwimwearF)
+      }
+      this.alias = this.alias.replace("yellow", color.toLowerCase());
+      if (this.image) this.image = this.image.replace("yellow", color.toLowerCase());
+      this.listalias = this.alias.replace("Yellow", sentenceCase(color));
+      this.examine = this.examine.replace("yellow", color.toLowerCase());
+    },
+  }
+);
+
+createItem("halter_black", MADE_OF(materials.cloth), HALTER(),
+  {
+    alias:"halter_black",
+    colors:erotica.colorListSwimwearF,
+    image:"halter_black",
+    examine:"A black, halter-neck bikini top.",
+  }
+);
+
+createItem("bandeau_black", MADE_OF(materials.cloth), HALTER(),
+  {
+    alias:"black bandeau bikini halter",
+    colors:erotica.colorListSwimwearF,
+    examine:"A strapless, black bikini halter with a twist between the cups.",
+    image:"bandeau_black",
+  }
+);
+
+createItem("briefs_black", MADE_OF(materials.cloth), BRIEFS(),
+  {
+    alias:"black bikini briefs",
+    colors:erotica.colorListSwimwearF,
+    examine:"A pair of black bikini briefs that tie up at the side.",
+    image:"briefs_black",
+    pullsoff:true,
+  }
+);
+
+createItem("sling_black", MADE_OF(materials.cloth), WEARABLE(1, ["crotch", "groin", "nipple"]),
+  {
+    alias:"black sling bikini",
+    examine:"A rather revealing one-piece, this is little more than a 'V', from from crotch, over the shoulders.",
+    colors:erotica.colorListSwimwearF,
+    swimwear:true,
+  }
+);
+
+createItem("halter_minimal_black", MADE_OF(materials.cloth), HALTER(),
+  {
+    alias:"indecent black bikini halter",
+    examine:"Two black strips that would only cover the middle third of each breast, with some thin straps to keep them in place.",
+    colors:erotica.colorListSwimwearF,
+    image:"halter_black",
+  }
+);
+
+createItem("halter_us", MADE_OF(materials.cloth), HALTER(),
+  {
+    alias:"USA bikini halter",
+    examine:"One cup of the halter is red and white stripes, the other white stars on blue.",
+    image:"halter_black",
+  }
+);
+
+createItem("briefs_us", MADE_OF(materials.cloth), BRIEFS(),
+  {
+    alias:"USA bikini briefs",
+    examine:"The bikini briefs are striped red and white, like the lower half of the US flag.",
+    image:"briefs_black",
+    pullsoff:true,
+  }
+);
+
+
+
+
+
+
+
 
 createItem("handcuffs", MADE_OF(materials.cloth), WEARABLE(2, ["wrists"]),
   {
@@ -471,6 +676,26 @@ createItem("tassels", MADE_OF(materials.cloth), WEARABLE(0, ["nipple"]),
     showwear:true,
   }
 );
+
+createItem("thong_sequined", MADE_OF(materials.cloth), THONG(),
+  {
+    alias:"sequinned thong",
+    examine:"The thong is rather small and covered in sequins - as if there is any more need to draw the eye -  with lacing along the three sides of the triangle.",
+    image:"thong_black",
+    showwear:true,
+  }
+);
+
+createItem("halter_leopard", MADE_OF(materials.cloth), BRA(),
+  {
+    alias:"leopard-skin halter",
+    examine:"A halter made of fake leopard-skin.",
+  }
+);
+
+
+
+
 
 createItem("leather_corset", MADE_OF(materials.leather), WEARABLE(4, ["chest", "nipple", "upperback", "midriff"]),
   {
@@ -512,3 +737,52 @@ createItem("leather_collar", MADE_OF(materials.leather), WEARABLE(2, ["neck"]),
   }
 );
 
+createItem("leather_thong", MADE_OF(materials.leather), THONG(),
+  {
+    alias:"leather thong",
+    examine:"The thong is made of soft black black, and where one might have expected a triangle of leather to preserve her modesty at least a little there is merely two straps, with studs at each end.",
+    image:"thong_leather",
+    getRevealing:function() { return 3; },
+  }
+);
+
+createItem("leather_halter", MADE_OF(materials.leather), BRA(),
+  {
+    alias:"leather halter",
+    examine:"The halter is made of soft black leather; three thin bands crossed each breast, offering minimal coverage.",
+    wearMsg:function(char) {
+      return nounVerb(char, "pull", true) + " on the halter, fastening it at the back, then adjusting the bands to cover " + char.pronouns.poss_adj + " nipples.";
+    },
+    image:"halter_leather",
+  }
+);
+
+createItem("leather_dress", MADE_OF(materials.leather), DRESS(["chest", "nipple", "upperback", "lowerback", "midriff", "hip", "groin", "buttock", "thigh"]),
+  {
+    alias:"black leather dress",
+    examine:function() {
+      if (this.worn) {
+        msg("Now she has it on, Lucy realises the black leather dress is even shorter at the back, and does not actually reach her crotch. The six inch hole over her cleavage also makes her feel rather exposed.");
+      }
+      else {
+        msg("The black leather dress is so short it would barely be decent. It has a high neckline, but a gaping hole, six inches across, over the cleavage.");
+      }
+    },
+    image:"dress_leather",
+  }
+);
+
+createItem("leather_mini_skirt", MADE_OF(materials.leather), SKIRT(0),
+  {
+    alias:"leather mini-skirt",
+    examine:"A tight black leather skirt, hardly covering the legs at all",
+  }
+);
+
+createItem("catsuit", MADE_OF(materials.pvc), WEARABLE(4, ["chest", "nipple", "upperback", "lowerback", "midriff", "hip", "groin", "buttock", "crotch", "thigh", "knee", "calf", "shoulder", "arm"]),
+  {
+    alias:"black PVC catsuit",
+    examine:"A very tight black catsuit, that covers the entire body between ankle, wrist and neck, but nevertheless leaves nothing to the imagination.",
+    colors:["black", "black", "red", "metallic blue", "metallic red"],
+  }
+);

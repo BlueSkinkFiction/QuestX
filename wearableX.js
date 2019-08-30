@@ -212,13 +212,13 @@ const THONG = function() {
   }
   res.wearMsg = function(char) {
     if (char.hasBodyPart("cock")) {
-      if (char.arousal > 60) {
+      if (char.getArousal() > 60) {
          return nounVerb(char, "pull", true) + " the thong up " + char.pronouns.poss_adj + " legs and over " + char.pronouns.poss_adj + " hips, struggling to tuck " + char.pronouns.poss_adj + " erect cock inside as best " + pronounVerb(char, "can") + ".";
       }
       else if (char.hasHugeCock) {
          return nounVerb(char, "pull", true) + " the thong up " + char.pronouns.poss_adj + " legs and over " + char.pronouns.poss_adj + " hips, struggling to tuck " + char.pronouns.poss_adj + " huge cock inside as best " + pronounVerb(char, "can") + ".";
       }
-      else if (char.arousal <20) {
+      else if (char.getArousal() <20) {
          return nounVerb(char, "pull", true) + " the thong up " + char.pronouns.poss_adj + " legs and over " + char.pronouns.poss_adj + " hips, easily covering " + char.pronouns.poss_adj + " limp manhood, despite being so small...";
       }
       else {
@@ -233,13 +233,13 @@ const THONG = function() {
     return nounVerb(char, "pull", true) + " down " + char.pronouns.poss_adj + " briefs, and steps out of them.";
 
     if (char.hasBodyPart("cock")) {
-      if (char.arousal > 60) {
+      if (char.getArousal() > 60) {
          return nounVerb(char, "pull", true) + " down " + char.pronouns.poss_adj + " thong, " + char.pronouns.poss_adj + " erect cock spring to attention. They slide down " + char.pronouns.poss_adj + " legs and " + pronounVerb(char, "step") + " out of them.";
       }
       else if (char.hasHugeCock) {
          return nounVerb(char, "pull", true) + " down " + char.pronouns.poss_adj + " thong, unleashing " + char.pronouns.poss_adj + " huge cock. They slide down " + char.pronouns.poss_adj + " legs and " + pronounVerb(char, "step") + " out of them.";
       }
-      else if (char.arousal <20) {
+      else if (char.getArousal() <20) {
          return nounVerb(char, "pull", true) + " down " + char.pronouns.poss_adj + " thong, revealing " + char.pronouns.poss_adj + " limp cock. They slide down " + char.pronouns.poss_adj + " legs and " + pronounVerb(char, "step") + " out of them.";
       }
       else {
@@ -356,13 +356,13 @@ const BRIEFS = function() {
   const res = WEARABLE(2, ["crotch", "groin", "buttock"]);
   res.wearMsg = function(char) {
     if (char.hasBodyPart("cock")) {
-      if (char.arousal > 60) {
+      if (char.getArousal() > 60) {
          return nounVerb(char, "pull", true) + " the briefs up " + char.pronouns.poss_adj + " legs and over " + char.pronouns.poss_adj + " hips, tucking " + char.pronouns.poss_adj + " erect cock inside as best " + pronounVerb(char, "can") + ".";
       }
       else if (char.hasHugeCock) {
          return nounVerb(char, "pull", true) + " the briefs up " + char.pronouns.poss_adj + " legs and over " + char.pronouns.poss_adj + " hips, tucking " + char.pronouns.poss_adj + " huge cock inside as best " + pronounVerb(char, "can") + ".";
       }
-      else if (char.arousal <20) {
+      else if (char.getArousal() <20) {
          return nounVerb(char, "pull", true) + " the briefs up " + char.pronouns.poss_adj + " legs and over " + char.pronouns.poss_adj + " hips, covering " + char.pronouns.poss_adj + " limp manhood.";
       }
       else {
@@ -377,13 +377,13 @@ const BRIEFS = function() {
     return nounVerb(char, "pull", true) + " down " + char.pronouns.poss_adj + " briefs, and steps out of them.";
 
     if (char.hasBodyPart("cock")) {
-      if (char.arousal > 60) {
+      if (char.getArousal() > 60) {
          return nounVerb(char, "pull", true) + " down " + char.pronouns.poss_adj + " briefs, " + char.pronouns.poss_adj + " erect cock spring to attention. They slide down " + char.pronouns.poss_adj + " legs and " + pronounVerb(char, "step") + " out of them.";
       }
       else if (char.hasHugeCock) {
          return nounVerb(char, "pull", true) + " down " + char.pronouns.poss_adj + " briefs, unleashing " + char.pronouns.poss_adj + " huge cock. They slide down " + char.pronouns.poss_adj + " legs and " + pronounVerb(char, "step") + " out of them.";
       }
-      else if (char.arousal <20) {
+      else if (char.getArousal() <20) {
          return nounVerb(char, "pull", true) + " down " + char.pronouns.poss_adj + " briefs, revealing " + char.pronouns.poss_adj + " limp cock. They slide down " + char.pronouns.poss_adj + " legs and " + pronounVerb(char, "step") + " out of them.";
       }
       else {
@@ -428,10 +428,10 @@ const BOOTS = function(slotCount) {
 const SHOES = function() {
   const res = WEARABLE(8, "foot");
   res.wearMsg = function(char) {
-    return nounVerb(char, "pull", true) + " on the left shoe, then the shoe.";
+    return nounVerb(char, "put", true) + " on the left shoe, then the right.";
   };
   res.removeMsg = function(char) {
-    return nounVerb(char, "pull", true) + " off " + char.pronouns.poss_adj + " left shoe, then the shoe.";
+    return nounVerb(char, "pull", true) + " off " + char.pronouns.poss_adj + " left shoe, then the right.";
   };
   res.pronouns = PRONOUNS.plural;
   return res;

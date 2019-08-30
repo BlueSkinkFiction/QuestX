@@ -58,6 +58,16 @@ createItem("Joanna",
     examine:"A hot, blonde babe. She is wearing {attire}. {ifposture:She is {posture}.}",
     bodyPartAdjectives:{upperback:"tattooed"},
     willingToExpose:5,
+    getAgreementPosture:function(name, object) {
+      return true;
+    },
+    getAgreementInteract:function(target, action, bodypart, actionName) {
+      if (action.name === "suck") {
+        msg("'Eww! I'm not sucking your " + bodypart.name + "!'")
+        return false;
+      }
+      return true;
+    },
   }
 );
 
@@ -201,7 +211,6 @@ createItem("dildo", MADE_OF(materials.rubber), TAKEABLE(),
 );
 
 
-
 createItem("whip", MADE_OF(materials.leather), TAKEABLE(),
   {
     loc:"table",
@@ -216,3 +225,19 @@ createItem("table", MADE_OF(materials.wood), EROTIC_FURNITURE({stand:true, bendo
   }
 );
 
+
+
+createItem("a_frame", MADE_OF(materials.metal), BONDAGE_DEVICE(false),
+  {
+    loc:"lounge",
+    alias:"A-frame",
+    properName:true,
+    situation:"manacled to the A-frame",
+    restrainMsg:function(char, victim) { 
+      return nounVerb(char, "manacle", true) + " " + victim.byname({article:DEFINITE, possessive:true}) + " wrists to the top of the A-frame, then " + conjugate(char, "make") + " " + victim.pronouns.objective + " open " + victim.pronouns.poss_adj + " legs wide, before manacling them too."
+    },
+    releaseMsg:function(char, victim) {
+      return nounVerb(char, "release", true) + " the manacles on " + victim.byname({article:DEFINITE, possessive:true}) + " ankles, then " + conjugate(char, "reach") + " up and " + conjugate(char, "release") + " " + victim.pronouns.poss_adj + " wrists."
+    },
+  }
+);
