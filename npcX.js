@@ -8,7 +8,7 @@ const ACTOR = function(isFemale, isPlayer) {
     res = PLAYER();
     res.isFemale = isFemale;
     // A very simple measure of size, so give an indicator of what NPC can wear what
-    res.size = isFemale ? 3 : 7
+    res.size = isFemale ? 4 : 6
   }
   else {
     res = NPC(isFemale)
@@ -52,6 +52,12 @@ const ACTOR = function(isFemale, isPlayer) {
     return true;
   }
   
+  
+  res.isBodyPartBare = function(bp) {
+    if (typeof bp === "string") bp = w[bp];
+    return (this.getOuterWearable(bp.getSlot()) === false)
+  }
+  
   // You can override this to give a specific body part an adjective
   // Could also be done dynamically, say to reflect the erection
   // Alternatively, set bodyPartAdjectives
@@ -81,7 +87,15 @@ const ACTOR = function(isFemale, isPlayer) {
     return this.hasCock ? "muscled" : "smooth";
   }
   
+  res.getStatusDesc = function() {
+    if (this.restraint) return w[this.restraint].situation
+    if (!this.posture) return false
+    if (!this.postureFurniture) return this.posture
+    return this.posture + " " + this.postureAdverb + " " + w[this.postureFurniture].byname({article:DEFINITE})
+  }
   
+
+
   
   // Effectively unit tested
   res.getClothing = function() {
@@ -286,7 +300,7 @@ const ACTOR = function(isFemale, isPlayer) {
   // Rating of how much the character's body would be exposed to view if the given garment was absent, for 0 to 24
   // Unit tested
   res.getExposureWithout = function(garment) {
-    if (garment.loc !== this.name || !garment.worn) {
+    if (garment.loc !== this.name || !garment.getWorn()) {
       errormsg("Trying to use getExposureWithout for " + this.name + " and a garment not worn: " + garment.name);
       return false;
     }
@@ -335,15 +349,15 @@ const ACTOR = function(isFemale, isPlayer) {
 
 
   res.respondToUndressNoChoice = function(char, garment) {
-    msg(nounVerb(char, "rip", true) + " " + garment.byname({article:DEFINITE}) + " off " + this.byname({article:DEFINITE}) + ".");
+    msg(nounVerb(char, "rip", true) + " " + garment.byname({article:DEFINITE, single:true}) + " off " + this.byname({article:DEFINITE}) + ".");
   }
 
   res.respondToUndressWilling = function(char, garment) {
-    msg(nounVerb(char, "pull", true) + " " + garment.byname({article:DEFINITE}) + " off " + this.byname({article:DEFINITE}) + ".");
+    msg(nounVerb(char, "pull", true) + " " + garment.byname({article:DEFINITE, single:true}) + " off " + this.byname({article:DEFINITE}) + ".");
   }
 
   res.respondToUndressRefusal = function(char, garment) {
-    msg(nounVerb(char, "try", true) + " to pull " + garment.byname({article:DEFINITE}) + " off " + this.byname({article:DEFINITE}) + ", but " + this.byname({article:DEFINITE}) + " is having none of it.");
+    msg(nounVerb(char, "try", true) + " to pull " + garment.byname({article:DEFINITE, single:true}) + " off " + this.byname({article:DEFINITE}) + ", but " + this.byname({article:DEFINITE}) + " is having none of it.");
   }
 
 
@@ -482,36 +496,3 @@ const ACTOR = function(isFemale, isPlayer) {
 
 
 
-
-function createMan(loc) {
-  res = createItem(randomFromArray(erotica.boysNames), ACTOR(false), {
-    loc:loc, 
-    properName:true,
-    size:randomInt(1,3) + randomInt(1,3) + 3,
-    willingToExpose:randomInt(1,5) + 3,
-    appearance:randomInt(1,3) + randomInt(1,3) + 4,
-    attactedToMen:randomInt(0,5),
-    attactedToWomen:randomInt(1,3) + 2,
-    getDescription:function() { return "A good looking guy." },
-  })
-  res.examine = "{description} He is wearing {attire}. {ifposture:He is {posture}.}",
-  erotica.createSwimwear(res.name, true);
-  return res
-}  
-
-
-function createWoman(loc) {
-  res = createItem(randomFromArray(erotica.girlsNames), ACTOR(true), {
-    loc:loc, 
-    properName:true,
-    size:randomInt(1,3) + randomInt(1,3) - 1,
-    willingToExpose:randomInt(1,8),
-    appearance:randomInt(1,3) + randomInt(1,3) + 4,
-    attactedToWomen:randomInt(0,5),
-    attactedToMen:randomInt(1,3) + 2,
-    getDescription:function() { return "A hot babe." },
-  })
-  res.examine = "{description} She is wearing {attire}. {ifposture:She is {posture}.}",
-  erotica.createSwimwear(res.name, true);
-  return res
-}

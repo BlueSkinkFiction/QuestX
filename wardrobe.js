@@ -29,22 +29,36 @@ erotica.createGarment = function(proto, loc, color, ...otherOptions) {
 
 erotica.createBikini = function(loc) {
   color = randomFromArray(erotica.colorListSwimwearF)
+  let halter, briefs, desc
   if (randomChance(1)) {
-    erotica.createGarment(w.halter_us, loc)
-    erotica.createGarment(w.briefs_us, loc)
+    halter = erotica.createGarment(w.halter_us, loc)
+    briefs = erotica.createGarment(w.briefs_us, loc)
+    desc = 'A "stars and stripes" bikini.'
   }
   else if (randomChance(3)) {
-    erotica.createGarment(w.halter_minimal_black, loc, color)
-    erotica.createGarment(w.thong_black_sw, loc, color)
+    halter = erotica.createGarment(w.halter_minimal_black, loc, color)
+    briefs = erotica.createGarment(w.thong_black_sw, loc, color)
+    desc = 'A ' + color + ' thong bikini.' 
   }
   else if (randomChance(30)) {
-    erotica.createGarment(w.bandeau_black, loc, color)
-    erotica.createGarment(w.briefs_black, loc, color)
+    halter = erotica.createGarment(w.bandeau_black, loc, color)
+    briefs = erotica.createGarment(w.briefs_black, loc, color)
+    desc = 'A ' + color + ' bikini, with a strapless bandeau halter.' 
   }
   else {
-    erotica.createGarment(w.halter_black, loc, color)
-    erotica.createGarment(w.briefs_black, loc, color)
+    halter = erotica.createGarment(w.halter_black, loc, color)
+    briefs = erotica.createGarment(w.briefs_black, loc, color)
+    desc = 'A ' + color + ' side-tie bikini.' 
   }
+  let ensembleAlias = halter.bikiniAlias ? halter.bikiniAlias : halter.alias.replace(" halter", "");
+  ensembleAlias = ensembleAlias.replace("black", color);
+  const ensembleName = world.findUniqueName(halter.name.replace("_halter", "_ensemble"))
+  
+  ensemble = createEnsemble(ensembleName, [halter, briefs], {
+    examine:desc,
+    alias:ensembleAlias,
+  });
+  return [halter, briefs]
 }
 
 
@@ -70,6 +84,12 @@ erotica.createSwimwearF = function(loc, addExtras) {
   }
   else if (randomChance(1)) {
     erotica.createGarment(w.sling_black, loc)
+  }
+  else if (randomChance(1)) {
+    erotica.createGarment(w.briefs_black, loc)
+  }
+  else if (randomChance(1)) {
+    erotica.createGarment(w.thong_black, loc)
   }
   else if (randomChance(3)) {
     erotica.createGarment(w.swimsuit_yellow_panel, loc)

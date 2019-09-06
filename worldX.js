@@ -46,21 +46,24 @@ createItem("mouth", BODY_PART(3, false, /mouth|lips?/), {
   getExposureRating:function(char) { return 0; },
   canBePenetrated:true,
 });
+createItem("face", BODY_PART(3, false, /face/), {
+  getExposureRating:function(char) { return 0; },
+});
 
 // These body parts are not in the garment slots, which use chest, buttock, groin, groin and crotch
-createItem("tit", BODY_PART(8, true, /tits?|boobs?|breasts?|gazongas?|mammary|mammaries/), {
+createItem("tit", BODY_PART(8, true, /tits?|boobs?|breasts?|gazongas?|mammary|mammaries|jugs?|hooters?|knockers?|melons?|baps?|rack/), {
   modestyBoost:true,
   getSlot:function() { return "chest"; },
 });
-createItem("ass", BODY_PART(8, false, /ass|arse|backside|bottom|tush|rump|butt/), {
+createItem("ass", BODY_PART(8, false, /ass|arse|backside|bottom|tush|rump|butt|booty|can|clacker/), {
   getSlot:function() { return "buttock"; },
   canBePenetrated:true,
 });
-createItem("bollock", GENITALS(9, true, /bollocks?|balls?|testicles?/), {
+createItem("bollock", GENITALS(9, true, /bollocks?|balls?|testicles?|nadgers?|nuts?/), {
   modestyBoost:true,
   getSlot:function(toHandle) { return toHandle ? "crotch" : "groin"; },
 });
-createItem("cock", GENITALS(10, false, /cock|dick|phallus|penis|willy|manhood/), {
+createItem("cock", GENITALS(10, false, /cock|dick|phallus|penis|willy|manhood|organ|tool|pecker|schlong|prick|member|wang|knob|dong/), {
   modestyBoost:true,
   response_suck:function(char, object) {
     msg(nounVerb(char, "suck", true) + " " + object.byname({article:DEFINITE}) + " hard cock.");
@@ -70,7 +73,7 @@ createItem("cock", GENITALS(10, false, /cock|dick|phallus|penis|willy|manhood/),
   },
   getSlot:function(toHandle) { return toHandle ? "crotch" : "groin"; },
 });
-createItem("pussy", GENITALS(10, false, /pussy|cunt|vagina|slit/), {
+createItem("pussy", GENITALS(10, false, /pussy|cunt|vagina|slit|putang|snatch|coochie/), {
   response_suck:function(char, object) {
     msg("You can't suck off a pussy!");
   },

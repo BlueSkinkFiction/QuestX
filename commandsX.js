@@ -59,6 +59,7 @@ CHAIN <character>
 CHAIN <character> TO <device>
 SMACK <character>
 SMACK <character>'s <bodypart>
+FLICK THE BEAN
 
 ```
 Note that several commands use 's. **This is not optional**, as Quest uses 's to separate the different terms. This means you may run into problems with items that have 's is their name. And it is not going to translate into other languages, sorry about that.
@@ -713,7 +714,7 @@ function cmdRemoveGarment(char, target, garment) {
     return FAILED;
   }
   
-  if (!garment.worn || !garment.isAtLoc(target)) {
+  if (!garment.getWorn() || !garment.isAtLoc(target.name)) {
     // garment not worn by target
     failedmsg(nounVerb(target, "be", true) + " not wearing " + garment.byname({article:INDEFINITE}) + ".");
     return FAILED;
@@ -774,19 +775,29 @@ function cmdRestrain (char, target, item) {
   if (!item) {
     const objs = scope(isBondageDeviceHere)
     if (objs.length === 0) {
-      failedmsg("Nothing to restrain someone with here.");
-      return FAILED;
+      failedmsg("Nothing to restrain someone with here.")
+      return FAILED
     }
     if (objs.length > 1) {
-      failedmsg("You will have to specify how you want to restrain someone when more than one device is present.");
-      return FAILED;
+      failedmsg("You will have to specify how you want to restrain someone when more than one device is present.")
+      return FAILED
     }
     item = objs[0]
   }
   if (target.restraint || item.victim) {
-    failedmsg(nounVerb(target, "be", true) + " already " + w[target.restraint].situation + ".");
-    return FAILED;
+    failedmsg(nounVerb(target, "be", true) + " already " + w[target.restraint].situation + ".")
+    return FAILED
   }
+  const held = target.getHolding()
+  if (held.length > 0) {
+    const it_them = held.length > 1 || held[0].pronouns === PRONOUNS.plural  || held[0].pronouns === PRONOUNS.massnoun ? "them" : "it"
+    msg(nounVerb(char, "take", true) + " " + formatList(held, {article:DEFINITE, lastJoiner:" and "}) + " from " + target.byname({article:DEFINITE}) + " and " + pronounVerb(char, "put") + " " + it_them + " on the ground.")
+    for (let i = 0; i < held.length; i++) {
+      held[i].moveToFrom(char.loc)
+    }
+  }
+  delete target.posture
+  delete target.postureFurniture
   item.restrain(char, target)
   return SUCCESS;
 }
@@ -882,6 +893,29 @@ commands.unshift(new Cmd('testnpc', {
     console.log(w.cock.getProtection(objects[0][0]));
     console.log(w.buttocks.getProtection(objects[0][0]));
     console.log(w.thighs.getProtection(objects[0][0]));
+    return SUCCESS;
+  },
+}));
+
+
+commands.unshift(new Cmd('testbikini', {
+  regex:/^bikini$/,
+  objects:[
+  ],
+  script:function(objects) {
+    console.log("briefs loc = " + w.briefsblack.loc);
+    console.log("briefs in lounge? " + w.briefsblack.isAtLoc("lounge"));
+    console.log("briefs with Joanna? " + w.briefsblack.isAtLoc("Joanna"));
+    console.log("briefs worn? " + w.briefsblack.getWorn());
+    
+    console.log("halter loc = " + w.halterblack.loc);
+    console.log("halter in lounge? " + w.halterblack.isAtLoc("lounge"));
+    console.log("halter with Joanna? " + w.halterblack.isAtLoc("Joanna"));
+    console.log("halter worn? " + w.halterblack.getWorn());
+
+    console.log("bikini in lounge? " + w.black_bikini.isAtLoc("lounge"));
+    console.log("bikini with Joanna? " + w.black_bikini.isAtLoc("Joanna"));
+    console.log("bikini worn? " + w.black_bikini.getWorn());
     return SUCCESS;
   },
 }));

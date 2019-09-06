@@ -19,6 +19,20 @@ tp.addDirective("ifposture", function(arr, params) {
   return params.tpItem.posture ? arr.join(":") : "";
 });
 
+tp.addDirective("restraint", function(arr, params) {
+  if (!params.tpItem.posture) return '';
+  return params.tpItem.restraint.situation;
+});
+
+tp.addDirective("ifrestaint", function(arr, params) {
+  return params.tpItem.restraint ? arr.join(":") : "";
+});
+
+tp.addDirective("ifbare", function(arr, params) {
+  const bodyPart = w[arr.shift()];
+  return params.tpItem.isBodyPartBare(bodyPart) ? arr.join(":") : "";
+});
+
 
 
 const erotica = {
@@ -34,5 +48,5 @@ function isBodyPart(item) {
   return item.isBodyPart;
 }
 function isWornByChar(item) {
-  return (isHeldByNpc(item) || isHeld(item)) && item.worn;
+  return (isHeldByNpc(item) || isHeld(item)) && item.getWorn();
 }

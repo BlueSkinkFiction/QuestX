@@ -96,19 +96,27 @@ createItem("Clive",
 createItem("halterblack", MADE_OF(materials.cloth), HALTER(),
   {
     alias:"black bikini halter",
+    regex:/bikini halter|halter/,
     loc:"Joanna",
     worn:true,
+    examineThis:"A bikini halter that is black.",
+    examineBikini:"A black bikini.",
   }
 );
 
 createItem("briefsblack", MADE_OF(materials.cloth), BRIEFS(),
   {
     alias:"black bikini briefs",
+    regex:/bikini briefs|briefs/,
     loc:"Joanna",
     worn:true,
+    examine:"Some bikini briefs that are black.",
   }
 );
 
+createEnsemble("black_bikini", [w.halterblack, w.briefsblack], {
+  examine:'A black bikini.',
+});
 
 createItem("thongred", MADE_OF(materials.cloth), THONG(),
   {
@@ -163,6 +171,7 @@ createItem("daisydukes", MADE_OF(materials.cloth), SHORTS(),
   {
     alias:"Daisy Dukes",
     loc:"lounge",
+    pronouns:PRONOUNS.plural,
   }
 );
 
@@ -170,6 +179,7 @@ createItem("jeans", MADE_OF(materials.cloth), PANTS(),
   {
     alias:"jeans",
     loc:"lounge",
+    pronouns:PRONOUNS.plural,
   }
 );
 
@@ -231,7 +241,6 @@ createItem("a_frame", MADE_OF(materials.metal), BONDAGE_DEVICE(false),
   {
     loc:"lounge",
     alias:"A-frame",
-    properName:true,
     situation:"manacled to the A-frame",
     restrainMsg:function(char, victim) { 
       return nounVerb(char, "manacle", true) + " " + victim.byname({article:DEFINITE, possessive:true}) + " wrists to the top of the A-frame, then " + conjugate(char, "make") + " " + victim.pronouns.objective + " open " + victim.pronouns.poss_adj + " legs wide, before manacling them too."
@@ -239,5 +248,135 @@ createItem("a_frame", MADE_OF(materials.metal), BONDAGE_DEVICE(false),
     releaseMsg:function(char, victim) {
       return nounVerb(char, "release", true) + " the manacles on " + victim.byname({article:DEFINITE, possessive:true}) + " ankles, then " + conjugate(char, "reach") + " up and " + conjugate(char, "release") + " " + victim.pronouns.poss_adj + " wrists."
     },
+  }
+);
+
+
+createItem("thin_shirt", MADE_OF(materials.cloth), BUTTONED_SHIRT(), {
+  alias:"thin white shirt",
+  loc:"me",
+  wet:false,
+  getreveal:function() { return this.wet ? 2 : 5 },
+  examine:"the material this white shirt is made from is so thyin it will be almost transparent when wet.",
+})
+
+createItem("dress_cursed", MADE_OF(materials.cloth), DRESS([]),
+  {
+    alias:"short, black, strapless dress",
+    examine:function() {
+      const n = Math.floor(this.count / this.countRate)
+      if (n < this.states.length - 1) {
+        return this.states[n].desc;
+      }
+      else if (this.getWorn()) {
+        return "A red strap that goes round " + w[this.loc].byname({article:DEFINITE,possessive:true}) + " bust, without covering the nipples, held up by thin straps over " + w[this.loc].pronouns.poss_adj + " shoulders.";
+      }
+      else {
+        return "A red strap that would go round the bust, without covering much at all, held up by thin straps.";
+      }
+    },
+    getSlots:function() {
+      const n = Math.floor(this.count / this.countRate)
+      if (n < this.states.length) {
+        return this.states[n].slots;
+      }
+      else {
+        return this.states[this.states.length - 1].slots;
+      }
+    },
+    getAlias:function() {
+      const n = Math.floor(this.count / this.countRate)
+      if (n < this.states.length) {
+        return this.states[n].slots;
+      }
+      else {
+        return this.states[this.states.length - 1].slots;
+      }
+    },
+    byname:function(options) {
+      let s;
+      if (options && options.article === DEFINITE) {
+        s = "the " + this.getAlias();
+      }
+      else if (options && options.article === INDEFINITE) {
+        s =  "a " + this.getAlias();
+      }
+      else {
+        s =  this.getAlias();
+      }
+      if (options && options.possessive) {
+        s += "'s";
+      }
+      return s;
+    },
+    count:0,
+    countRate:2,
+    image:"dress_strapless_black",
+    states:[
+      { 
+        alias:"long red dress",
+        slots:["chest", "cleavage", "nipple", "upperback", "lowerback", "midriff", "hip", "groin", "buttock", "thigh", "knee", "calf"],
+        desc:"A long, blood-red dress that falls to the ankles, with thin straps over the shoulders"
+      },
+      { 
+        alias:"long red dress",
+        slots:["chest", "cleavage", "nipple", "upperback", "lowerback", "midriff", "hip", "groin", "buttock", "thigh", "knee", "calf"],
+        desc:"A long, blood-red dress that falls halfway down the calf, with thin straps over the shoulders"
+      },
+      { 
+        alias:"red dress",
+        slots:["chest", "cleavage", "nipple", "upperback", "lowerback", "midriff", "hip", "groin", "buttock", "thigh", "knee"],
+        desc:"A long, blood-red dress that falls to just cover the knees, with thin straps over the shoulders"
+      },
+      { 
+        alias:"red dress",
+        slots:["chest", "cleavage", "nipple", "upperback", "lowerback", "midriff", "hip", "groin", "buttock", "thigh"],
+        desc:"A blood-red dress that falls to just above the knees, with thin straps over the shoulders"
+      },
+      { 
+        alias:"short red dress",
+        slots:["chest", "cleavage", "nipple", "upperback", "lowerback", "midriff", "hip", "groin", "buttock", "thigh"],
+        desc:"A blood-red dress that falls to part way down the thigh, with thin straps over the shoulders"
+      },
+      { 
+        alias:"short red dress",
+        slots:["chest", "cleavage", "nipple", "upperback", "lowerback", "midriff", "hip", "groin", "buttock"],
+        desc:"A short blood-red dress that leaves most of the thigh bare, with thin straps over the shoulders"
+      },
+      { 
+        alias:"short red dress",
+        slots:["chest", "cleavage", "nipple", "upperback", "lowerback", "midriff", "hip", "groin", "buttock"],
+        desc:"A barely-decent blood-red dress that just about reaches the crotch, with thin straps over the shoulders"
+      },
+      { 
+        alias:"red vest-top",
+        slots:["chest", "cleavage", "nipple", "upperback", "lowerback", "midriff"],
+        desc:"A blood-red top that falls to just below the waist, with thin straps over the shoulders"
+      },
+      { 
+        alias:"red vest-top",
+        slots:["chest", "cleavage", "nipple", "upperback", "lowerback", "midriff"],
+        desc:"A blood-red top that falls to just below the waist, with thin straps over the shoulders"
+      },
+      { 
+        alias:"red vest-top",
+        slots:["chest", "cleavage", "nipple", "upperback", "lowerback", "midriff"],
+        desc:"A blood-red top that almost reaches the waist, with thin straps over the shoulders"
+      },
+      { 
+        alias:"red cropped top",
+        slots:["chest", "cleavage", "nipple", "upperback"],
+        desc:"A cropped blood-red top that leaves most of the midriff bare, with thin straps over the shoulders"
+      },
+      { 
+        alias:"red cropped top",
+        slots:["chest", "cleavage", "nipple", "upperback"],
+        desc:"A cropped blood-red top that barely covers the bust, with thin straps over the shoulders"
+      },
+      { 
+        alias:"red strap",
+        slots:[],
+      },
+    ],
   }
 );

@@ -2,21 +2,221 @@
 // Also 250 cocktails
 
 
-erotica.hairstyles = [
-  "long XXX hair cascading down her back",
-  "long XXX hair",
-  "long XXX hair in a ponytail",
-  "long XXX hair, held in a high ponytail",
-  "XXX hair that brushed her shoulders",
-  "XXX hair shaped in a Mohican",
-  "spiked XXX hair",
-  "XXX hair in a buzzcut",
-  "shaven head",
+// form can be
+// "is", "are", "has" to indicate the phrase can follow "she is" etc.
+// "iso" to indicate a complete phrase, including verb
+erotica.smallBustFeature = { type:'bust', form:'has', s:'{random:modest tits:slight breasts:little in the way of tits:small tits:hardly any boobs}'},
+erotica.bigBustFeature = { type:'bust', form:'has', s:'{random:impressive:good-sized:great} {random:tits:boobs}'},
+erotica.hugeBustFeature = { type:'bust', form:'has', s:'{random:large:huge} {random:tits:gazongas:jugs}'},
+
+erotica.smallCockFeature = { type:'cock', form:'has', bp:'cock', s:'a {random:small:less than impressive:disappointing} {random:willy:todger}'},
+erotica.bigCockFeature = { type:'cock', form:'has', bp:'cock', s:'a {random:impressive:good-sized:great} {random:cock:dick}'},
+erotica.hugeCockFeature = { type:'cock', form:'has', bp:'cock', s:'a {random:large:huge} {random:cock:dick}'},
+
+
+erotica.maleFeatures = []
+erotica.femaleFeatures = []
+
+
+erotica.femaleFeatures.small = { type:'size', form:'is', s:'{random:a small woman:small:petite:a petite woman}'},
+erotica.femaleFeatures.big = { type:'size', form:'is', s:'{random:a tall woman:tall:Amazonian in stature}'},
+erotica.maleFeatures.small = { type:'size', form:'is', s:'{random:not so tall:on the short side:below average height}'},
+erotica.maleFeatures.big = { type:'size', form:'is', s:'{random:a tall guy:tall:statuesque}'},
+
+erotica.femaleFeatures.hot = { type:'attraction', form:'is', s:'{random:attractive:good-looking:sexy:alluring:beautiful:very good-looking}'},
+erotica.femaleFeatures.superHot = { type:'attraction', form:'is', s:'{random:super hot::stunning:amazingly attractive:so beautiful:drop-dead gorgeous}'},
+
+erotica.maleFeatures.hot = { type:'attraction', form:'is', s:'{random:handsome:good-looking:an attractive guy}'},
+erotica.maleFeatures.superHot = { type:'attraction', form:'is', s:'{random:super hot:very handsome:very good-looking:stunning:drop-dead gorgeous}'},
+
+
+
+
+
+erotica.features = [
+  { type:'mouth', form:'has', bp:'mouth', s:'a broad mouth'},
+  { type:'mouth', form:'has', bp:'mouth', s:'a wide mouth'},
+  { type:'mouth', form:'has', bp:'mouth', s:'a narrow mouth'},
+  { type:'mouth', form:'has', bp:'mouth', s:'a broad mouth'},
+  { type:'mouth', form:'has', bp:'mouth', s:'a pouting mouth'},
+  { type:'mouth', form:'has', bp:'mouth', s:'pursed lips'},
+  { type:'mouth', form:'has', bp:'mouth', s:'side lips'},
+  { type:'mouth', form:'has', bp:'mouth', s:'thin lips'},
+  { type:'mouth', form:'has', bp:'mouth', s:'pursed lips'},
+  
+  { type:'expression', form:'has', bp:'face', s:'a hostile expression'},
+  { type:'expression', form:'has', bp:'face', s:'a wary expression'},
+  { type:'expression', form:'has', bp:'face', s:'a severe expression'},
+  { type:'expression', form:'has', bp:'face', s:'a harsh expression'},
+  { type:'expression', form:'has', bp:'face', s:'a vacant expression'},
+  { type:'expression', form:'is', bp:'face', s:'smiling'},
+  { type:'expression', form:'is', bp:'face', s:'scowling'},
+  { type:'expression', form:'is', bp:'face', s:'frowning'},
+
+  { type:'eyebrows', form:'has', bp:'face', s:'arched eyebrows'},
+  { type:'eyebrows', form:'has', bp:'face', s:'thick eyebrows'},
+  { type:'eyebrows', form:'has', bp:'face', s:'faint eyebrows'},
+  { type:'eyebrows', form:'has', bp:'face', s:'rounded eyebrows'},
+  { type:'eyebrows', form:'has', bp:'face', s:'straight eyebrows'},
+  { type:'eyebrows', form:'has', bp:'face', s:'faint eyebrows'},
+  { type:'eyebrows', form:'has', bp:'face', s:'high eyebrows'},
+  { type:'eyebrows', form:'has', bp:'face', s:'shirt eyebrows'},
+  { type:'eyebrows', form:'has', bp:'face', s:'long eyebrows'},
+  
+  { type:'nose', form:'has', bp:'face', s:'a pert nose'},
+  { type:'nose', form:'has', bp:'face', s:'a fleshy nose'},
+  { type:'nose', form:'has', bp:'face', s:'a turned-up nose'},
+  { type:'nose', form:'has', bp:'face', s:'a snub nose'},
+  { type:'nose', form:'has', bp:'face', s:'a Roman nose'},
+  { type:'nose', form:'has', bp:'face', s:'a hawk nose'},
+  { type:'nose', form:'has', bp:'face', s:'a Greek nose'},
+  { type:'nose', form:'has', bp:'face', s:'a Nubian nose'},
+  { type:'nose', form:'has', bp:'face', s:'a bony nose'},
+  { type:'nose', form:'has', bp:'face', s:'a small nose'},
+  { type:'nose', form:'has', bp:'face', s:'a soft, petite nose'},
+  { type:'nose', form:'has', bp:'face', s:'a bony nose'},
+  { type:'nose', form:'has', bp:'face', s:'an aquiline nose'},
+  { type:'nose', form:'has', bp:'face', s:function(char) { return "a slight indentation in the tip of " + char.pronouns.poss_adj + " nose"}},
+
+  { type:'body', form:'has', s:'a muscled body'},
+  { type:'body', form:'has', ifHas:'cock', s:'a muscled body'},
+  { type:'body', form:'has', ifHas:'cock', s:'a broad chest'},
+  { type:'body', form:'has', ifHas:'cock', s:'impressive abs'},
+  { type:'body', form:'has', ifHas:'cock', s:'a very muscled body'},
+  { type:'body', form:'has', ifHas:'tit', s:'long legs'},
+  { type:'body', form:'has', ifHas:'tit', s:'long legs'},
+  { type:'body', form:'has', ifHas:'tit', s:'long legs'},
+  { type:'body', form:'has', ifHas:'tit', s:'great legs'},
+  { type:'body', form:'has', ifHas:'tit', s:'hot legs'},
+
 ]
 
-erotica.haircolours = [
+erotica.maleFeatures.features = erotica.features
+erotica.femaleFeatures.features = erotica.features
+
+
+
+
+
+
+// ---- EYES ---
+
+erotica.eyeColors = [
+  "amber",
+  "blue",
+  "deeo blue",
+  "pale blue",
+  "aquamarine",
+  "brown",
+  "brown",
+  "brown",
+  "brown",
+  "brown",
+  "gray",
+  "green",
+  "hazel",
+]
+
+erotica.eyeFeatureGeneric = { type:'eyes', form:'has', bp:'face', s:function(char) { return char.eyeColor + ' eyes'}},
+erotica.maleFeatures.eyeGeneric = erotica.eyeFeatureGeneric
+erotica.femaleFeatures.eyeGeneric = erotica.eyeFeatureGeneric
+
+erotica.eyeFeatures = [
+  { type:'eyes', form:'has', bp:'face', s:function(char) { return 'upturned ' + char.eyeColor + ' eyes'}},
+  { type:'eyes', form:'has', bp:'face', s:function(char) { return 'downturned ' + char.eyeColor + ' eyes'}},
+  { type:'eyes', form:'has', bp:'face', s:function(char) { return 'warm ' + char.eyeColor + ' eyes'}},
+  { type:'eyes', form:'has', bp:'face', s:function(char) { return 'friendly ' + char.eyeColor + ' eyes'}},
+  { type:'eyes', form:'has', bp:'face', s:function(char) { return 'doleful ' + char.eyeColor + ' eyes'}},
+  { type:'eyes', form:'has', bp:'face', s:function(char) { return 'doe-like ' + char.eyeColor + ' eyes'}},
+  { type:'eyes', form:'has', bp:'face', s:function(char) { return 'soulful ' + char.eyeColor + ' eyes'}},
+  { type:'eyes', form:'has', bp:'face', s:function(char) { return 'almond-shaped ' + char.eyeColor + ' eyes'}},
+  { type:'eyes', form:'has', bp:'face', s:function(char) { return 'moon-shaped ' + char.eyeColor + ' eyes'}},
+  { type:'eyes', form:'has', bp:'face', s:function(char) { return 'sparkling ' + char.eyeColor + ' eyes'}},
+  { type:'eyes', form:'has', bp:'face', s:function(char) { return 'staring ' + char.eyeColor + ' eyes'}},
+  { type:'eyes', form:'has', bp:'face', s:function(char) { return 'scary ' + char.eyeColor + ' eyes'}},
+]
+  
+erotica.maleFeatures.eye = erotica.eyeFeatures
+erotica.femaleFeatures.eye = erotica.eyeFeatures
+
+
+
+
+
+// ---- SKIN TONE ---
+
+erotica.skinToneFeatures = [
+  { type:'skintone', form:'has', s:function(char) { return char.skinTone + " skin"}},
+  { type:'skintone', form:'has', s:function(char) { return "a " + char.skinTone + " skin tone"}},
+  { type:'skintone', form:'iso', s:function(char) { return sentenceCase(char.pronouns.poss_adj) + " skin is " + char.skinTone}},
+]
+
+erotica.paleSkinTones = [
+  "pale",
+  "very pale",
+  "almost white",
+  "milky white",
+  "alabaster",
+]
+
+erotica.skinTones = [
+  "umber",
+  "dark yellow-brown",
+  "sepia",
+  "reddish-brown",
+  "ochre",
+  "russet",
+  "terra-cotta",
+  "deep lustrous yellow-brown",
+  "tawny",
+  "taupe",
+  "khaki",
+  "fawn",
+  "beige",
+  "warm beige",
+  "tanned brown",
+  "creamy beige",
+  "warm brown",
+  "bronze",
+  "copper",
+  "sable",
+  "mahogany",
+  "chestnut",
+  "very dark",
+  "almost black",
+]
+
+
+
+
+
+
+
+// ---- HAIR ---
+
+erotica.naturalHairColors = [
+  "raven black",
   "black",
-  "blonde",
+  "black",
+  "black",
+  "deepest brunette",
+  "dark brown",
+  "medium brown",
+  "brunette",
+  "light brown",
+  "chestnut brown",
+  "walnut brown",
+  "light chestnut brown",
+  "caramel brown",
+  "auburn",
+  "ginger red",
+  "copper",
+  "titian",
+  "strawberry blond",
+  "light blonde",
+  "golden blonde",
+  "medium blonde",
+  "platinum blonde",
   "blue",
   "brunette",
   "ginger",
@@ -24,24 +224,362 @@ erotica.haircolours = [
   "platinum",
 ]
 
-erotica.bodystyles = [
-  "modest boobs",
-  "pert boobs",
-  "big boobs",
-  "huge boobs",
-  "average lips",
-  "pouting lips",
-  "blue eyes",
-  "green eyes",
-  "brown eyes",
-  "aqua eyes",
-  "purple eyes",
-  "turquoise eyes",
-  "very pale skin",
-  "lightly tanned skin",
-  "tanned skin",
-  "heavily tanned skin",
+erotica.redHairColors = [
+  "auburn",
+  "ginger red",
+  "copper",
+  "titian",
+  "strawberry blond",
+  "ginger",
 ]
+
+erotica.altHairColors = [
+  "pink",
+  "shocking pink",
+  "violet",
+  "purple",
+  "mauve",
+  "blue",
+  "electric blue",
+  "bright red",
+  "bright yellow",
+  "bright green",
+]
+  // Hair length
+  // 0 Shaved
+  // 1 buzzcut
+  // 2 crewcut, inch or so
+  // 3 
+  // 4
+  // 5 shoulder length
+  // 6 armpit
+  // 7 lower boob
+  // 8 naval
+  // 9 waist
+  // 10 crotch
+erotica.femaleFeatures.hairStyles = [
+  
+  // long hair (6-10)
+  { type:'hair', hairLength:8, form:'has', bp:'head', s:function(char) { return "long " + char.hairColor + " hair cascading down " + char.pronouns.poss_adj + " back"}},
+  { type:'hair', hairLength:7, form:'has', bp:'head', s:function(char) { return "wavy long " + char.hairColor + " hair"}},
+  { type:'hair', hairLength:6, form:'has', bp:'head', s:function(char) { return "long, wild " + char.hairColor + " hair"}},
+  { type:'hair', hairLength:7, form:'has', bp:'head', s:function(char) { return "long, tousled " + char.hairColor + " hair"}},
+  { type:'hair', hairLength:8, form:'has', bp:'head', s:function(char) { return "long " + char.hairColor + " hair"}},
+  { type:'hair', hairLength:7, form:'has', bp:'head', s:function(char) { return "long " + char.hairColor + " hair in cornrow braids"}},
+  { type:'hair', hairLength:6, form:'has', bp:'head', s:function(char) { return "long " + char.hairColor + " hair swept to the left"}},
+  { type:'hair', hairLength:6, form:'has', bp:'head', s:function(char) { return "right-swept " + char.hairColor + " hair"}},
+  { type:'hair', hairLength:9, form:'has', bp:'head', s:function(char) { return "long, layered " + char.hairColor + " hair falling down her back"}},
+  { type:'hair', hairLength:7, form:'has', bp:'head', s:function(char) { return "sleek, straight and long " + char.hairColor + " hair"}},
+  { type:'hair', hairLength:6, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in long glamorous waves"}},
+  { type:'hair', hairLength:9, form:'has', bp:'head', s:function(char) { return "long " + char.hairColor + " hair tumbling down " + char.pronouns.poss_adj + " back"}},
+  { type:'hair', hairLength:7, form:'has', bp:'head', s:function(char) { return "wavy long " + char.hairColor + " hair"}},
+  { type:'hair', hairLength:7, form:'has', bp:'head', s:function(char) { return "long, wild " + char.hairColor + " hair"}},
+  { type:'hair', hairLength:7, form:'has', bp:'head', s:function(char) { return "long, tousled " + char.hairColor + " hair"}},
+  { type:'hair', hairLength:8, form:'has', bp:'head', s:function(char) { return "long " + char.hairColor + " hair"}},
+  { type:'hair', hairLength:7, form:'has', bp:'head', s:function(char) { return "long cornrow-braided " + char.hairColor + " hair"}},
+  { type:'hair', hairLength:7, form:'has', bp:'head', s:function(char) { return "long " + char.hairColor + " hair swept to the left"}},
+  { type:'hair', hairLength:6, form:'has', bp:'head', s:function(char) { return "right-swept " + char.hairColor + " hair"}},
+  { type:'hair', hairLength:7, form:'has', bp:'head', s:function(char) { return "long, layered " + char.hairColor + " hair falling to " + char.pronouns.poss_adj + " waist"}},
+  { type:'hair', hairLength:10, form:'has', bp:'head', s:function(char) { return "long, wild " + char.hairColor + " hair falling to well below " + char.pronouns.poss_adj + " waist"}},
+  { type:'hair', hairLength:8, form:'has', bp:'head', s:function(char) { return "long, sleek and straight " + char.hairColor + " hair"}},
+  { type:'hair', hairLength:6, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in long glamorous waves"}},
+
+  // ponytail, etc. (5-8)
+  { type:'hair', hairLength:7, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in braids"}},
+  { type:'hair', hairLength:8, form:'has', bp:'head', s:function(char) { return "long " + char.hairColor + " hair in braids"}},
+  { type:'hair', hairLength:5, form:'has', bp:'head', s:function(char) { return char.pronouns.poss_adj + "long " + char.hairColor + " hair in a high ponytail"}},
+  { type:'hair', hairLength:8, form:'has', bp:'head', s:function(char) { return char.pronouns.poss_adj + "long " + char.hairColor + " hair in a high ponytail that falls halfway down " + char.pronouns.poss_adj + " back"}},
+  { type:'hair', hairLength:5, form:'has', bp:'head', s:function(char) { return "long " + char.hairColor + " hair held in a tight ponytail"}},
+  { type:'hair', hairLength:6, form:'has', bp:'head', s:function(char) { return "long " + char.hairColor + " hair held in a ponytail"}},
+  { type:'hair', hairLength:6, form:'has', bp:'head', s:function(char) { return "long " + char.hairColor + " hair in a neat ponytail"}},
+  { type:'hair', hairLength:5, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in a half-ponytail"}},
+  { type:'hair', hairLength:6, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in a side-ponytail"}},
+  { type:'hair', hairLength:5, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in two pigtails"}},
+  { type:'hair', hairLength:7, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in long pigtails"}},
+  
+  // short hair (1-5)
+  { type:'hair', hairLength:5, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair that brushes " + char.pronouns.poss_adj + " shoulders"}},
+  { type:'hair', hairLength:3, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in a short fro"}},
+  { type:'hair', hairLength:4, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in a short bob"}},
+  { type:'hair', hairLength:4, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in a bob"}},
+  { type:'hair', hairLength:5, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in a bob with outward curls"}},
+  { type:'hair', hairLength:5, form:'has', bp:'head', s:function(char) { return "slicked-back, shoulder-length " + char.hairColor + " hair"}},
+  { type:'hair', hairLength:5, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in a shoulder-grazing bob"}},
+  { type:'hair', hairLength:5, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in a curly bob"}},
+  { type:'hair', hairLength:2, form:'has', bp:'head', s:function(char) { return "pixie-cut " + char.hairColor + " hair"}},
+  { type:'hair', hairLength:1, form:'has', bp:'head', s:function(char) { return "buzz-cut " + char.hairColor + " hair"}},
+  { type:'hair', hairLength:2, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in a crew-cut"}},
+  { type:'hair', hairLength:2, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in a short, Mohawk-style"}},
+  { type:'hair', hairLength:5, form:'has', bp:'head', s:function(char) { return char.pronouns.poss_adj + " " + char.hairColor + " hair in a halo of curls"}},
+]
+
+erotica.maleFeatures.hairStyles = [
+  
+  // long hair (6-10)
+  { type:'hair', hairLength:8, form:'has', bp:'head', s:function(char) { return "long " + char.hairColor + " hair cascading down " + char.pronouns.poss_adj + " back"}},
+  { type:'hair', hairLength:7, form:'has', bp:'head', s:function(char) { return "wavy long " + char.hairColor + " hair"}},
+  { type:'hair', hairLength:6, form:'has', bp:'head', s:function(char) { return "long, wild " + char.hairColor + " hair"}},
+
+  // ponytail, etc. (5-8)
+  { type:'hair', hairLength:6, form:'has', bp:'head', s:function(char) { return "long " + char.hairColor + " hair held in a ponytail"}},
+  { type:'hair', hairLength:6, form:'has', bp:'head', s:function(char) { return "long " + char.hairColor + " hair in a neat ponytail"}},
+  
+  // short hair (1-5)
+  { type:'hair', hairLength:5, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair that brushes " + char.pronouns.poss_adj + " shoulders"}},
+  { type:'hair', hairLength:3, form:'has', bp:'head', s:function(char) { return "slicked-back " + char.hairColor + " hair"}},
+  { type:'hair', hairLength:1, form:'has', bp:'head', s:function(char) { return "buzz-cut " + char.hairColor + " hair"}},
+  { type:'hair', hairLength:1, form:'has', bp:'head', s:function(char) { return "buzz-cut " + char.hairColor + " hair"}},
+  { type:'hair', hairLength:1, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in a buzz-cut"}},
+  { type:'hair', hairLength:2, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in a crew-cut"}},
+  { type:'hair', hairLength:2, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in a flat-top"}},
+  { type:'hair', hairLength:2, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in a short, Mohawk-style"}},
+  { type:'hair', hairLength:4, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in a high Mohawk-style"}},
+  { type:'hair', hairLength:2, form:'has', bp:'head', s:function(char) { return "spiky " + char.hairColor + " hair"}},
+
+  { type:'hair', hairLength:0, form:'has', bp:'head', s:function(char) { return "a shaven head"}},
+  { type:'hair', hairLength:0, form:'has', bp:'head', s:function(char) { return "a shaven head"}},
+  { type:'hair', hairLength:0, form:'has', bp:'head', s:function(char) { return "a shaven head"}},
+
+]
+
+
+
+
+
+
+// ---- TATTOOS ---
+
+erotica.femaleFeatures.tattoos = [
+  
+  { type:'tattoo', form:'has', s:function(char) { return "tattoos all over " + char.pronouns.poss_adj + " body"}},
+
+  { type:'tattoo', form:'has', bp:'upperback', script:erotica.setTattooImage, s:function(char) {
+    return char.tattooImage + " tattooed on " + char.pronouns.poss_adj + " left shoulder blade"
+  }},
+
+  { type:'tattoo', form:'has', bp:'lowerback', script:erotica.setTattooImage, s:function(char) {
+    return char.tattooImage + " tattooed on " + char.pronouns.poss_adj + " lower back"
+  }},
+
+  { type:'tattoo', form:'has', bp:'midriff', script:erotica.setTattooImage, s:function(char) {
+    return char.tattooImage + " tattooed on " + char.pronouns.poss_adj + " her midriff"
+  }},
+
+  { type:'tattoo', form:'has', bp:'tit', script:erotica.setTattooImage, s:function(char) {
+    return char.tattooImage + " tattooed on " + char.pronouns.poss_adj + " left breast"
+  }},
+
+  { type:'tattoo', form:'has', bp:'buttock', script:erotica.setTattooImage, s:function(char) {
+    return char.tattooImage + " tattooed on " + char.pronouns.poss_adj + " left buttock"
+  }},
+
+
+  { type:'tattoo', form:'has', bp:'thigh', script:erotica.setTattooQuote, s:function(char) {
+    return "the words \"" + char.tattooQuote + "\" tattooed on " + char.pronouns.poss_adj + " left thigh"
+  }},
+
+  { type:'tattoo', form:'has', bp:'arm', script:erotica.setTattooQuote, s:function(char) {
+    return "the words \"" + char.tattooQuote + "\" tattooed on " + char.pronouns.poss_adj + " left arm"
+  }},
+
+  { type:'tattoo', form:'has', bp:'midriff', script:erotica.setTattooQuote, s:function(char) {
+    return "the words \"" + char.tattooQuote + "\" tattooed just above " + char.pronouns.poss_adj + " waist"
+  }},
+]
+
+erotica.maleFeatures.tattoos = [
+  
+  { type:'tattoo', form:'has', bp:'arm', s:function(char) { return "large tribal tattoos covering both " + char.pronouns.poss_adj + " arms"}},
+  { type:'tattoo', form:'has', s:function(char) { return "tattoos all over " + char.pronouns.poss_adj + " body"}},
+
+  { type:'tattoo', form:'has', bp:'upperback', script:erotica.setTattooImage, s:function(char) {
+    return char.tattooImage + " tattooed on " + char.pronouns.poss_adj + " back"
+  }},
+
+  { type:'tattoo', form:'has', bp:'chest', script:erotica.setTattooImage, s:function(char) {
+    return char.tattooImage + " tattooed on " + char.pronouns.poss_adj + " chest"
+  }},
+
+  { type:'tattoo', form:'has', bp:'midriff', script:erotica.setTattooImage, s:function(char) {
+    return char.tattooImage + " tattooed on " + char.pronouns.poss_adj + " stomach"
+  }},
+
+  { type:'tattoo', form:'has', bp:'arm', script:erotica.setTattooImage, s:function(char) {
+    return char.tattooImage + " tattooed on " + char.pronouns.poss_adj + " upper left arm"
+  }},
+
+  { type:'tattoo', form:'has', bp:'arm', script:erotica.setTattooImage, s:function(char) {
+    return char.tattooImage + " tattooed on " + char.pronouns.poss_adj + " upper right arm"
+  }},
+
+  { type:'tattoo', form:'has', bp:'buttock', script:erotica.setTattooImage, s:function(char) {
+    return char.tattooImage + " tattooed on " + char.pronouns.poss_adj + " left buttock"
+  }},
+
+
+  { type:'tattoo', form:'has', bp:'thigh', script:erotica.setTattooQuote, s:function(char) {
+    return "the words \"" + char.tattooQuote + "\" tattooed on " + char.pronouns.poss_adj + " right arm"
+  }},
+
+]
+
+erotica.tattooImages = [
+  "a fiery scorpion",
+  "a colorful bird with its wings spread",
+  "a tiger's head",
+  "a roaring tiger",
+  "three wolves",
+  "wolves howling at the moon",
+  "a lion's head",
+  "an elephant head",
+  "a serpentine dragon",
+  "fire-breathing dragon",
+  "a dragon coiled around a naked woman",
+  "a pheonix, wings spread",
+  "a pheonix rising from flames",
+  "Pegasus",
+  "an angel",
+  "two entwined snakes",
+  "an eagle",
+  
+  "an army of fire-eyed skeletons",
+  "a fiery skull",
+  "a skull and dagger",
+  "a skull wearing a crown",
+  "a crown",
+  "some dollar bills",
+  "a rose",
+  "a crying rose",
+  "a rose dripping blood",
+  "a sunflower",
+  "an oak tree",
+  "a revolver and a rose",
+  "an assault rifle",
+  "an AK-47",
+  "the gates of hell",
+  "meticulously drawn feathers",
+  "some Chinese characters",
+]
+
+erotica.tattooQuotes = [
+  "For the eyes of the Lord are over the righteous and his ears are open…",
+  "Take care of the sense, and the sounds will take care of themselves.",
+  "Even angels fall",
+  "My life is my art, My art is my life",
+  "Live by faith, not by sight",
+  "Love me for who I am",
+  "Too wild to live, too rare to die",
+  "We accept the love, we think we deserve",
+  "How sweet the sound",
+  "Death leaves a heartache no one can heal.  Love bears a memory no one can steal.",
+  "I should have been a pair of ragged claws, scuttling across the floors of silent seas.",
+  "As it was in the beginning one love so shall it be in the end one heart.",
+  "When you left me behind you set me free.",
+  "She said lose your eyes and free your mind, you’re free to fly.",
+  "There is a change for the hearing of my heart.  It really goes.",
+  "Life’s roughest storms prove the strength of our anchors.",
+  "Float like a butterfly, sting like a bee.",
+  "Dream as if you’ll live forever.  Live as if you’ll die today.",
+  "We must all face the choice between what is right and what is easy.",
+  "Have faith",
+  "Family like branches on a tree, we all grow in different directions.",
+  "By the strength within I shall succeed.",
+  "Don’t worry be happy",
+  "My soul corrupted by vengeance hath endured torment…",
+  "She is too fond of books, and it has turned her brain.",
+  "And though she be but little, she is fierce",
+  "Happiness depends upon ourselves.",
+  "So dear love him,that with him all deaths could endure…",
+  "Beneath the makeup and behind the smile, I am just a girl…",
+  "For every dark night, there’s a brighter day.",
+  "Do not go gentle into that good night…",
+  "In the beginning, God created the heavens and the earth.",
+  "Don’t dream your life, live your dream.",
+  "Sometimes when you fall you fly",
+  "Through every dark night, there is a brighter day",
+  "Some say I’m going the wrong way…",
+  "Take a breath and be strong",
+  "It’s only life after all",
+  "Flowers only last so long",
+  "The ultimate measure of a man is not who he stands in the moments of comfort…",
+  "The greatest thing you’ll ever learn is just to love and be loved in return.",
+  "Do what you love",
+  "With His love there is nothing I cannot do.",
+  "Every moment overflows with power, 66 thousand miles an hour.",
+  "You be the Anchor that keeps my feet on the ground… and I’ll be the wings….",
+  "Hate without reason",
+  "Who is more real?",
+  "Life goes on",
+  "... and the world will be yours",
+  "You believe lies so you must learn to trust no one but yourself.",
+  "Get busy living or get busy dying",
+  "We are the graceless and dumbfounded, insane with our own insatiable desire…",
+  "Don’t test the ones you love, it will only tear us down.",
+  "If you want peace, prepare for war",
+  "Lead me not into temptation",
+  "Walk by faith, not by sight",
+  "Beneath lay words that suffocate",
+  "If you don’t live for something, you’ll die for nothing",
+  "She flies by her own wings",
+  "Art never comes from happiness",
+  "This is your life and it’s ending one minute at a time…",
+  "When the power of love overcomes the love of power then the world will know peace",
+  "Dream as if you’ll live forever",
+  "Even though I walk through the valley of the shadow of death…",
+  "Reality is wrong, dreams are for real",
+  "If I lay here if I just lay here, would you lie with me…",
+  "You get what you give",
+  "It’s only forever… not long at all",
+  "In love and death",
+  "In a world of my own",
+  "This too shall pass",
+  "What type of harvest will September bring",
+  "Life is not measured by the number of breaths…",
+  "Fate fell short",
+  "Never a failure always a lesson.",
+  "Betrayer, where is your head. Betrayer, where is your heart.",
+  "Until forever fades away",
+  "Fear is the mind killer",
+  "Strength Respect Loyalty",
+  "Hope Love Family Believe Strength Dream",
+  "Dear lover, give me one last painful kiss",
+  "Never compromise. Not even in the face of armageddon.",
+  "Heart means everything",
+  "Never forget who you are",
+  "Grant me the serenity to accept the things I cannot change…",
+  "You are what you love and not what loves you back",
+  "Wars begin in the minds of men",
+  "If you can dream it you can do it",
+  "With pain comes strength",
+  "To die would be an awfully big adventure",
+  "Be the one to guide me but never hold me down",
+  "I will fear no evil for you are with me",
+  "Live each day as if it were your last",
+  "Faith Hope and Love",
+  "She was no more no less, than anything but herself",
+  "Dream Believe Dare Do",
+  "Just as long as there are stars above us",
+  "A prayer for the wild at heart, kept in cages",
+  "To err is human; to forgive is divine.",
+  "Uncertain, intrepid, possibly immortal decidedly in love",
+  "I brought down the sky for you but all you did was shrug",
+  "Forget your past, forgive yourself, and begin again",
+  "You don’t know what you’re alive for until you know what you would die for",
+  "Fearfully and wonderfully made",
+  "To sleep, perchance to dream…",
+  "Be the change",
+  "The worst part about being lied to is knowing you weren’t worth the truth",
+  "I listened to the brag of my heart I am I am I am",
+  "Miss me little but not too long.",
+  "One Life One Love",
+]
+
+
+
+
+
+
+// ---- OLD AND UNUSED ---
 
 erotica.piercings = [
   "no piercings",
@@ -101,6 +639,15 @@ erotica.icons = [
   "a pizza slice",
 ]
 
+
+
+
+
+
+
+
+// ---- NAMES ---
+
 erotica.boysNames = [
   "Aaron",
   "Abdul",
@@ -148,12 +695,10 @@ erotica.boysNames = [
   "Amos",
   "Anderson",
   "Andre",
-  "Andrea",
   "Andreas",
   "Andres",
   "Andrew",
   "Andy",
-  "Angel",
   "Angelo",
   "Anibal",
   "Anthony",
@@ -161,7 +706,6 @@ erotica.boysNames = [
   "Antoine",
   "Anton",
   "Antone",
-  "Antonia",
   "Antonio",
   "Antony",
   "Antwan",
@@ -181,7 +725,6 @@ erotica.boysNames = [
   "Arthur",
   "Arturo",
   "Asa",
-  "Ashley",
   "Aubrey",
   "August",
   "Augustine",
@@ -211,14 +754,12 @@ erotica.boysNames = [
   "Bert",
   "Bertram",
   "Bill",
-  "Billie",
   "Billy",
   "Blaine",
   "Blair",
   "Blake",
   "Bo",
   "Bob",
-  "Bobbie",
   "Bobby",
   "Booker",
   "Boris",
@@ -269,15 +810,12 @@ erotica.boysNames = [
   "Carlos",
   "Carlton",
   "Carmelo",
-  "Carmen",
   "Carmine",
-  "Carol",
   "Carrol",
   "Carroll",
   "Carson",
   "Carter",
   "Cary",
-  "Casey",
   "Cecil",
   "Cedric",
   "Cedrick",
@@ -312,7 +850,6 @@ erotica.boysNames = [
   "Clayton",
   "Clement",
   "Clemente",
-  "Cleo",
   "Cletus",
   "Cleveland",
   "Cliff",
@@ -329,7 +866,6 @@ erotica.boysNames = [
   "Collin",
   "Colton",
   "Columbus",
-  "Connie",
   "Conrad",
   "Cordell",
   "Corey",
@@ -337,7 +873,6 @@ erotica.boysNames = [
   "Cornell",
   "Cortez",
   "Cory",
-  "Courtney",
   "Coy",
   "Craig",
   "Cristobal",
@@ -347,7 +882,6 @@ erotica.boysNames = [
   "Curtis",
   "Cyril",
   "Cyrus",
-  "Dale",
   "Dallas",
   "Dalton",
   "Damian",
@@ -355,7 +889,6 @@ erotica.boysNames = [
   "Damion",
   "Damon",
   "Dan",
-  "Dana",
   "Dane",
   "Danial",
   "Daniel",
@@ -385,7 +918,6 @@ erotica.boysNames = [
   "Dean",
   "Deandre",
   "Deangelo",
-  "Dee",
   "Del",
   "Delbert",
   "Delmar",
@@ -418,7 +950,6 @@ erotica.boysNames = [
   "Domingo",
   "Dominic",
   "Dominick",
-  "Dominique",
   "Don",
   "Donald",
   "Dong",
@@ -500,7 +1031,6 @@ erotica.boysNames = [
   "Erich",
   "Erick",
   "Erik",
-  "Erin",
   "Ernest",
   "Ernesto",
   "Ernie",
@@ -537,12 +1067,10 @@ erotica.boysNames = [
   "Forest",
   "Forrest",
   "Foster",
-  "Frances",
   "Francesco",
   "Francis",
   "Francisco",
   "Frank",
-  "Frankie",
   "Franklin",
   "Franklyn",
   "Fred",
@@ -555,8 +1083,6 @@ erotica.boysNames = [
   "Freeman",
   "Fritz",
   "Gabriel",
-  "Gail",
-  "Gale",
   "Galen",
   "Garfield",
   "Garland",
@@ -567,7 +1093,6 @@ erotica.boysNames = [
   "Gary",
   "Gaston",
   "Gavin",
-  "Gayle",
   "Gaylord",
   "Genaro",
   "Gene",
@@ -599,7 +1124,6 @@ erotica.boysNames = [
   "Gregorio",
   "Gregory",
   "Grover",
-  "Guadalupe",
   "Guillermo",
   "Gus",
   "Gustavo",
@@ -670,7 +1194,6 @@ erotica.boysNames = [
   "Ivory",
   "Jacinto",
   "Jack",
-  "Jackie",
   "Jackson",
   "Jacob",
   "Jacques",
@@ -686,7 +1209,6 @@ erotica.boysNames = [
   "Jamey",
   "Jamie",
   "Jamison",
-  "Jan",
   "Jared",
   "Jarod",
   "Jarred",
@@ -698,7 +1220,6 @@ erotica.boysNames = [
   "Javier",
   "Jay",
   "Jayson",
-  "Jean",
   "Jed",
   "Jeff",
   "Jefferey",
@@ -722,15 +1243,10 @@ erotica.boysNames = [
   "Jess",
   "Jesse",
   "Jessie",
-  "Jesus",
-  "Jewel",
-  "Jewell",
   "Jim",
   "Jimmie",
   "Jimmy",
-  "Joan",
   "Joaquin",
-  "Jody",
   "Joe",
   "Joel",
   "Joesph",
@@ -748,7 +1264,6 @@ erotica.boysNames = [
   "Jonathan",
   "Jonathon",
   "Jordan",
-  "Jordon",
   "Jorge",
   "Jose",
   "Josef",
@@ -769,11 +1284,9 @@ erotica.boysNames = [
   "Justin",
   "Kareem",
   "Karl",
-  "Kasey",
   "Keenan",
   "Keith",
   "Kelley",
-  "Kelly",
   "Kelvin",
   "Ken",
   "Kendall",
@@ -785,11 +1298,9 @@ erotica.boysNames = [
   "Kent",
   "Kenton",
   "Kermit",
-  "Kerry",
   "Keven",
   "Kevin",
   "Kieth",
-  "Kim",
   "King",
   "Kip",
   "Kirby",
@@ -797,13 +1308,11 @@ erotica.boysNames = [
   "Korey",
   "Kory",
   "Kraig",
-  "Kris",
   "Kristofer",
   "Kristopher",
   "Kurt",
   "Kurtis",
   "Kyle",
-  "Lacy",
   "Lamar",
   "Lamont",
   "Lance",
@@ -811,17 +1320,14 @@ erotica.boysNames = [
   "Lane",
   "Lanny",
   "Larry",
-  "Lauren",
   "Laurence",
   "Lavern",
-  "Laverne",
   "Lawerence",
   "Lawrence",
   "Lazaro",
   "Leandro",
   "Lee",
   "Leif",
-  "Leigh",
   "Leland",
   "Lemuel",
   "Len",
@@ -835,14 +1341,10 @@ erotica.boysNames = [
   "Leopoldo",
   "Leroy",
   "Les",
-  "Lesley",
-  "Leslie",
   "Lester",
   "Levi",
   "Lewis",
   "Lincoln",
-  "Lindsay",
-  "Lindsey",
   "Lino",
   "Linwood",
   "Lionel",
@@ -867,12 +1369,10 @@ erotica.boysNames = [
   "Luigi",
   "Luis",
   "Luke",
-  "Lupe",
   "Luther",
   "Lyle",
   "Lyman",
   "Lyndon",
-  "Lynn",
   "Lynwood",
   "Mac",
   "Mack",
@@ -892,10 +1392,8 @@ erotica.boysNames = [
   "Marcos",
   "Marcus",
   "Margarito",
-  "Maria",
   "Mariano",
   "Mario",
-  "Marion",
   "Mark",
   "Markus",
   "Marlin",
@@ -905,7 +1403,6 @@ erotica.boysNames = [
   "Martin",
   "Marty",
   "Marvin",
-  "Mary",
   "Mason",
   "Mathew",
   "Matt",
@@ -1016,8 +1513,6 @@ erotica.boysNames = [
   "Paris",
   "Parker",
   "Pasquale",
-  "Pat",
-  "Patricia",
   "Patrick",
   "Paul",
   "Pedro",
@@ -1140,7 +1635,6 @@ erotica.boysNames = [
   "Sammy",
   "Samual",
   "Samuel",
-  "Sandy",
   "Sanford",
   "Sang",
   "Santiago",
@@ -1158,7 +1652,6 @@ erotica.boysNames = [
   "Seymour",
   "Shad",
   "Shane",
-  "Shannon",
   "Shaun",
   "Shawn",
   "Shayne",
@@ -1167,7 +1660,6 @@ erotica.boysNames = [
   "Shelton",
   "Sherman",
   "Sherwood",
-  "Shirley",
   "Shon",
   "Sid",
   "Sidney",
@@ -1178,8 +1670,6 @@ erotica.boysNames = [
   "Son",
   "Sonny",
   "Spencer",
-  "Stacey",
-  "Stacy",
   "Stan",
   "Stanford",
   "Stanley",
@@ -1198,7 +1688,6 @@ erotica.boysNames = [
   "Sylvester",
   "Tad",
   "Tanner",
-  "Taylor",
   "Ted",
   "Teddy",
   "Teodoro",
@@ -1231,7 +1720,6 @@ erotica.boysNames = [
   "Tony",
   "Tory",
   "Tracey",
-  "Tracy",
   "Travis",
   "Trent",
   "Trenton",
@@ -1285,7 +1773,6 @@ erotica.boysNames = [
   "Wes",
   "Wesley",
   "Weston",
-  "Whitney",
   "Wilber",
   "Wilbert",
   "Wilbur",
@@ -1320,13 +1807,6 @@ erotica.boysNames = [
   "Zackary",
   "Zane",
 ]
-
-
-
-
-
-
-
 
 erotica.girlsNames = [
   "Mary",
@@ -1424,7 +1904,6 @@ erotica.girlsNames = [
   "Annie",
   "Lillian",
   "Emily",
-  "Robin",
   "Peggy",
   "Crystal",
   "Gladys",
@@ -1470,7 +1949,6 @@ erotica.girlsNames = [
   "Leslie",
   "Clara",
   "Lucille",
-  "Jamie",
   "Joanne",
   "Eleanor",
   "Valerie",
@@ -1539,11 +2017,9 @@ erotica.girlsNames = [
   "Wilma",
   "Gina",
   "Kristin",
-  "Jessie",
   "Natalie",
   "Agnes",
   "Vera",
-  "Willie",
   "Charlene",
   "Bessie",
   "Delores",
@@ -1577,7 +2053,6 @@ erotica.girlsNames = [
   "Jo",
   "Vickie",
   "Mattie",
-  "Terry",
   "Maxine",
   "Irma",
   "Mabel",
@@ -1604,7 +2079,6 @@ erotica.girlsNames = [
   "Olga",
   "Billie",
   "Dianne",
-  "Tracey",
   "Leona",
   "Jenny",
   "Felicia",
@@ -1664,7 +2138,6 @@ erotica.girlsNames = [
   "Kayla",
   "Sonya",
   "Jan",
-  "Lee",
   "Kristine",
   "Candace",
   "Fannie",
@@ -1715,7 +2188,6 @@ erotica.girlsNames = [
   "Roxanne",
   "Angelica",
   "Robyn",
-  "Francis",
   "Adrienne",
   "Rosalie",
   "Alexandra",
@@ -1772,14 +2244,12 @@ erotica.girlsNames = [
   "Henrietta",
   "Alyssa",
   "Jana",
-  "Kelley",
   "Gwen",
   "Kerry",
   "Jenna",
   "Tricia",
   "Laverne",
   "Olive",
-  "Alexis",
   "Tasha",
   "Silvia",
   "Elvira",
@@ -1819,8 +2289,6 @@ erotica.girlsNames = [
   "Ora",
   "Nettie",
   "Tabitha",
-  "Ollie",
-  "Jaime",
   "Winifred",
   "Kristie",
   "Marina",
@@ -1841,7 +2309,6 @@ erotica.girlsNames = [
   "Stacie",
   "Adriana",
   "Cheri",
-  "Shelby",
   "Abigail",
   "Celeste",
   "Jewel",
@@ -1850,11 +2317,9 @@ erotica.girlsNames = [
   "Rebekah",
   "Lucinda",
   "Dorthy",
-  "Chris",
   "Effie",
   "Trina",
   "Reba",
-  "Shawn",
   "Sallie",
   "Aurora",
   "Lenora",
@@ -1897,7 +2362,6 @@ erotica.girlsNames = [
   "Janette",
   "Latonya",
   "Candy",
-  "Morgan",
   "Consuelo",
   "Tamika",
   "Rosetta",
@@ -1919,13 +2383,11 @@ erotica.girlsNames = [
   "Carolina",
   "Cleo",
   "Stefanie",
-  "Rosario",
   "Ola",
   "Janine",
   "Mollie",
   "Lupe",
   "Alisa",
-  "Lou",
   "Maribel",
   "Susanne",
   "Bette",
@@ -1974,7 +2436,6 @@ erotica.girlsNames = [
   "Angeline",
   "Frieda",
   "Lily",
-  "Robbie",
   "Shauna",
   "Millie",
   "Claudette",
@@ -1988,14 +2449,12 @@ erotica.girlsNames = [
   "Staci",
   "Lea",
   "Christi",
-  "Jimmie",
   "Justine",
   "Elma",
   "Luella",
   "Margret",
   "Dominique",
   "Socorro",
-  "Rene",
   "Martina",
   "Margo",
   "Mavis",
@@ -2099,7 +2558,6 @@ erotica.girlsNames = [
   "Allyson",
   "Ashlee",
   "Tania",
-  "Tommie",
   "Esmeralda",
   "Karina",
   "Eve",
@@ -2113,14 +2571,12 @@ erotica.girlsNames = [
   "Amie",
   "Althea",
   "Rosalinda",
-  "Jordan",
   "Lilia",
   "Alana",
   "Gay",
   "Clare",
   "Alejandra",
   "Elinor",
-  "Michael",
   "Lorrie",
   "Jerri",
   "Darcy",
@@ -2158,8 +2614,6 @@ erotica.girlsNames = [
   "Suzette",
   "Corine",
   "Kaye",
-  "Jerry",
-  "Merle",
   "Chrystal",
   "Lina",
   "Deanne",
@@ -2177,7 +2631,6 @@ erotica.girlsNames = [
   "Nadia",
   "Madge",
   "Kathie",
-  "Eddie",
   "Ophelia",
   "Valeria",
   "Nona",
@@ -2195,7 +2648,6 @@ erotica.girlsNames = [
   "Chasity",
   "Sheree",
   "Carly",
-  "James",
   "Elvia",
   "Alyce",
   "Deirdre",
@@ -2222,8 +2674,6 @@ erotica.girlsNames = [
   "Josefa",
   "Augusta",
   "Liliana",
-  "Young",
-  "Christian",
   "Lessie",
   "Amalia",
   "Savannah",
@@ -2235,7 +2685,6 @@ erotica.girlsNames = [
   "Corina",
   "Alfreda",
   "Leanna",
-  "Carey",
   "Amparo",
   "Coleen",
   "Tamra",
@@ -2278,7 +2727,6 @@ erotica.girlsNames = [
   "Lauri",
   "Helga",
   "Gilda",
-  "Adrian",
   "Rhea",
   "Marquita",
   "Hollie",
@@ -2312,7 +2760,6 @@ erotica.girlsNames = [
   "Sharlene",
   "Lesa",
   "Beverley",
-  "Robert",
   "Isabella",
   "Herminia",
   "Terra",
