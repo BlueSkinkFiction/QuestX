@@ -1,7 +1,6 @@
 "use strict";
 
 
-
 const ACTOR = function(isFemale, isPlayer) {
   let res
   if (isPlayer) {
@@ -14,29 +13,156 @@ const ACTOR = function(isFemale, isPlayer) {
     res = NPC(isFemale)
   }
   
+  res.actor = true
   res.getArousal = function() {return this.arousal}
   res.arousal = 10; // changes dynamically, 0 - 100
-  
-  // From 0 to 5
-  // 0 repulsed (eg homophobic)
-  // 1 rather not
-  // 2 not interested
-  // 3 somewhat
-  // 4 definitely
-  // 5 always looking, always thinking
-  res.attactedToMen = 4;
-  res.attactedToWomen = 4;
-  
-  // From 0 to 10
-  // 0 pig ugly
-  // 2 you wouldn't
-  // 4 plain
-  // 6 quite attractive
-  // 8 hot
-  // 10 swimwear model
-  res.appearance = 7;
-  
+  res.reputation = 0  // getting a reputation is BAD, as other characters will dislike you
+  res.responses = erotica.defaultResponses
   res.responseNotWhileTiedUp = "'Not while I'm tied up.'"
+  
+  res.doEvent = function() {
+    if (this.npc) {
+      this.doReactions();
+      if (!this.paused && !this.suspended && this.agenda.length > 0) this.doAgenda();
+    }
+    this.updateArousal();
+  }
+  
+  
+  res.updateArousal = function() {
+    const l = this.othersHere()
+    let total = 0
+    if (this.report) console.log("Arousal for " + this.name)
+    if (this.report) console.log("Was: " + this.arousal)
+    for (let i = 0; i < l.length; i++) {
+      const inc = this.getInstantAttraction(l[i])
+      if (this.report) console.log("Add " + inc + " for " + l[i].name)
+      total += inc
+    }
+    this.arousal += total / 5 - this.arousal / 10
+    if (this.report) console.log("Now: " + this.arousal)
+  }
+  
+  // The character does something sexy, rated from 0 to 10
+  // This raises the arousal of other characters (not this one)
+  res.arousalBomb = function(rating) {
+    const l = this.othersHere()
+    let total = 0
+    if (this.report) console.log("Arousal bomb for " + this.name)
+    for (let i = 0; i < l.length; i++) {
+      const att = l[i].getInstantAttraction(this)
+      if (this.report) console.log("Adding " + (att * rating / 10) + " to " + l[i].name)
+      l[i].arousal += att * rating / 10
+    }
+  }
+  
+  
+  res.othersHere = function() {
+    const l = []
+    for (let key in w) {
+      const o = w[key]
+      if (o.actor && o !== this && o.loc === this.loc) l.push(o)
+    }
+    return l
+  }
+  
+
+
+   // Get a rating for how public the room is
+  // 0 might be a private room, 10 on a raised area in a public thoroughfare
+  // Effectively unit tested
+  res.getPublicRating = function(room) {
+    do {
+      if (room.getPublicRating) return room.getPublicRating();
+      room = w[room.loc];
+    } while (room);
+    return 5;
+  }
+  
+  res.getPublicRatingHere = function() {
+    return this.getPublicRating(this.loc);
+  }
+ 
+  res.assumePosture = function(posture, forced) {
+    if (this.posture === posture.desc && this.postureFurniture === undefined) {
+      failedmsg(ALREADY(this));
+      return FAILED;
+    }
+    if (!this.canPosture()) {
+      return FAILED;
+    }
+    if (!forced && !this.getAgreement("Posture", posture.cmd)) {
+      // The getAgreement should give the response
+      return FAILED;
+    }
+    if (this.postureFurniture) {
+      this.msg(STOP_POSTURE(this));  // STOP_POSTURE handles details
+    }  
+    this.posture = posture.desc;
+    this.postureAddFloor = posture.addFloor;
+    this.msg(nounVerb(this, "be", true) + " now " + this.getPostureDescription() + ".");
+    return SUCCESS;
+  }  
+  
+  
+  res.findCutter = function() {
+    for (let key in w) {
+      if (w[key].isAtLoc(this.name) && w[key].cutter) return w[key]
+    }
+    return false
+  }
+  
+  // Should already know char has pussy, this has cock, both accessible
+  res.girlOnTop = function(char) {
+    msg("Girl on top")
+    return SUCCESS
+  }
+  
+  // sextoy may be undefined. If it is, just already know char has cock, exposed
+  // Should already know this has specified bodypart, exposed
+  res.fuck = function(char, bodypart, sextoy) {
+    msg("Fuck")
+    return SUCCESS
+  }
+  
+  
+  
+  
+  // --------------  DESCRIBING ---------------------------
+  
+  res.examine = function(isMultiple, char) { 
+    msg("{description} " + pronounVerb(this, "be", true) + " wearing {attire}.{ifposture: " + pronounVerb(this, "be", true) + " is {posture}.}{ifrestraint: " + pronounVerb(this, "be", true) + " is {restraint}.}", {item:this})
+  }
+  
+  res.getPostureDescription = function(capitalise) {
+    if (!this.posture) return false;
+
+    const pos = this.posture.replace("#", this.pronouns.poss_adj);
+    if (this.postureFurniture) {
+      return pos + " " + this.postureAdverb + " " + w[this.postureFurniture].byname({article:DEFINITE});
+    }
+    else if (this.postureAddFloor) {
+      return pos + " on the floor";
+    }
+    else {
+      return pos;
+    }
+    
+  }
+
+  res.getStatusDesc = function() {
+    if (this.restraint) return w[this.restraint].situation
+    if (!this.posture) return false
+    if (!this.postureFurniture) return this.posture
+    return this.posture + " " + this.postureAdverb + " " + w[this.postureFurniture].byname({article:DEFINITE})
+  }
+  
+  
+  
+  
+  
+  
+  // --------------  BODY PARTS ---------------------------
   
   // You can override this to have an erotic actor have, for example, both a cock and tits
   // or to have novel body parts, such as a tail
@@ -50,14 +176,11 @@ const ACTOR = function(isFemale, isPlayer) {
     if (!this.isFemale && bp === "tit") return false;
     if (w[bp].notStd) return false;
     return true;
-  }
-  
-  
+  }  
   res.isBodyPartBare = function(bp) {
     if (typeof bp === "string") bp = w[bp];
     return (this.getOuterWearable(bp.getSlot()) === false)
   }
-  
   // You can override this to give a specific body part an adjective
   // Could also be done dynamically, say to reflect the erection
   // Alternatively, set bodyPartAdjectives
@@ -66,10 +189,21 @@ const ACTOR = function(isFemale, isPlayer) {
     if (bp_name === "tit") return "firm";
     if (bp_name === "cock") return "hard";
     if (bp_name === "bollock") return "hot";
+    if (bp_name === "pussy") return "hot";
     return this.getDefaultBodyPartAdjective();
   }
-  res.bodyPartAdjectives = {},
-  
+  res.descCock = function() {
+    console.log("here" + (this.arousal / 10))
+    console.log(erotica.erectionStates[Math.floor(this.arousal / 10)])
+    return erotica.erectionStates[Math.floor(this.arousal / 10) + 1];
+  }
+  res.descTits = function() {
+    return this.getBodyPartAdjective("tit") + " tits"
+  }
+  res.descPussy = function() {
+    return this.getBodyPartAdjective("pussy") + " pussy"
+  }
+  res.bodyPartAdjectives = {},  
   // Do not override
   // Effectively unit tested
   res.getBodyPartList = function() {
@@ -80,37 +214,50 @@ const ACTOR = function(isFemale, isPlayer) {
       }
     }
     return list;
-  }
-  
+  }  
   // You can override this as desired.
   res.getDefaultBodyPartAdjective = function() {
     return this.hasCock ? "muscled" : "smooth";
   }
-  
-  res.getStatusDesc = function() {
-    if (this.restraint) return w[this.restraint].situation
-    if (!this.posture) return false
-    if (!this.postureFurniture) return this.posture
-    return this.posture + " " + this.postureAdverb + " " + w[this.postureFurniture].byname({article:DEFINITE})
-  }
-  
-
-
-  
-  // Effectively unit tested
-  res.getClothing = function() {
-    return scope(isWornBy, {npc:this});
+  // You can override this to have an erotic actor have a fetish for a body part
+  // Have it return a number for a recognised body part, or false for anything else
+  res.getIntimateRating = function(bp_name) {
+    return false;
   }
   
   
+  
+  
+  
+  
+  // --------------  CLOTHING ---------------------------
+  
+  res.getWearingVisible = function() {
+    return this.getWearingSlottedVisible().concat(this.getWearingUnslotted())
+  }
+  res.getWearingSlottedVisible = function() {
+    let list = []
+    for (let i = 0; i < erotica.slots.length; i++) {
+      const g = this.getOuterWearable(erotica.slots[i])
+      if (g && !list.includes(g)) list.push(g)
+    }
+    return list
+  }
+  res.getWearingUnslotted = function() {
+    let list = []
+    for (let key in w) {
+      const g = w[key]
+      if (g.wearable && g.isAtLoc(this.name) && g.getSlots().length === 0) list.push(g)
+    }
+    return list
+  }
   res.isNaked = function() {
-    return (this.getClothing().length === 0)
+    return (this.getWearing().length === 0)
   }
-  
   // Dresses the characters in the give items, removing any others first
-  // Used for unit testing, may nt be that useful otherwise
+  // Used for unit testing, may not be that useful otherwise
   res.dressUp = function() {
-    const clothes = this.getClothing();
+    const clothes = this.getWearing();
     for (let i = 0; i < clothes.length; i++) {
       delete clothes[i].loc;
       clothes[i].worn = false;
@@ -120,12 +267,11 @@ const ACTOR = function(isFemale, isPlayer) {
       w[arguments[i]].worn = true;
     }
   }
-  
   // The first item a character will want to remove is the one on the outermost layer,
   // with the least exposure after it is removed
   // In the case of a draw, the one with the less slots
   res.firstToRemove = function() {
-    const clothing = this.getClothing()
+    const clothing = this.getWearing()
     let res = null;
     
     for (let i = 0; i < clothing.length; i++) {
@@ -153,80 +299,6 @@ const ACTOR = function(isFemale, isPlayer) {
     return res;
   }
 
-    
-  res.attractionTo = function(target) {
-    if (typeof this["attraction_" + target.name] === "number") {
-      return this["attraction_" + target.name];
-    }
-    if (typeof this["attraction_" + target.name] === "function") {
-      return this["attraction_" + target.name]();
-    }
-    this.baseAttraction(target)
-    return this["attraction_" + target.name];
-  }
-  
-  res.baseAttraction = function(target) {
-    this["attraction_" + target.name] = 0;
-  }
-  
-  
-  // how attracted is the character to the appearance of the target?
-  // Ranges from 10 to 0 (indifference) to -5 (horrified)
-  res.getInstantAttraction = function(target) {
-    const attact = target.isFemale ? this.attactedToWomen : this.attactedToMen
-    return Math.floor(Math.log((target.getExposure() + 15) * (attact - 0) * target.appearance / 1 + 1) * 2 - 5);  // 0 - 24
-    
-  }
-  
-  res.modifyAttraction = function(target, amount) {
-    if (typeof this["attraction_" + target.name] !== "number") {
-      this.baseAttraction(target);
-    }
-    this["attraction_" + target.name] += amount;
-  }
-  
-  
-  res.getPostureDescription = function(capitalise) {
-    if (!this.posture) return false;
-
-    const pos = this.posture.replace("#", this.pronouns.poss_adj);
-    if (this.postureFurniture) {
-      return pos + " " + this.postureAdverb + " " + w[this.postureFurniture].byname({article:DEFINITE});
-    }
-    else if (this.postureAddFloor) {
-      return pos + " on the floor";
-    }
-    else {
-      return pos;
-    }
-    
-  }
-  
-  
-  
-  
-  
-  // You can override this to have an erotic actor have a fetish for a body part
-  // Have it return a number for a recognised body part, or false for anything else
-  res.getIntimateRating = function(bp_name) {
-    return false;
-  }
-  
-  // Get a rating for how public the room is
-  // 0 might be a private room, 10 on a raised area in a public thoroughfare
-  // Effectively unit tested
-  res.getPublicRating = function(room) {
-    do {
-      if (room.getPublicRating) return room.getPublicRating();
-      room = w[room.loc];
-    } while (room);
-    return 5;
-  }
-  
-  res.getPublicRatingHere = function() {
-    return this.getPublicRating(this.loc);
-  }
-
 
   // Get a rating of how much the character is will to show, given how public the room is.
   // If the public is:
@@ -246,9 +318,6 @@ const ACTOR = function(isFemale, isPlayer) {
     return this.getWillingToExpose(w[this.loc]);
   }
   res.willingToExpose =  5
-  
-  
-  
   
   // Rating of how much the character's body is exposed to view, from 0 to 24
   // Exposure for women
@@ -319,6 +388,94 @@ const ACTOR = function(isFemale, isPlayer) {
     return erotica.HAPPY;
   }
   
+    
+    
+    
+    
+  // --------------  ATTRACTION ---------------------------
+    
+  // From 0 to 5
+  // 0 repulsed (eg homophobic)
+  // 1 rather not
+  // 2 not interested
+  // 3 somewhat
+  // 4 definitely
+  // 5 always looking, always thinking
+  res.attactedToMen = 4;
+  res.attactedToWomen = 4;
+  
+  // From 0 to 10
+  // 0 pig ugly
+  // 2 you wouldn't
+  // 4 plain
+  // 6 quite attractive
+  // 8 hot
+  // 10 swimwear model
+  res.appearance = 7;
+  
+  res.attractionTo = function(target) {
+    if (typeof this["attraction_" + target.name] === "number") {
+      return this["attraction_" + target.name];
+    }
+    if (typeof this["attraction_" + target.name] === "function") {
+      return this["attraction_" + target.name]();
+    }
+    this.baseAttraction(target)
+    return this["attraction_" + target.name];
+  }
+  
+  res.baseAttraction = function(target) {
+    this["attraction_" + target.name] = 0;
+  }
+  
+  // how attracted is the character to the appearance of the target?
+  // Ranges from 10 to 0 (indifference) to -5 (horrified)
+  res.getInstantAttraction = function(target) {
+    const attact = target.isFemale ? this.attactedToWomen : this.attactedToMen
+    return Math.floor(Math.log((target.getExposure() + 15) * (attact - 0) * target.appearance / 1 + 1) * 2 - 5);  // 0 - 24
+  }
+  
+  res.modifyAttraction = function(target, amount) {
+    if (typeof this["attraction_" + target.name] !== "number") {
+      this.baseAttraction(target);
+    }
+    this["attraction_" + target.name] += amount;
+  }
+
+
+
+
+
+  
+  
+
+  
+  
+  // Handle responses to grope, kiss, etc.
+  // Character needs a dictionary, responsesToActions, with an entry for each
+  // suck, lick, kiss, smack and grope
+  // each should be a dictionary, with a penalty function and responses array
+  res.actionResponse = function(params) {
+    //console.log(params)
+    
+    for (let i = 0; i < this.responses[params.action].length; i++) {
+      const response = this.responses[params.action][i];
+      if (!response.test(params)) continue
+      //console.log(this.responses[i].rating)
+      //console.log(rating < this.responses[i].rating)
+      if (response.script) response.script(params)
+      if (response.msg) this.msg(response.msg, params)
+      //if (this.responses[i].attraction) this.modifyAttraction(char, this.responses[i].attraction)
+      //if (char === game.player) game.player.reputation += this.responses[i].reputation
+      return true
+    }
+    return false;
+  }
+  
+  
+  
+  
+
   // Is the character willing to perform the given action?
   res.getWillingToInteract = function(target, action, bodypart) {
     // A high score indicates some the character will be reluctant to do
@@ -348,18 +505,37 @@ const ACTOR = function(isFemale, isPlayer) {
   }
 
 
-  res.respondToUndressNoChoice = function(char, garment) {
-    msg(nounVerb(char, "rip", true) + " " + garment.byname({article:DEFINITE, single:true}) + " off " + this.byname({article:DEFINITE}) + ".");
+/*
+
+  // --------------  RESPONSES (SOME?) ---------------------------
+
+
+  res.respondToUndressNoChoiceHappy = function(char, garment) {
+    this.arousal += 5
+    return "{nv:char:rip:true} {nm:garment:the} off {nm:target:the}."
+  }
+
+  res.respondToUndressNoChoiceUnhappy = function(char, garment) {
+    this.modifyAttraction(char, -15)
+    return "{nv:char:rip:true} {nm:garment:the} off {nm:target:the}."
   }
 
   res.respondToUndressWilling = function(char, garment) {
-    msg(nounVerb(char, "pull", true) + " " + garment.byname({article:DEFINITE, single:true}) + " off " + this.byname({article:DEFINITE}) + ".");
+    this.arousal += 5
+    return "{nv:char:pull:true} {nm:garment:the} off {nm:target:the}."
   }
 
   res.respondToUndressRefusal = function(char, garment) {
-    msg(nounVerb(char, "try", true) + " to pull " + garment.byname({article:DEFINITE, single:true}) + " off " + this.byname({article:DEFINITE}) + ", but " + this.byname({article:DEFINITE}) + " is having none of it.");
+    this.modifyAttraction(char, -5)
+    return "{nv:char:try:true} to pull {nm:garment:the} off {nm:target:the}, but {nm:target:the} is having none of it."
   }
 
+*/
+
+
+
+
+  // --------------  AGREEMENT ---------------------------
 
   res.getAgreement = function(...args) {
     if (args.length === 0) {
@@ -447,14 +623,21 @@ const ACTOR = function(isFemale, isPlayer) {
   }
   
   
-  res.canMove = function(dir) {
+  
+  
+  // --------------  CAN? ---------------------------
+  
+  res.canMove = function(ex, dir) {
     if (this.restraint && !w[this.restraint].canMove) {
-      if (this === game.player) {
-        failedmsg(w[this.restraint].cannotMoveMsg(this, dir));
+      if (dir !== undefined) {
+        if (this === game.player) {
+          failedmsg(w[this.restraint].cannotMoveMsg(this, dir));
+        }
+        else {
+          msg(this.responseNotWhileTiedUp)
+        }
+        return false;
       }
-      else
-      msg(this.responseNotWhileTiedUp)
-      return false;
     }
     else {
       return true;
@@ -462,11 +645,14 @@ const ACTOR = function(isFemale, isPlayer) {
   }
   res.canManipulate = function(obj, verb) {
     if (this.restraint && !w[this.restraint].canManipulate) {
-      if (this === game.player) {
-        failedmsg(w[this.restraint].cannotManipulateMsg(this, obj, verb));
+      if (obj !== undefined) {
+        if (this === game.player) {
+          failedmsg(w[this.restraint].cannotManipulateMsg(this, obj, verb));
+        }
+        else {
+          msg(this.responseNotWhileTiedUp)
+        }
       }
-      else
-      msg(this.responseNotWhileTiedUp)
       return false;
     }
     else {
@@ -475,12 +661,15 @@ const ACTOR = function(isFemale, isPlayer) {
   }
   res.canPosture = function(verb) {
     if (this.restraint && !w[this.restraint].canMove) {
-      if (this === game.player) {
-        failedmsg(w[this.restraint].cannotPostureMsg(this, verb));
+      if (verb  !== undefined) {
+        if (this === game.player) {
+          failedmsg(w[this.restraint].cannotPostureMsg(this, verb));
+        }
+        else {
+          msg(this.responseNotWhileTiedUp)
+        }
+        return false;
       }
-      else
-      msg(this.responseNotWhileTiedUp)
-      return false;
     }
     else {
       return true;
@@ -490,9 +679,94 @@ const ACTOR = function(isFemale, isPlayer) {
     return this.gag ? false : true
   }
 
+
   return res;
 }  
 
 
 
 
+
+
+
+// --------------  AGENDA ---------------------------
+
+
+// Remove one item, which can be specified.
+// If it is, it does not check what else is worn
+agenda.removeGarment = function(npc, arr) {
+  const g = (arr.length === 0 ? npc.firstToRemove() : w[arr[0]])
+  if (!g.wearable || g.loc !== npc.name) console.log(arr)
+  npc.msg(g.removeMsg(npc), {garment:g, actor:npc});
+  g.worn = false
+  g.loc = npc.loc
+  return true;
+}
+
+// Remove one item per turn until naked
+agenda.strip = function(npc, arr) {
+  const g = npc.firstToRemove()
+  if (!g.wearable || g.loc !== npc.name) console.log(arr)
+  npc.msg(g.removeMsg(npc), {garment:g, actor:npc});
+  g.worn = false
+  g.loc = npc.loc
+  return npc.isNaked();
+}
+
+// Remove one item per turn until the next item is the one specified (which is not taken off)
+agenda.stripTo = function(npc, arr) {
+  const g = npc.firstToRemove()
+  if (!g.wearable || g.loc !== npc.name) console.log(arr)
+  npc.msg(g.removeMsg(npc), {garment:g, actor:npc});
+  g.worn = false
+  g.loc = npc.loc
+  return npc.firstToRemove().name === arr[0];
+}
+
+// Wear one item.
+// It does not check what else is worn
+agenda.wearGarment = function(npc, arr) {
+  const g = w[arr[0]]
+  if (!g.wearable) console.log(arr)
+  npc.msg(g.wearMsg(npc), {garment:g, actor:npc});
+  g.worn = true
+  g.loc = npc.name
+  return true;
+}
+
+// Wear one item.
+// It does not check what else is worn
+agenda.wearCostume = function(npc, arr) {
+  let count = 0
+  let g = false
+  for (let i = 0; i < arr.length; i++) {
+    const g2 = w[arr[i]]
+    if (!g2.worn || g2.loc !== npc.name) {
+      count++
+      if (!g) g = g2
+    }
+  }
+  if (count === 0) return true;  // should not happen!
+  if (!g.wearable) console.log(arr)
+  npc.msg(g.wearMsg(npc), {garment:g, actor:npc});
+  g.worn = true
+  g.loc = npc.name
+  return count === 1;
+}
+
+// bendover, straddle, siton, reclineon, standon
+// kneel, bendover, sit, liefacedown, lieback, crawl
+
+agenda.posture = function(npc, arr) {
+  if (arr.length === 2) {
+    const furniture = w[arr[1]]
+    console.log(furniture)
+    console.log(arr[0])
+    furniture[arr[0]](false, npc)
+  }
+  else {
+    const posture = erotica.POSITIONS_LIST.find(function(el) { return el.cmd === arr[0]} )
+    npc.assumePosture(posture)
+  }
+  return true 
+}

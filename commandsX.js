@@ -1,72 +1,291 @@
 "use strict";
 
-/*
 
 
-Postures
-
-(KNEEL|BEND OVER|CRAWL|SIT|LIE BACK|LIE FACE DOWN)
-(BEND OVER|STRADLE) <furniture>
-
-
-
-Interacting with bodyparts
-
-(GROPE|FINGER|LICK|KISS|SMACK|SUCK) <character>'s (LEFT|RIGHT)? <bodypart>
-(GROPE|FINGER|LICK|KISS|SMACK|SUCK) MY (LEFT|RIGHT)? <bodypart>
-JERK OFF
-JERK OFF <character>
-SUCK OFF <character>
-GO DOWN ON <character>
-CUNNILINGUS <character>
-KISS <character>
-
-The commands are all understood, but need work on the responses
-
-
-Fuck (all to do)
-
-FUCK <character>
-FACE FUCK <character>
-ASS FUCK <character>
-FUCK <character>'s <bodypart>
-
-PUSH <sextoy> IN  <character>
-PUSH <sextoy> IN  <character>'s <bodypart>
-FUCK <character> WITH <sextoy>
-ASS FUCK <character> WITH <sextoy>
-FUCK <character>'s <bodypart> WITH <sextoy>
+commands.unshift(new Cmd('Snog', {
+  npcCmd:true,
+  useThisScriptForNpcs:true,
+  regex:/^(snog|make out with|make out|french kiss) (.+)$/,
+  objects:[
+    {scope:parser.isNpcAndHere},
+  ],
+  script:function(objects) {
+    
+  },
+}));
 
 
 
 
-Clothing (the first two are in the vanilla Quest 6)
 
-TAKE OFF MY <garment> [b]
-TAKE MY <garment> OFF [b]
-REMOVE <character>'s <garment>
-TAKE OFF <character>'s <garment>
-TAKE <character>'s <garment> OFF
-REMOVE <garment> FROM <character>
-UNDRESS <character>
-STRIP
+function cmdFuck(char, target, bodypart, sextoy) {
+  if (char.hasBodyPart("cock") || sextoy) {
+    if (bodypart === undefined) bodypart = target.hasBodyPart("pussy") ? w.pussy : w.ass
+    if (!target.npc) {
+      failedmsg("That's for people not things.")
+      return FAILED
+    }
+
+    if (sextoy && !sextoy.sextoy) {
+      failedmsg("You cannot use " + sextoy.byname({article:DEFINITE}) + " that way.")
+      return FAILED
+    }
+
+    if (bodypart && !bodypart.bodypart) {
+      failedmsg("Not sure how that would work with " + bodypart.byname({article:DEFINITE}) + ".")
+      return FAILED
+    }
+    
+    if (bodypart && !bodypart.canBePenetrated) {
+      failedmsg("You cannot put anything in " + bodypart.byname({article:INDEFINITE}) + ".")
+      return FAILED
+    }
+    
+    const g = target.getOuterWearing(bodypart.getSlot())
+    if (g) {
+      failedmsg("You cannot do that while " + target.byname({article:DEFINITE}) + " is wearing " + g.byname({article:INDEFINITE}) + ".")
+      return FAILED
+    }
+    
+    const g2 = char.getOuterWearing("crotch")
+    if (g2 && !sextoy) {
+      failedmsg("Not while " + char.byname({article:DEFINITE}) +  " is wearing " + g2.byname({article:INDEFINITE}) + ".")
+      return FAILED
+    }
+
+    return target.fuck(char, bodypart, sextoy);
+  }
+  
+  else if (target.hasBodyPart("cock") && char.hasBodyPart("pussy")) {
+    if (bodypart) {
+      failedmsg("Not sure how " + char.byname({article:DEFINITE}) + " is going to do that.")
+      return FAILED
+    }
+    
+    const g = target.getOuterWearing("crotch")
+    if (g) {
+      failedmsg("You cannot do that while " + target.byname({article:DEFINITE}) + " is wearing " + g.byname({article:INDEFINITE}) + ".")
+      return FAILED
+    }
+    
+    const g2 = char.getOuterWearing("crotch")
+    if (g2) {
+      failedmsg("Not while " + char.byname({article:DEFINITE}) +  " is wearing " + g2.byname({article:INDEFINITE}) + ".")
+      return FAILED
+    }
+
+    return target.girlOnTop(char);
+  }  
+  
+  else {
+    failedmsg("Not sure how that would work. Sorry.")
+    return FAILED
+  }
+}
 
 
 
-Others (to do)
-```
-CHAIN <character>
-CHAIN <character> TO <device>
-SMACK <character>
-SMACK <character>'s <bodypart>
-FLICK THE BEAN
+commands.unshift(new Cmd("Fuck1", {
+  npcCmd:true,
+  cmdCategory:'InsertSextoy',
+  regex:/^(fuck|penetrate|pleasure|shag|bonk) (.+)$/,
+  objects:[
+    {ignore:true},
+    {scope:parser.isNpcAndHere},
+  ],
+  useThisScriptForNpcs:true,
+  script:function(objects) {
+    const char = extractChar(this, objects)
+    if (!char) return FAILED
+    const target = objects[0][0]
+    return cmdFuck(char, objects[0][0])
+  },
+}));
 
-```
-Note that several commands use 's. **This is not optional**, as Quest uses 's to separate the different terms. This means you may run into problems with items that have 's is their name. And it is not going to translate into other languages, sorry about that.
+commands.unshift(new Cmd("Fuck3", {
+  npcCmd:true,
+  cmdCategory:'InsertSextoy',
+  regex:/^(push|insert|force|thrust)( my| your| his| her|) (cock|dick) in (.+)'s (.+)$/,
+  objects:[
+    {ignore:true},
+    {ignore:true},
+    {ignore:true},
+    {scope:parser.isNpcAndHere},
+    {scope:parser.isBodyPart},
+  ],
+  useThisScriptForNpcs:true,
+  script:function(objects) {
+    const char = extractChar(this, objects)
+    if (!char) return FAILED
+    return cmdFuck(char, objects[0][0], objects[1][0])    
+  },
+}));
+
+commands.unshift(new Cmd("Fuck4", {
+  npcCmd:true,
+  cmdCategory:'InsertSextoy',
+  regex:/^(fuck|penetrate|pleasure) (.+)'s (.+)$/,
+  objects:[
+    {ignore:true},
+    {scope:parser.isHere},
+    {scope:parser.isNpcAndHere},
+    {scope:parser.isBodyPart},
+  ],
+  useThisScriptForNpcs:true,
+  script:function(objects) {
+    const char = extractChar(this, objects)
+    if (!char) return FAILED
+    return cmdFuck(char, objects[0][0], objects[1][0])
+  },
+}));
+
+commands.unshift(new Cmd("Fuck5", {
+  npcCmd:true,
+  cmdCategory:'InsertSextoy',
+  regex:/^(ass fuck) (.+)$/,
+  objects:[
+    {ignore:true},
+    {scope:parser.isNpcAndHere},
+  ],
+  useThisScriptForNpcs:true,
+  script:function(objects) {
+    const char = extractChar(this, objects)
+    if (!char) return FAILED
+    const target = objects[0][0]
+    return cmdFuck(char, objects[0][0], w.ass)
+  },
+}));
+
+commands.unshift(new Cmd("Fuck6", {
+  npcCmd:true,
+  cmdCategory:'InsertSextoy',
+  regex:/^(face fuck) (.+)$/,
+  objects:[
+    {ignore:true},
+    {scope:parser.isNpcAndHere},
+  ],
+  useThisScriptForNpcs:true,
+  script:function(objects) {
+    const char = extractChar(this, objects)
+    if (!char) return FAILED
+    return cmdFuck(char, objects[0][0], w.mouth)
+  },
+}));
+
+commands.unshift(new Cmd("Sextoy1", {
+  npcCmd:true,
+  cmdCategory:'InsertSextoy',
+  regex:/^(fuck|penetrate|pleasure) (.+) with (.+)$/,
+  objects:[
+    {ignore:true},
+    {scope:parser.isNpcAndHere},
+    {scope:parser.isHere},
+  ],
+  useThisScriptForNpcs:true,
+  script:function(objects) {
+    const char = extractChar(this, objects)
+    if (!char) return FAILED
+    return cmdFuck(char, objects[0][0], undefined, objects[1][0])
+  },
+}));
+
+commands.unshift(new Cmd("Sextoy5", {
+  npcCmd:true,
+  cmdCategory:'InsertSextoy',
+  regex:/^(ass fuck) (.+) with (.+)$/,
+  objects:[
+    {ignore:true},
+    {scope:parser.isNpcAndHere},
+    {scope:parser.isHere},
+  ],
+  useThisScriptForNpcs:true,
+  script:function(objects) {
+    const char = extractChar(this, objects)
+    if (!char) return FAILED
+    return cmdFuck(char, objects[0][0], undefined, objects[1][0])
+  },
+}));
+
+commands.unshift(new Cmd("Sextoy6", {
+  npcCmd:true,
+  cmdCategory:'InsertSextoy',
+  regex:/^(face fuck) (.+) with (.+)$/,
+  objects:[
+    {ignore:true},
+    {scope:parser.isNpcAndHere},
+    {scope:parser.isHere},
+  ],
+  useThisScriptForNpcs:true,
+  script:function(objects) {
+    const char = extractChar(this, objects)
+    if (!char) return FAILED
+    return cmdFuck(char, objects[0][0], undefined, objects[1][0])
+  },
+}));
+
+commands.unshift(new Cmd("Sextoy2", {
+  npcCmd:true,
+  cmdCategory:'InsertSextoy',
+  regex:/^(push|insert|force|thrust) (.+) in (.+)$/,
+  objects:[
+    {ignore:true},
+    {scope:parser.isHere},
+    {scope:parser.isNpcAndHere},
+  ],
+  useThisScriptForNpcs:true,
+  script:function(objects) {
+    const char = extractChar(this, objects)
+    if (!char) return FAILED
+    return cmdFuck(char, objects[1][0], undefined, objects[0][0])
+  },
+}));
+
+
+commands.unshift(new Cmd("Sextoy3", {
+  npcCmd:true,
+  cmdCategory:'InsertSextoy',
+  regex:/^(push|insert|force|thrust) (.+) in (.+)'s (.+)$/,
+  objects:[
+    {ignore:true},
+    {scope:parser.isHere},
+    {scope:parser.isNpcAndHere},
+    {scope:parser.isBodyPart},
+  ],
+  useThisScriptForNpcs:true,
+  script:function(objects) {
+    const char = extractChar(this, objects)
+    if (!char) return FAILED
+    return cmdFuck(char, objects[1][0], objects[2][0], objects[0][0])
+  },
+}));
+
+commands.unshift(new Cmd("Sextoy4", {
+  npcCmd:true,
+  cmdCategory:'InsertSextoy',
+  regex:/^(fuck|penetrate|pleasure) (.+)'s (.+) with (.+)$/,
+  objects:[
+    {ignore:true},
+    {scope:parser.isHere},
+    {scope:parser.isNpcAndHere},
+    {scope:parser.isBodyPart},
+  ],
+  useThisScriptForNpcs:true,
+  script:function(objects) {
+    const char = extractChar(this, objects)
+    if (!char) return FAILED
+    return cmdFuck(char, objects[0][0], objects[1][0], objects[2][0])
+  },
+}));
 
 
 
-*/
+
+
+
+
+
+
+
 
 //----  Interactions ----
 
@@ -74,31 +293,11 @@ Note that several commands use 's. **This is not optional**, as Quest uses 's to
 erotica.ACTIONS = [
   {
     name:'grope',
-    pattern:'grope|feel|caress|finger|massage',
+    pattern:'grope|feel|caress|finger|massage|stroke',
     mustBeBare:false,
     intimateRating:3,
+    reflexive:true,  // you can readily do this to yourself
     defaultBodyPart:"buttock",
-    action:function(char, object, bodypart, side) {
-      let targetName;
-      if (bodypart.paired) {
-        if (side === '') {
-          targetName = object.getBodyPartAdjective(bodypart.name) + " " + bodypart.pluralAlias;
-        }
-        else {
-          targetName = side + bodypart.alias;
-        }
-      }
-      else {
-        targetName = object.getBodyPartAdjective(bodypart.name) + " " + bodypart.alias;
-      }
-      const garment = bodypart.getCovering(object);
-      const garmentStr = garment ? ", through " + object.pronouns.poss_adj + " " + garment.byname() : "";
-      msg (nounVerb(char, "spend", true) + " a few minutes running " + char.pronouns.poss_adj + " fingers over " + object.byname({article:DEFINITE, possessive:true}) + " " + targetName + garmentStr + ".");
-
-      //msg("Intimate " + bodypart.getIntimateRating(object));
-      //msg("Okay");
-      return SUCCESS;
-    }
   },
   
   {
@@ -109,9 +308,6 @@ erotica.ACTIONS = [
     bodypartCheck(bp) {
       return ["cock", "ball", "tit"].includes(bp.name);
     },
-    action:function(char, object, bodypart, side) {
-      msg("Doing suck");
-    },
   },
 
   {
@@ -119,10 +315,6 @@ erotica.ACTIONS = [
     pattern:'lick|taste',
     mustBeBare:true,
     intimateRating:8,
-    action:function(char, object, bodypart, side) {
-      msg("Doing lick");
-      msg(bodypart.getProtection(object));      
-    }
   },
 
   {
@@ -130,9 +322,6 @@ erotica.ACTIONS = [
     mustBeBare:true,
     intimateRating:7,
     defaultBodyPart:"mouth",
-    action:function(char, object, bodypart, side) {
-      msg("Doing kiss");
-    }
   },
 
   {
@@ -140,10 +329,8 @@ erotica.ACTIONS = [
     pattern:'smack|slap',
     mustBeBare:false,
     intimateRating:1,
+    reflexive:true,
     defaultBodyPart:"buttock",
-    action:function(char, object, bodypart, side) {
-      msg("Doing smack");
-    }
   },
 ]
 
@@ -157,7 +344,7 @@ for (let i = 0; i < erotica.ACTIONS.length; i++) {
   }
 }
 
-
+// This also catches GROPE JOANNA, etc.
 commands.unshift(new Cmd('SexActionsMy', {
   npcCmd:true,
   regex:new RegExp("^(" + erotica.ACTIONS_LIST.join('|') + ") (my |your |his |her |)(left |right |)(.+)$"),
@@ -165,7 +352,7 @@ commands.unshift(new Cmd('SexActionsMy', {
     {text:true},
     {ignore:true},
     {text:true},
-    {scope:isBodyPart}
+    {scope:parser.isBodyPart}
   ],
   useThisScriptForNpcs:true,
   script:function(objects) {
@@ -176,20 +363,39 @@ commands.unshift(new Cmd('SexActionsMy', {
 }));
 
 
+
+
+
+
 commands.unshift(new Cmd("SexActions", {
   npcCmd:true,
   regex:new RegExp("^(" + erotica.ACTIONS_LIST.join('|') + ") (.+)'s (left |right |)(.+)$"),
   objects:[
     {text:true},
-    {scope:isNpcAndHere},
+    {scope:parser.isNpcAndHere},
     {text:true},
-    {scope:isBodyPart}
+    {scope:parser.isBodyPart}
   ],
   useThisScriptForNpcs:true,
   script:function(objects) {
     const char = extractChar(this, objects)
     if (!char) return FAILED;
     return cmdInteract(objects[0], char, objects[1][0], objects[3][0], objects[2]);
+  },
+}));
+
+commands.unshift(new Cmd("SexActionsNoBP", {
+  npcCmd:true,
+  regex:new RegExp("^(" + erotica.ACTIONS_LIST.join('|') + ") (.+)$"),
+  objects:[
+    {text:true},
+    {scope:parser.isNpcAndHere},
+  ],
+  useThisScriptForNpcs:true,
+  script:function(objects) {
+    const char = extractChar(this, objects)
+    if (!char) return FAILED;
+    return cmdInteract(objects[0], char, '', objects[1][0], '');
   },
 }));
 
@@ -215,19 +421,23 @@ function cmdInteract(actionName, char, object, bodypart, side, altName) {
       bodypart = w[verb.defaultBodyPart]
     }
     else {
-      metamsg("I was expecting a body part at the end of that. Quite the disappointment!");
+      failedmsg("I was expecting a body part at the end of that. Quite the disappointment!");
       return FAILED;
     }
   }
+  if (!verb.reflexive && (bodypart.name !== 'arm' || bodypart.name !== 'hand') && char === object) {
+    failedmsg("You would need to be some sort of contortionist to do that!");
+    return FAILED;
+  }
   if (!bodypart.paired && side !== '') {
-    metamsg("I was not expecting that body part to have a left and right!");
+    failedmsg("I was not expecting that body part to have a left and right!");
     return FAILED;
   }
   if (verb.bodypartCheck && !verb.bodypartCheck(bodypart)) {
-    metamsg("That is not a body part you can do that with, is it?");
+    failedmsg("That is not a body part you can do that with, is it?");
     return FAILED;
   }
-  if (!char.canManipulate()) {
+  if (!char.canManipulate(object, "grope")) {
     return FAILED;
   }
   if (!char.getAgreement("Interact", object, verb, bodypart, altName ? altName : actionName)) {
@@ -245,28 +455,34 @@ function cmdInteract(actionName, char, object, bodypart, side, altName) {
       return FAILED;
     }
     
-    // At this point, we have a success. The target may react badly, but the action is performed
-    if (!object["count_" + verb.name + "_" + bodypart.name]) object["count_" + verb.name + "_" + bodypart.name] = 0;
-    object["count_" + verb.name + "_" + bodypart.name]++;
+    //console.log(char.name + ":" + verb.name + ":" + bodypart.name + ":" + side + ":" + altName)
+    let rating = object.attractionTo(char) + object.arousal / 4
+    if (bodypart) rating -= bodypart.getIntimateRating(object) * 5
+    if (char.reputation) rating -= char.reputation
+    if (object === game.player) rating = 100  // you want it done to yourself
     
-    // something specific to the target?
-    if (object["response_" + verb.name + "_" + bodypart.name]) {
-      object["response_" + verb.name + "_" + bodypart.name](char, side, altName ? altName : actionName);
-      return SUCCESS;
+    const params = {
+      boss:game.player,
+      actor:char,
+      target:object,
+      action:verb.name,
+      garment:bodypart.getCovering(object),
+      bodypart:bodypart,
+      side:side,
+      bpadj:object.getBodyPartAdjective(bodypart.name),
+      bpname:bodypart.getName(side),
+      rating:rating,
     }
+    if (object.restraint) params.restraint = w[target.restraint]
 
-    // something specific to the bodypart?
-    if (bodypart["response_" + verb.name]) {
-      bodypart["response_" + verb.name](char, object, side, altName ? altName : actionName);
-      return SUCCESS;
-    }
-
-    return verb.action(char, object, bodypart, side, altName ? altName : actionName);
-
+    object.actionResponse(params);
+    return SUCCESS;
   }
 }
 
-
+erotica.wankScriptReversed = function(objects) {
+  return erotica.wankScript(objects.reverse())
+}
 erotica.wankScript = function(objects) {
   const char = extractChar(this, objects)
   if (!char) return FAILED;
@@ -279,25 +495,21 @@ erotica.wankScript = function(objects) {
     target = char
   }
   //console.log(verb);
-  if (target.hasBodyPart("cock") && !verb.startsWith("jill")) {
+  if (target.hasBodyPart("cock") && !verb.startsWith("jill") && !verb.startsWith("flick")) {
     return cmdInteract("grope", char, target, w.cock, '', verb)
   }
-  if (target.hasBodyPart("pussy") && !verb.startsWith("jerk") && !verb.startsWith("jack")) {
+  if (target.hasBodyPart("pussy") && !verb.startsWith("jerk") && !verb.startsWith("jack") && !verb.startsWith("rub") && !verb.endsWith("tug")) {
     return cmdInteract("grope", char, target, w.pussy, '', verb)
   }
-  if (verb.startsWith("jill")) {
-    metamsg("You can only jill off character's with pussies.")
+  if (verb.startsWith("jill") || verb.startsWith("flick")) {
+    failedmsg("You can only jill off character's with pussies.")
     return FAILED
   }
-  if (verb.startsWith("jerk")) {
-    metamsg("You can only jerk off character's with dicks.")
+  if (verb.startsWith("jerk") || verb.startsWith("jack") || verb.startsWith("rub") || verb.endsWith("tug")) {
+    failedmsg("You can only jerk off character's with dicks.")
     return FAILED
   }
-  if (verb.startsWith("jack")) {
-    metamsg("You can only jack off character's with dicks.")
-    return FAILED
-  }
-  metamsg("You can only masturbate character's with genitals.")
+  failedmsg("You can only masturbate characters with genitals.")
   return FAILED
 }
 commands.unshift(new Cmd('MasturbateOff', {
@@ -306,7 +518,7 @@ commands.unshift(new Cmd('MasturbateOff', {
   regex:/^(masturbate|wank|jerk off|jerk|jack off|jack|jill off|jill) (.+)$/,
   objects:[
     {text:true},
-    {scope:isNpcAndHere},
+    {scope:parser.isNpcAndHere},
   ],
   script:erotica.wankScript,
 }));
@@ -316,17 +528,27 @@ commands.unshift(new Cmd('Masturbate', {
   regex:/^(wank|jerk|jack|jill) (.+) off$/,
   objects:[
     {text:true},
-    {scope:isNpcAndHere},
+    {scope:parser.isNpcAndHere},
   ],
   script:erotica.wankScript,
+}));
+commands.unshift(new Cmd('Masturbate2', {
+  npcCmd:true,
+  useThisScriptForNpcs:true,
+  regex:/^give (.+) a? ?(wank|tug|jerk)$/,
+  objects:[
+    {scope:parser.isNpcAndHere},
+    {text:true},
+  ],
+  script:erotica.wankScriptReversed,
 }));
 commands.unshift(new Cmd('MasturbateSelf', {
   npcCmd:true,
   useThisScriptForNpcs:true,
-  regex:/^(masturbate|wank|jerk off|jerk|jack off|jack|jill off|jill)$/,
+  regex:/^(masturbate|wank|jerk off|jerk|jack off|jack|jill off|jill|rub one out|flick the bean)$/,
   objects:[
     {text:true},
-    {scope:isNpcAndHere},
+    {scope:parser.isNpcAndHere},
   ],
   script:erotica.wankScript,
 }));
@@ -343,7 +565,7 @@ erotica.blowJobScript = function(objects) {
     return cmdInteract("suck", char, target, w.cock, '')
   }
   else {
-    metamsg("You can only suck off character's with dicks.")
+    failedmsg("You can only suck off character's with dicks.")
     return FAILED
   }
 }
@@ -353,7 +575,7 @@ commands.unshift(new Cmd('Fellatio', {
   regex:/^(suck off|suck|fellato|perform fellatio on|perform fellatio|fellatio|give blow job to|blow job|blow) (.+)$/,
   objects:[
     {text:true},
-    {scope:isNpcAndHere},
+    {scope:parser.isNpcAndHere},
   ],
   script:erotica.blowJobScript,
 }));
@@ -363,7 +585,7 @@ commands.unshift(new Cmd('FellatioOff', {
   regex:/^(suck) (.+) off$/,
   objects:[
     {text:true},
-    {scope:isNpcAndHere},
+    {scope:parser.isNpcAndHere},
   ],
   script:erotica.blowJobScript,
 }));
@@ -380,7 +602,7 @@ erotica.goDownScript = function(objects) {
   if (target.hasBodyPart("pussy")) {
     return cmdInteract("lick", char, target, w.pussy, '')
   }
-  metamsg("You can only go down on character's with genitals.")
+  failedmsg("You can only go down on character's with genitals.")
   return FAILED
 }
 commands.unshift(new Cmd('GoDownOn', {
@@ -389,7 +611,7 @@ commands.unshift(new Cmd('GoDownOn', {
   regex:/^(go down on|go down) (.+)$/,
   objects:[
     {text:true},
-    {scope:isNpcAndHere},
+    {scope:parser.isNpcAndHere},
   ],
   script:erotica.goDownScript,
 }));
@@ -403,7 +625,7 @@ erotica.cunnilingusScript = function(objects) {
   if (target.hasBodyPart("pussy")) {
     return cmdInteract("lick", char, target, w.pussy, '')
   }
-  metamsg("You can only do cunnilingus on character's with a pussy.")
+  failedmsg("You can only do cunnilingus on character's with a pussy.")
   return FAILED
 }
 commands.unshift(new Cmd('Cunnilingus', {
@@ -412,7 +634,7 @@ commands.unshift(new Cmd('Cunnilingus', {
   regex:/^(perform cunnilingus|cunnilingus) (.+)$/,
   objects:[
     {text:true},
-    {scope:isNpcAndHere},
+    {scope:parser.isNpcAndHere},
   ],
   script:erotica.cunnilingusScript,
 }));
@@ -426,7 +648,7 @@ erotica.teabagScript = function(objects) {
   if (target.hasBodyPart("bollock")) {
     return cmdInteract("suck", char, target, w.bollock, '')
   }
-  metamsg("You can only teabag character's with balls.")
+  failedmsg("You can only teabag character's with balls.")
   return FAILED
 }
 commands.unshift(new Cmd('Teabag', {
@@ -435,7 +657,7 @@ commands.unshift(new Cmd('Teabag', {
   regex:/^(teabag) (.+)$/,
   objects:[
     {text:true},
-    {scope:isNpcAndHere},
+    {scope:parser.isNpcAndHere},
   ],
   script:erotica.teabagScript,
 }));
@@ -457,7 +679,7 @@ commands.unshift(new Cmd('BendOverFurniture', {
   attName:"bendover",
   objects:[
     {ignore:true},
-    {scope:isHere, attName:"assumePosture"},
+    {scope:parser.isHere, attName:"assumePosture"},
   ],
   defmsg:CANNOT_BEND_OVER,
 }));
@@ -467,7 +689,7 @@ commands.unshift(new Cmd('Straddle', {
   attName:"straddle",
   objects:[
     {ignore:true},
-    {scope:isHere, attName:"assumePosture"},
+    {scope:parser.isHere, attName:"assumePosture"},
   ],
   defmsg:CANNOT_STADDLE,
 }));
@@ -525,24 +747,7 @@ for (let i = 0; i < erotica.POSITIONS_LIST.length; i++) {
       else {
         char = game.player;
       }
-      if (char.posture === posture.desc && char.postureFurniture === undefined) {
-        msg(ALREADY(char));
-        return FAILED;
-      }
-      if (!char.canPosture()) {
-        return FAILED;
-      }
-      if (!char.getAgreement("Posture", posture.cmd)) {
-        // The getAgreement should give the response
-        return FAILED;
-      }
-      if (char.postureFurniture) {
-        msg(STOP_POSTURE(char));  // STOP_POSTURE handles details
-      }  
-      char.posture = posture.desc;
-      char.postureAddFloor = posture.addFloor;
-      msg(nounVerb(char, "be", true) + " now " + char.getPostureDescription() + ".");
-      return SUCCESS;
+      return char.assumePosture(posture)
     },
   }));
 }
@@ -570,7 +775,7 @@ commands.unshift(new Cmd('NpcUndress1', {
   regex:/^(.+), ?(undress|strip)$/,
   cmdCategory:"Remove",
   objects:[
-    {scope:isNpcAndHere},
+    {scope:parser.isNpcAndHere},
     {ignore:true},
   ],
   script:function(objects) {
@@ -587,7 +792,7 @@ commands.unshift(new Cmd('NpcUndress2', {
   regex:/^tell (.+) to ?(undress|strip)$/,
   cmdCategory:"Remove",
   objects:[
-    {scope:isNpcAndHere},
+    {scope:parser.isNpcAndHere},
     {ignore:true},
   ],
   script:function(objects) {
@@ -625,7 +830,7 @@ commands.unshift(new Cmd('UndressOther', {
   regex:/^(undress|strip) (.+)$/,
   objects:[
     {ignore:true},
-    {scope:isNpcAndHere},
+    {scope:parser.isNpcAndHere},
   ],
   script:function(objects) {
     const char = extractChar(this, objects)
@@ -640,7 +845,7 @@ commands.unshift(new Cmd('UndressOther', {
       failedmsg(nounVerb(target, "be", true) + " already naked.");
       return FAILED;
     }
-    return cmdRemoveGarment(char, target, target.firstToRemove());
+    return cmdRemoveGarment(char, target, target.firstToRemove(), 0);
   },
 }));
 
@@ -651,14 +856,14 @@ commands.unshift(new Cmd("TakeOffFrom", {
   regex:/^(remove|take off) (.+)'s (.+)$/,
   objects:[
     {ignore:true},
-    {scope:isNpcAndHere},
-    {scope:isWornByChar},
+    {scope:parser.isNpcAndHere},
+    {scope:parser.isWornByChar},
   ],
   useThisScriptForNpcs:true,
   script:function(objects) {
     const char = extractChar(this, objects)
     if (!char) return FAILED;
-    return cmdRemoveGarment(char, objects[0][0], objects[1][0]);
+    return cmdRemoveGarment(char, objects[0][0], objects[1][0], 0);
   },
 }));
 commands.unshift(new Cmd("TakeOffFrom2", {
@@ -666,15 +871,15 @@ commands.unshift(new Cmd("TakeOffFrom2", {
   cmdCategory:'TakeOffFrom',
   regex:/^take (.+)'s (.+) off(| him| her)$/,
   objects:[
-    {scope:isNpcAndHere},
-    {scope:isWornByChar},
+    {scope:parser.isNpcAndHere},
+    {scope:parser.isWornByChar},
     {ignore:true},
   ],
   useThisScriptForNpcs:true,
   script:function(objects) {
     const char = extractChar(this, objects)
     if (!char) return FAILED;
-    return cmdRemoveGarment(char, objects[0][0], objects[1][0]);
+    return cmdRemoveGarment(char, objects[0][0], objects[1][0], 0);
   },
 }));
 commands.unshift(new Cmd("TakeOffFrom3", {
@@ -683,25 +888,203 @@ commands.unshift(new Cmd("TakeOffFrom3", {
   regex:/^(take|remove) (.+) (from|off) (.+)$/,
   objects:[
     {ignore:true},
-    {scope:isWornByChar},
+    {scope:parser.isWornByChar},
     {ignore:true},
-    {scope:isNpcAndHere},
+    {scope:parser.isNpcAndHere},
   ],
   useThisScriptForNpcs:true,
   script:function(objects) {
     const char = extractChar(this, objects)
     if (!char) return FAILED;
-    return cmdRemoveGarment(char, objects[1][0], objects[0][0]);
+    return cmdRemoveGarment(char, objects[1][0], objects[0][0], 0);
   },
 }));
 
 
 
 
+commands.unshift(new Cmd("RipOffFrom", {
+  npcCmd:true,
+  cmdCategory:'RipOffFrom',
+  regex:/^(rip off|rip|tear off|tear) (.+)'s (.+)$/,
+  objects:[
+    {ignore:true},
+    {scope:parser.isNpcAndHere},
+    {scope:parser.isWornByChar},
+  ],
+  useThisScriptForNpcs:true,
+  script:function(objects) {
+    const char = extractChar(this, objects)
+    if (!char) return FAILED;
+    return cmdRemoveGarment(char, objects[0][0], objects[1][0], 2);
+  },
+}));
+commands.unshift(new Cmd("RipOffFrom2", {
+  npcCmd:true,
+  cmdCategory:'RipOffFrom',
+  regex:/^(rip|tear) (.+)'s (.+) off(| him| her)$/,
+  objects:[
+    {ignore:true},
+    {scope:parser.isNpcAndHere},
+    {scope:parser.isWornByChar},
+    {ignore:true},
+  ],
+  useThisScriptForNpcs:true,
+  script:function(objects) {
+    const char = extractChar(this, objects)
+    if (!char) return FAILED;
+    return cmdRemoveGarment(char, objects[0][0], objects[1][0], 2);
+  },
+}));
+commands.unshift(new Cmd("RipOffFrom2", {
+  npcCmd:true,
+  cmdCategory:'RipOffFrom',
+  regex:/^(rip|tear) (.+) (off|from) (.+)$/,
+  objects:[
+    {ignore:true},
+    {scope:parser.isWornByChar},
+    {ignore:true},
+    {scope:parser.isNpcAndHere},
+  ],
+  useThisScriptForNpcs:true,
+  script:function(objects) {
+    const char = extractChar(this, objects)
+    if (!char) return FAILED;
+    return cmdRemoveGarment(char, objects[1][0], objects[0][0], 2);
+  },
+}));
+
+
+commands.unshift(new Cmd("CutOffFrom", {
+  npcCmd:true,
+  cmdCategory:'CutOffFrom',
+  regex:/^(cut off|cut) (.+)'s (.+)$/,
+  objects:[
+    {ignore:true},
+    {scope:parser.isNpcAndHere},
+    {scope:parser.isWornByChar},
+  ],
+  useThisScriptForNpcs:true,
+  script:function(objects) {
+    const char = extractChar(this, objects)
+    if (!char) return FAILED;
+    return cmdRemoveGarment(char, objects[0][0], objects[1][0], 5);
+  },
+}));
+commands.unshift(new Cmd("CutOffFrom2", {
+  npcCmd:true,
+  cmdCategory:'CutOffFrom',
+  regex:/^(cut) (.+)'s (.+) off(| him| her)$/,
+  objects:[
+    {ignore:true},
+    {scope:parser.isNpcAndHere},
+    {scope:parser.isWornByChar},
+    {ignore:true},
+  ],
+  useThisScriptForNpcs:true,
+  script:function(objects) {
+    const char = extractChar(this, objects)
+    if (!char) return FAILED;
+    return cmdRemoveGarment(char, objects[0][0], objects[1][0], 5);
+  },
+}));
 
 
 
-function cmdRemoveGarment(char, target, garment) {
+
+commands.unshift(new Cmd("PullUp", {
+  npcCmd:true,
+  cmdCategory:'PullUp',
+  regex:/^pull up( my| your| his| her| their|) (.+)$/,
+  objects:[
+    {ignore:true},
+    {scope:parser.isWornByChar},
+  ],
+  useThisScriptForNpcs:true,
+  script:function(objects) {
+    const char = extractChar(this, objects)
+    if (!char) return FAILED
+    const g = objects[0][0]
+    
+    if (!g.pullUp) {
+      failedmsg("That's not something you can pull up.")
+      return FAILED
+    }
+    
+    return g.pullUp(char);
+  },
+}));
+commands.unshift(new Cmd("PullDown", {
+  npcCmd:true,
+  cmdCategory:'PullDown',
+  regex:/^pull down( my| your| his| her| their|) (.+)$/,
+  objects:[
+    {ignore:true},
+    {scope:parser.isWornByChar},
+  ],
+  useThisScriptForNpcs:true,
+  script:function(objects) {
+    const char = extractChar(this, objects)
+    if (!char) return FAILED
+    const g = objects[0][0]
+    
+    if (!g.pullDown) {
+      failedmsg("That's not something you can pull down.")
+      return FAILED
+    }
+    
+    return g.pullDown(char);
+  },
+}));
+commands.unshift(new Cmd("Fasten", {
+  npcCmd:true,
+  cmdCategory:'Fasten',
+  regex:/^(fasten|button up|button)( my| your| his| her| their|) (.+)$/,
+  objects:[
+    {ignore:true},
+    {ignore:true},
+    {scope:parser.isWornByChar},
+  ],
+  useThisScriptForNpcs:true,
+  script:function(objects) {
+    const char = extractChar(this, objects)
+    if (!char) return FAILED
+    const g = objects[0][0]
+    
+    if (!g.fasten) {
+      failedmsg("That's not something you can fasten up.")
+      return FAILED
+    }
+    
+    return g.fasten(char);
+  },
+}));
+commands.unshift(new Cmd("Unfasten", {
+  npcCmd:true,
+  cmdCategory:'Unfasten',
+  regex:/^(unfasten|unbutton)( my| your| his| her| their|) (.+)$/,
+  objects:[
+    {ignore:true},
+    {ignore:true},
+    {scope:parser.isWornByChar},
+  ],
+  useThisScriptForNpcs:true,
+  script:function(objects) {
+    const char = extractChar(this, objects)
+    if (!char) return FAILED
+    const g = objects[0][0]
+    
+    if (!g.unfasten) {
+      failedmsg("That's not something you can unfasten.")
+      return FAILED
+    }
+    
+    return g.unfasten(char);
+  },
+}));
+
+
+function cmdRemoveGarment(char, target, garment, strength) {
   if (!char.isHere()) {
     // char not here
     failedmsg(nounVerb(char, "be", true) + " not here.");
@@ -720,6 +1103,13 @@ function cmdRemoveGarment(char, target, garment) {
     return FAILED;
   }
 
+  const cutter = char.findCutter()
+  if (strength > 2 && !cutter) {
+    // garment not worn by target
+    failedmsg(nounVerb(char, "need", true) + " a knife or something to do that.");
+    return FAILED;
+  }
+
   const blocker = garment.getWearRemoveBlocker(target, false);
   if (blocker) {
     failedmsg(nounVerb(char, "can", true) + " not remove " + garment.byname({article:DEFINITE}) + " whilst " + target.byname({article:DEFINITE}) + " is wearing " + blocker.byname({article:INDEFINITE}) + ".");
@@ -735,32 +1125,37 @@ function cmdRemoveGarment(char, target, garment) {
     return res ? SUCCESS : FAILED;
   }
   
-  const targetWilling = target.getWillingToRemove(garment);
-  const targetNoChoice = !target.canManipulate(garment, "remove");
-  if (!char.getAgreement("RemoveOther", garment, target, targetWilling, targetNoChoice)) {
+  let rating = target.attractionTo(char) + target.arousal / 4
+  if (char.reputation) rating -= char.reputation
+  if (target === game.player) rating = 100  // you want it done to yourself
+  //console.log("target.getWillingToExpose(w[target.loc]): " + target.getWillingToExpose(w[target.loc]))
+  //console.log("target.getExposureWithout(garment): " + target.getExposureWithout(garment))
+  //console.log("char.reputation: " + char.reputation)
+  //console.log("rating: " + rating)
+
+  const targetNoChoice = !target.canManipulate();
+  if (!char.getAgreement("RemoveOther", garment, target, rating, targetNoChoice)) {
     // The getAgreement should give the response
     // Count as success as an action has been taken
     return SUCCESS;
   }
 
   // By now we have a character, char, willing to try to remove an item, garment, from a different character, target
-  
-  if (targetNoChoice) {
-    target.respondToUndressNoChoice(char, garment);
-    garment.loc = char.loc;
-    //garment.damage("rip");
-    garment.worn = false;
+  //console.log(char.name + ":remove:" + garment.name)
+  const params = {
+    boss:game.player,
+    actor:char,
+    target:target,
+    action:"remove",
+    garment:garment,
+    rating:rating,
+    strength:strength,
+    exposure:target.getWillingToExpose(w[target.loc]) - target.getExposureWithout(garment),
   }
-  else if (targetWilling) {
-    target.respondToUndressWilling(char, garment);
-    garment.loc = char.name;
-    garment.worn = false;
-  }
-  else {
-    target.respondToUndressRefusal(char, garment);
-  }
-    
-  return SUCCESS
+  if (target.restraint) params.restraint = w[target.restraint]
+
+  target.actionResponse(params);
+  return SUCCESS;
 }
 
 
@@ -773,7 +1168,7 @@ function cmdRemoveGarment(char, target, garment) {
 
 function cmdRestrain (char, target, item) {
   if (!item) {
-    const objs = scope(isBondageDeviceHere)
+    const objs = parser.scope(parser.isBondageDeviceHere)
     if (objs.length === 0) {
       failedmsg("Nothing to restrain someone with here.")
       return FAILED
@@ -812,8 +1207,8 @@ commands.unshift(new Cmd("RestrainWith", {
   regex:/^(manacle|chain|tie) (.+) to (.+)$/,
   objects:[
     {ignore:true},
-    {scope:isNpcAndHere},
-    {scope:isHere, attName:"bondage"},
+    {scope:parser.isNpcAndHere},
+    {scope:parser.isHere, attName:"bondage"},
   ],
   useThisScriptForNpcs:true,
   script:function(objects) {
@@ -829,7 +1224,7 @@ commands.unshift(new Cmd("Restrain", {
   regex:/^(restrain|manacle|chain|tie up|tie) (.+)$/,
   objects:[
     {ignore:true},
-    {scope:isNpcAndHere},
+    {scope:parser.isNpcAndHere},
   ],
   useThisScriptForNpcs:true,
   script:function(objects) {
@@ -845,7 +1240,7 @@ commands.unshift(new Cmd("Restrain2", {
   regex:/^(chain|tie) (.+) up$/,
   objects:[
     {ignore:true},
-    {scope:isNpcAndHere},
+    {scope:parser.isNpcAndHere},
   ],
   useThisScriptForNpcs:true,
   script:function(objects) {
@@ -862,7 +1257,7 @@ commands.unshift(new Cmd("Release", {
   regex:/^(free|release) (.+)$/,
   objects:[
     {ignore:true},
-    {scope:isNpcAndHere},
+    {scope:parser.isNpcAndHere},
   ],
   useThisScriptForNpcs:true,
   script:function(objects) {
@@ -878,16 +1273,16 @@ commands.unshift(new Cmd("Release", {
   },
 }));
 
-function isBondageDeviceHere (item) {
-  return item.isAtLoc(game.player.loc) && item.bondage;
-}
+
+
+
 
 
 
 commands.unshift(new Cmd('testnpc', {
   regex:/^npc (.+)$/,
   objects:[
-    {scope:isInWorld}
+    {scope:parser.isInWorld}
   ],
   script:function(objects) {
     console.log(w.cock.getProtection(objects[0][0]));

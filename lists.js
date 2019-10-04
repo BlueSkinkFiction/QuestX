@@ -151,6 +151,21 @@ erotica.skinToneFeatures = [
   { type:'skintone', form:'iso', s:function(char) { return sentenceCase(char.pronouns.poss_adj) + " skin is " + char.skinTone}},
 ]
 
+erotica.erectionStates = [
+  "shrivelled little willy",
+  "lifeless willy",
+  "limp willy",
+  "swelling dick",
+  "semi-erect dick",
+  "erect dick",
+  "swollen cock",
+  "hard cock",
+  "hard cock",
+  "steel-hard cock",
+  "cum-dripping cock",
+  "ready-to-explode cock",
+]
+
 erotica.paleSkinTones = [
   "pale",
   "very pale",

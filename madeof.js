@@ -2,17 +2,18 @@
 
 
 materials = {
-  paper:{ fire:"ash", whip:true, rip:true, name:'paper' },
-  cloth:{ fire:"ash", whip:true, rip:true, name:'cloth' },
-  pvc:{ fire:"ash", name:'pvc'},
-  leather:{ fire:"ash", name:'leather'},
-  flesh:{ name:'flesh'},
-  ceramic:{ smash:true, name:'ceramic' },
-  glass:{ smash:true, name:'glass' },
-  wood:{ fire:"ash", smash:true, name:'wood' },
-  stone:{ smash:true, name:'stone' },
-  metal:{ rust:true, name:'metal' },
-  rubber:{ name:'rubber'},
+  paper:{ fire:"ash", whip:true, rip:true, name:'paper', strength:1 },
+  cloth:{ fire:"ash", whip:true, rip:true, name:'cloth', strength:2 },
+  pvc:{ fire:"ash", name:'pvc', strength:3 },
+  leather:{ fire:"ash", name:'leather', strength:4 },
+  flesh:{ name:'flesh', strength:1 },
+  ceramic:{ smash:true, name:'ceramic', strength:7 },
+  glass:{ smash:true, name:'glass', strength:3 },
+  wood:{ fire:"ash", smash:true, name:'wood', strength:6 },
+  stone:{ smash:true, name:'stone', strength:7 },
+  metal:{ rust:true, name:'metal', strength:8 },
+  rubber:{ name:'rubber', strength:5 },
+  plastic:{ name:'plastic', strength:6 },
 };
 
 
@@ -21,23 +22,20 @@ materials = {
 const MADE_OF = function(material) {
   res = {
     material:material,
+    strength:material.strength,
     damageable:function(damage) {
       return this.material[damage] !== undefined;
     },
-    damage:function(damage) {
-      console.log(damage)
-      console.log(this.material)
+    damage:function(damage, report) {
       if (!this.damageable(damage)) {
         // Ideally you should test if this will work and give your own error message
         // (or none at all), this is a safety net that we hope is not used.
         failedmsg("That doesn't work.");
         return false;
       }
-      console.log(typeof this.material[damage])
       const flindersName = (typeof this.material[damage] === "string" ? 
                             this.material[damage] + "_flinders" : 
                             this.material.name + "_flinders");
-      console.log(flindersName)
       if (w[flindersName] === undefined) {
         errormsg("Cannot find flinders called " + flindersName + ".");
         return false;
@@ -48,7 +46,7 @@ const MADE_OF = function(material) {
       s = sentenceCase(s.replace("####", this.byname({article:DEFINITE})));
       flinders.examine = flinders.examine.replace("####", this.byname({article:DEFINITE}));
       this.loc = undefined;
-      msg(s);
+      if (report) msg(s);
       return true;
     },
   };
@@ -57,7 +55,7 @@ const MADE_OF = function(material) {
 
 
 function haveFireSource() { 
-  const l = scope(isReachable);
+  const l = scopeReachable();
   for (let i = 0; i < l.length; i++) {
     if (l[i].firesource) {
       return l[i].firesource;
@@ -74,7 +72,7 @@ commands.unshift(new Cmd('Burn', {
   regex:/^(burn) (.+)$/,
   objects:[
     {ignore:true},
-    {scope:isPresent}
+    {scope:parser.isPresent}
   ],
   useThisScriptForNpcs:true,
   script:function(objects) {
@@ -94,7 +92,7 @@ commands.unshift(new Cmd('Smash', {
   regex:/^(smash) (.+)$/,
   objects:[
     {ignore:true},
-    {scope:isPresent}
+    {scope:parser.isPresent}
   ],
   useThisScriptForNpcs:true,
   script:function(objects) {
@@ -110,13 +108,13 @@ commands.unshift(new Cmd('Shred', {
   regex:/^(shred|rip up|rip) (.+)$/,
   objects:[
     {ignore:true},
-    {scope:isPresent}
+    {scope:parser.isPresent}
   ],
   useThisScriptForNpcs:true,
   script:function(objects) {
     const char = extractChar(this, objects)
     if (!char) return FAILED;
-    return cmdDamage("smash", char, objects[0], "#### cannot be ripped.");
+    return cmdDamage("rip", char, objects[0], "#### cannot be ripped.");
   },
 }));
 
@@ -124,7 +122,7 @@ commands.unshift(new Cmd('Shred', {
 function cmdDamage(damage, char, objects, nomsg) {
   let success = false;
   const multiple = objects.length > 1 || parser.currentCommand.all;
-  if (!char.canManipulate()) {
+  if (!char.canManipulate(objects[0], "damage")) {
     return FAILED;
   }
   for (let i = 0; i < objects.length; i++) {
@@ -137,7 +135,7 @@ function cmdDamage(damage, char, objects, nomsg) {
       failedmsg(sentenceCase(nomsg.replace("####", objects[i].byname({article:DEFINITE}))));
     }
     else {
-      success = objects[i].damage(damage);
+      success = objects[i].damage(damage, true);
     }
   }
   return success ? SUCCESS : FAILED;

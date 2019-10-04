@@ -28,11 +28,12 @@ const SAVE_DISABLED = true;  // so we can use create when test ing
 const LANG_FILENAME = "lang-en.js";  // set to the language file of your choice
 const DEBUG = true;                  // set to false when releasing
 const CUSTOM_EXITS = false;          // set to true to use custom exits, in exits.js
-const FILES = ["setupX", "npcX", "templatesX", "commandsX", "worldX", "madeof", "wearableX", "wardrobe", "generator", "lists", "code", "data"];
+const FILES = ["setupX", "responsesX", "npcX", "templatesX", "commandsX", "worldX", "madeof", "wearableX", "wardrobe", "generator", "lists", "code", "data"];
 const MAX_UNDO = 10;
 const ROOM_HEADINGS = true;
 const NO_TALK_TO = "TALK TO is not a feature in this game.";
 const NO_ASK_TELL = "ASK/TELL ABOUT is not a feature in this game.";
+const NPC_REACTIONS_AWAYS = true;
 
 
 const PARSER_DEBUG = false;      // If true, will report the data the parser outputs
@@ -65,9 +66,9 @@ const STATUS = [
 // Change the name values to alter how items are displayed
 // You can add (or remove) inventories too
 const INVENTORIES = [
-  {name:'Items Held', alt:'itemsHeld', test:isHeldNotWorn, getLoc:function() { return game.player.name; } },
-  {name:'Items Worn', alt:'itemsWorn', test:isWorn, getLoc:function() { return game.player.name; } },
-  {name:'Items Here', alt:'itemsHere', test:isHere, getLoc:function() { return game.player.loc; } },
+  {name:'Items Held', alt:'itemsHeld', test:util.isHeldNotWorn, getLoc:function() { return game.player.name; } },
+  {name:'Items Worn', alt:'itemsWorn', test:util.isWorn, getLoc:function() { return game.player.name; } },
+  {name:'Items Here', alt:'itemsHere', test:util.isHere, getLoc:function() { return game.player.loc; } },
 ];
 
 

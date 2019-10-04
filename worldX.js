@@ -66,7 +66,7 @@ createItem("bollock", GENITALS(9, true, /bollocks?|balls?|testicles?|nadgers?|nu
 createItem("cock", GENITALS(10, false, /cock|dick|phallus|penis|willy|manhood|organ|tool|pecker|schlong|prick|member|wang|knob|dong/), {
   modestyBoost:true,
   response_suck:function(char, object) {
-    msg(nounVerb(char, "suck", true) + " " + object.byname({article:DEFINITE}) + " hard cock.");
+    msg(nounVerb(char, "suck", true) + " " + object.byname({article:DEFINITE}) + " {cock:target}.", {target:object});
   },
   response_lick:function(char, object) {
     msg(nounVerb(char, "run", true) + " " + char.PRONOUNS.posessive + " tongue along the length of " + object.byname({article:DEFINITE}) + " hard cock.");
@@ -107,6 +107,8 @@ for (let key in w) {
 
 
 erotica.verify = function() {
+  const checkFunctions = ["wearMsg", "removeMsg", "ripOff", "getSlots"]
+  const checkInts = ["strength"]
   for (let key in w) {
     if (w[key].wearable) {
       const slots = w[key].getSlots();
@@ -119,6 +121,12 @@ erotica.verify = function() {
             errormsg("Unknown slot for garment " + w[key].name + " (" + slots[i] + ")");
           }
         }
+      }
+      for (let i = 0; i < checkFunctions.length; i++) {
+        if (typeof w[key][checkFunctions[i]] !== "function") errormsg("No function'" + checkFunctions[i] + "' for garment " + w[key].name);
+      }
+      for (let i = 0; i < checkInts.length; i++) {
+        if (typeof w[key][checkInts[i]] !== "number") errormsg("No number'" + checkInts[i] + "' for garment " + w[key].name);
       }
     }
   }

@@ -33,7 +33,6 @@ function createWoman(loc) {
   
   
 erotica.generate = function(char, list, averageSize) {
-  char.examine = "{description} " + pronounVerb(char, "be", true) + " wearing {attire}.{ifposture: " + pronounVerb(char, "be", true) + " is {posture}.}{ifrestraint: " + pronounVerb(char, "be", true) + " is {restraint}.}"
   char.eyeColor = randomFromArray(erotica.eyeColors)
   char.getDescription = erotica.getDescription
   char.properName = true

@@ -7,6 +7,22 @@ function setup() {
 
 
 
+commands.unshift(new Cmd('start', {
+  regex:/^start$/,
+  objects:[
+  ],
+  script:function(objects) {
+    w.Joanna.loc = "lobby"
+    erotica.createGarment("boxers_black", "me", "white")
+    erotica.createGarment("teeshirt_black_with_logo", "me")
+    erotica.createGarment("jeans", "me")
+    erotica.createGarment("trainers", "me", "white")
+    world.setRoom(game.player, "lobby")
+    return SUCCESS;
+  },
+}));
+
+
 
 const DISABLED = true;
 const professions = [

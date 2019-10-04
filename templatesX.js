@@ -31,7 +31,7 @@ const BODY_PART = function(intimateRating, paired, regex) {
     },
     // gets all the garments that hides this body part
     getAllCoverings:function(char) {
-      return scope(isWornBy, {npc:char}).filter(el => el.getSlots().includes(this.getSlot()));
+      return char.getWearing().filter(el => el.getSlots().includes(this.getSlot()));
     },
     // returns false if there is a garment covering the bodypart with no getRevealing 
     // i.e., the bodypart is concealed, otherwise returns a measure of how revealed
@@ -60,6 +60,10 @@ const BODY_PART = function(intimateRating, paired, regex) {
     getExposureRating:function(char) {
       return this.getIntimateRating(char);
     },
+    getName(side) {
+      if (!this.paired) return this.alias
+      return side ? side.trim() + " " + this.alias : this.pluralAlias
+    }
   }
   return res;
 }  
@@ -133,6 +137,7 @@ const BONDAGE_DEVICE = function(canMove) {
     bondage:true,
     canMove:canMove,
     canManipulate:false,
+    points:[],
     cannotManipulateMsg:function(char, obj, verb) {
       if (verb === undefined) verb = "do anything with"
       const objName = obj ? obj.byname({article:DEFINITE}) : "anything"
