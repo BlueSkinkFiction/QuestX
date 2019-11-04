@@ -6,19 +6,21 @@ const ACTOR = function(isFemale, isPlayer) {
   if (isPlayer) {
     res = PLAYER();
     res.isFemale = isFemale;
-    // A very simple measure of size, so give an indicator of what NPC can wear what
+    // A very simple measure of size, to give an indicator of what NPC can wear what
     res.size = isFemale ? 4 : 6
   }
   else {
     res = NPC(isFemale)
   }
   
+  res.posture = "standing"
   res.actor = true
   res.getArousal = function() {return this.arousal}
   res.arousal = 10; // changes dynamically, 0 - 100
   res.reputation = 0  // getting a reputation is BAD, as other characters will dislike you
-  res.responses = erotica.defaultResponses
+  //res.responses = erotica.defaultResponses
   res.responseNotWhileTiedUp = "'Not while I'm tied up.'"
+  res.insult = function(target) { return target.hasBodyPart("cock") ? "jerk" : "bitch" }
   
   res.doEvent = function() {
     if (this.npc) {
@@ -84,26 +86,17 @@ const ACTOR = function(isFemale, isPlayer) {
   }
  
   res.assumePosture = function(posture, forced) {
-    if (this.posture === posture.desc && this.postureFurniture === undefined) {
-      failedmsg(ALREADY(this));
-      return FAILED;
-    }
-    if (!this.canPosture()) {
-      return FAILED;
-    }
-    if (!forced && !this.getAgreement("Posture", posture.cmd)) {
-      // The getAgreement should give the response
-      return FAILED;
-    }
+    if (this.posture === posture.desc && this.postureFurniture === undefined) return failedmsg(ALREADY(this));
+    if (!this.canPosture()) return FAILED;
+    if (!forced && !this.getAgreement("Posture", posture.cmd)) return FAILED;
     if (this.postureFurniture) {
       this.msg(STOP_POSTURE(this));  // STOP_POSTURE handles details
     }  
+    this.msg(posture.getAssumePostureDescription(this, this.posture));
     this.posture = posture.desc;
     this.postureAddFloor = posture.addFloor;
-    this.msg(nounVerb(this, "be", true) + " now " + this.getPostureDescription() + ".");
     return SUCCESS;
   }  
-  
   
   res.findCutter = function() {
     for (let key in w) {
@@ -127,7 +120,6 @@ const ACTOR = function(isFemale, isPlayer) {
   
   
   
-  
   // --------------  DESCRIBING ---------------------------
   
   res.examine = function(isMultiple, char) { 
@@ -135,14 +127,14 @@ const ACTOR = function(isFemale, isPlayer) {
   }
   
   res.getPostureDescription = function(capitalise) {
-    if (!this.posture) return false;
+    if (!this.posture || this.posture === "standing") return false;
 
     const pos = this.posture.replace("#", this.pronouns.poss_adj);
     if (this.postureFurniture) {
       return pos + " " + this.postureAdverb + " " + w[this.postureFurniture].byname({article:DEFINITE});
     }
     else if (this.postureAddFloor) {
-      return pos + " on the floor";
+      return pos + " on the " + (w[this.loc].postureSurface || "floor");
     }
     else {
       return pos;
@@ -152,7 +144,7 @@ const ACTOR = function(isFemale, isPlayer) {
 
   res.getStatusDesc = function() {
     if (this.restraint) return w[this.restraint].situation
-    if (!this.posture) return false
+    if (!this.posture || this.posture === "standing") return false
     if (!this.postureFurniture) return this.posture
     return this.posture + " " + this.postureAdverb + " " + w[this.postureFurniture].byname({article:DEFINITE})
   }
@@ -193,8 +185,6 @@ const ACTOR = function(isFemale, isPlayer) {
     return this.getDefaultBodyPartAdjective();
   }
   res.descCock = function() {
-    console.log("here" + (this.arousal / 10))
-    console.log(erotica.erectionStates[Math.floor(this.arousal / 10)])
     return erotica.erectionStates[Math.floor(this.arousal / 10) + 1];
   }
   res.descTits = function() {
@@ -232,6 +222,33 @@ const ACTOR = function(isFemale, isPlayer) {
   
   // --------------  CLOTHING ---------------------------
   
+  
+  
+  
+  res.getOuterWearable = function(slot, considerBondage) {
+    if (considerBondage && this.restraint) {
+      const slots = w[this.restraint].getHides(this)
+      if (slots.includes(slot)) return w[this.restraint]
+    }
+
+    const clothing = this.getWearing().filter(function(el) {
+      if (typeof el.getSlots !== "function") {
+        console.log("Item with worn set to true, but no getSlots function");
+        console.log(el);
+      }
+      return el.getSlots().includes(slot);
+    });
+
+    if (clothing.length === 0) { return false; }
+    let outer = clothing[0];
+    for (let i = 1; i < clothing.length; i++) {
+      if (clothing[i].wear_layer > outer.wear_layer) {
+        outer = clothing[i];
+      }
+    }
+    return outer;
+  }
+  
   res.getWearingVisible = function() {
     return this.getWearingSlottedVisible().concat(this.getWearingUnslotted())
   }
@@ -251,8 +268,17 @@ const ACTOR = function(isFemale, isPlayer) {
     }
     return list
   }
-  res.isNaked = function() {
-    return (this.getWearing().length === 0)
+  res.getWearing = function(ignoreFootwear) {
+    if (ignoreFootwear) {
+      return this.getContents(display.LOOK).filter(function(el) { return el.getWorn() && !el.ensemble && !el.footwear; });
+    }
+    else {
+      return this.getContents(display.LOOK).filter(function(el) { return el.getWorn() && !el.ensemble; });
+    }
+  }
+
+  res.isNaked = function(ignoreFootwear) {
+    return (this.getWearing(ignoreFootwear).length === 0)
   }
   // Dresses the characters in the give items, removing any others first
   // Used for unit testing, may not be that useful otherwise
@@ -298,6 +324,44 @@ const ACTOR = function(isFemale, isPlayer) {
     }
     return res;
   }
+
+
+
+  // returns true if every visible garment is of one of the types specified
+  res.clothingTypeOnlyFor = function(garmentType, ignoreFootwear) {
+    const l = this.getWearingVisible();
+    for (let i = 0; i < l.length; i++) {
+      if (l[i].footwear && ignoreFootwear) continue
+      if (l[i].garmentType !== garmentType) return false
+    }
+    return true
+  }
+
+
+
+  // returns true if at least one visible garment is of one of the types specified
+  res.clothingTypeIncludesFor = function(garmentType, ignoreFootwear) {
+    const l = this.getWearingVisible();
+    for (let i = 0; i < l.length; i++) {
+      if (l[i].footwear && ignoreFootwear) continue
+      if (l[i].garmentType === garmentType) return true
+    }
+    return false
+  }
+
+
+  // returns true if the char is wearing the items listed (by name)
+  res.testCostume = function(garments, ignoreFootwear) {
+    if (typeof garments[0] !== "string") garments = garments.map(el => el.name)
+    const l = this.getWearing(ignoreFootwear)
+    if (garments.length !== l.length) return false
+    for (let i = 0; i < garments.length; i++) {
+      if (!garments.includes(l[i].name)) return false
+    }
+    return true
+  }
+
+
 
 
   // Get a rating of how much the character is will to show, given how public the room is.
@@ -458,8 +522,8 @@ const ACTOR = function(isFemale, isPlayer) {
   res.actionResponse = function(params) {
     //console.log(params)
     
-    for (let i = 0; i < this.responses[params.action].length; i++) {
-      const response = this.responses[params.action][i];
+    for (let i = 0; i < erotica.defaultResponses[params.action].length; i++) {
+      const response = erotica.defaultResponses[params.action][i];
       if (!response.test(params)) continue
       //console.log(this.responses[i].rating)
       //console.log(rating < this.responses[i].rating)
@@ -467,13 +531,16 @@ const ACTOR = function(isFemale, isPlayer) {
       if (response.msg) this.msg(response.msg, params)
       //if (this.responses[i].attraction) this.modifyAttraction(char, this.responses[i].attraction)
       //if (char === game.player) game.player.reputation += this.responses[i].reputation
+      if (!params.action) console.log(params)
+      let s = params.action.name + "_"
+      if (params.bodypart) s += "_" + params.bodypart.name
+      if (params.garment) s += "_" + params.garment.name
+      if (response.failed) s += "_failed"
+      params.target[s] = true
       return true
     }
     return false;
   }
-  
-  
-  
   
 
   // Is the character willing to perform the given action?
@@ -504,33 +571,6 @@ const ACTOR = function(isFemale, isPlayer) {
     return erotica.REFUSE;
   }
 
-
-/*
-
-  // --------------  RESPONSES (SOME?) ---------------------------
-
-
-  res.respondToUndressNoChoiceHappy = function(char, garment) {
-    this.arousal += 5
-    return "{nv:char:rip:true} {nm:garment:the} off {nm:target:the}."
-  }
-
-  res.respondToUndressNoChoiceUnhappy = function(char, garment) {
-    this.modifyAttraction(char, -15)
-    return "{nv:char:rip:true} {nm:garment:the} off {nm:target:the}."
-  }
-
-  res.respondToUndressWilling = function(char, garment) {
-    this.arousal += 5
-    return "{nv:char:pull:true} {nm:garment:the} off {nm:target:the}."
-  }
-
-  res.respondToUndressRefusal = function(char, garment) {
-    this.modifyAttraction(char, -5)
-    return "{nv:char:try:true} to pull {nm:garment:the} off {nm:target:the}, but {nm:target:the} is having none of it."
-  }
-
-*/
 
 
 
@@ -579,11 +619,8 @@ const ACTOR = function(isFemale, isPlayer) {
   res.getAgreementRemove = function(obj) {
     if (this === game.player) return true;
     
-    if (this.restraint && w[this.restraint].canManipulate) {
-      failedmsg(this.responseNotWhileTiedUp)
-      return false;
-    }
-    
+    if (this.restraint && w[this.restraint].canManipulate) return failedmsg(this.responseNotWhileTiedUp)
+   
     const agreement = this.getWillingToRemove(obj);
     if (agreement === erotica.HAPPY) {
       msg("'Sure thing!'");
@@ -679,7 +716,6 @@ const ACTOR = function(isFemale, isPlayer) {
     return this.gag ? false : true
   }
 
-
   return res;
 }  
 
@@ -766,7 +802,7 @@ agenda.posture = function(npc, arr) {
   }
   else {
     const posture = erotica.POSITIONS_LIST.find(function(el) { return el.cmd === arr[0]} )
-    npc.assumePosture(posture)
+    npc.assumePosture(posture, true)
   }
   return true 
 }

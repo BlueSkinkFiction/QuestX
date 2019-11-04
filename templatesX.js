@@ -100,9 +100,37 @@ const GENITALS = function(intimateRating, paired, regex) {
 
 const EROTIC_FURNITURE = function(options) {
   const res = FURNITURE(options);
+  res.assumePosture = function(isMultiple, char, posture, success_msg, adverb) {
+    if (char.posture === posture && char.postureFurniture === this.name) {
+      char.msg(ALREADY(char));
+      return false;
+    }
+    if (!this.testForPosture(char, posture)) {
+      return false;
+    }
+    if (char.posture && char.postureFurniture !== this.name) {
+      char.msg(STOP_POSTURE(char))
+      char.msg(success_msg(char, this));
+    }
+    else if (char.posture && this[char.posture + "_to_" + posture]) {
+      debugmsg(this[char.posture + "_to_" + posture])
+      char.msg(this[char.posture + "_to_" + posture], {actor:char, item:this})
+    }
+    else {
+      char.msg(success_msg(char, this));
+    }
+    
+    char.posture = posture;
+    char.postureFurniture = this.name;
+    char.postureAdverb = adverb === undefined ? 'on' : adverb;
+    
+    if (typeof this["on" + posture] === "function") this["on" + posture](char);
+    return true;
+  };
+
   if (options.bendover) {
     res.bendover = function(isMultiple, char) {
-      return this.assumePosture(isMultiple, char, "bending", BEND_OVER_SUCCESSFUL, "over");
+      return this.assumePosture(isMultiple, char, "bending", BENDOVER_SUCCESSFUL, "over");
     };
   }
   if (options.straddle) {
@@ -110,6 +138,25 @@ const EROTIC_FURNITURE = function(options) {
       return this.assumePosture(isMultiple, char, "straddling", STRADDLE_SUCCESSFUL, "");
     };
   }
+  if (options.recline) {
+    res.facedown = function(isMultiple, char) {
+      return this.assumePosture(isMultiple, char, "facedown", FACEDOWN_SUCCESSFUL, "");
+    };
+  }
+  res.hidesWhen_sitting = ["buttock", "lowerback", "upperback"]
+  res.hidesWhen_reclining = ["buttock", "lowerback", "upperback"]
+  res.hidesWhen_facedown = ["groin", "midriff", "chest", "tit", "nipple"]
+  res.hidesWhen_standing = []
+  res.hidesWhen_kneeling = []
+  res.hidesWhen_crawling = []
+  res.hidesWhen_straddling = ["crotch"]
+  res.hidesWhenBendover = ["chest", "tit", "nipple", "midriff", "groin"]
+  res.reclining_to_facedown = "{nv:actor:roll:true} on to {pa:actor} front."
+  res.facedown_to_reclining = "{nv:actor:roll:true} on to {pa:actor} back."
+  res.straddling_to_sitting = "{nv:actor:swing:true} around to sit properly on {nm:item:the}."
+  res.sitting_to_straddling = "{nv:actor:swing:true} around to straddle {nm:item:the}."
+  res.sitting_to_reclining = "{nv:actor:lie:true} back on {nm:item:the}."
+  res.reclining_to_sitting = "{nv:actor:sit:true} up on {nm:item:the}."
   return res;
 }
 
@@ -121,10 +168,10 @@ const EROTIC_FURNITURE = function(options) {
 const PHALLUS = function(canMove) {
   const res = {
     canMove:canMove,
+    dildo:true,
   };
   return res;
 }
-
 
 const GAG = function() {
   const res = {
@@ -138,6 +185,8 @@ const BONDAGE_DEVICE = function(canMove) {
     canMove:canMove,
     canManipulate:false,
     points:[],
+    posture:'standing',
+    getHides:function(actor) { return [] },
     cannotManipulateMsg:function(char, obj, verb) {
       if (verb === undefined) verb = "do anything with"
       const objName = obj ? obj.byname({article:DEFINITE}) : "anything"

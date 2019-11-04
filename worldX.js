@@ -55,7 +55,7 @@ createItem("tit", BODY_PART(8, true, /tits?|boobs?|breasts?|gazongas?|mammary|ma
   modestyBoost:true,
   getSlot:function() { return "chest"; },
 });
-createItem("ass", BODY_PART(8, false, /ass|arse|backside|bottom|tush|rump|butt|booty|can|clacker/), {
+createItem("ass", BODY_PART(8, false, /ass|arse|backside|bottom|tush|rump|butt|booty|can|clacker|bum/), {
   getSlot:function() { return "buttock"; },
   canBePenetrated:true,
 });

@@ -16,7 +16,7 @@ tp.addDirective("posture", function(arr, params) {
 });
 
 tp.addDirective("ifposture", function(arr, params) {
-  return params.item.posture ? arr.join(":") : "";
+  return params.item.posture && params.item.posture !== "standing" ? arr.join(":") : "";
 });
 
 tp.addDirective("restraint", function(arr, params) {
@@ -80,4 +80,23 @@ parser.isWornByChar = function(item) {
 
 parser.isBondageDeviceHere = function(item) {
   return item.isAtLoc(game.player.loc) && item.bondage;
+}
+
+
+
+
+function STOP_POSTURE(char) {
+  if (!char.posture) char.posture = "standing"
+  if (char.posture === "standing") return "";
+  let s;
+  // You could split up sitting, standing and lying
+  if (char.postureFurniture) {
+    s = nounVerb(char, "get", true) + " off " + w[char.postureFurniture].byname({article:DEFINITE}) + ".";
+  }
+  else {
+    s = nounVerb(char, "stand", true) + " up.";
+  }
+  char.posture = "standing"
+  delete char.postureFurniture
+  return s;
 }

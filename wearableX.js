@@ -6,6 +6,19 @@
 const WEARABLE_X = function (layer, slots) {
   const res = Object.assign(WEARABLE(layer, slots), MADE_OF(materials.cloth))
   
+  if (res.getVerbs === undefined) console.log(res)
+  
+  res.getBaseVerbs = res.getVerbs
+  
+  res.getVerbs = function() {
+    return this.getBaseVerbs()
+  }
+  
+  res.examine = function() {
+    msg(this.exam + (this.coveredInCum ? " " + pronounVerb(this, "be", true) + " covered in cum." : ""))
+    return true
+  }
+  
   res.byname = function(options) {
     if (!options) options = {};
     let s = "";
@@ -23,6 +36,7 @@ const WEARABLE_X = function (layer, slots) {
     s += this.alias;
     if (options && options.possessive) s += "'s";
     if (this.worn && options.modified && (this.isAtLoc(game.player.name))) { s += " (worn)"; }
+    if (options && options.capital) s = sentenceCase(s);
     return s;
   };
   
@@ -39,10 +53,9 @@ const WEARABLE_X = function (layer, slots) {
   };
   
   res.getPrice = function() {
-    console.log("getPrice")
     if (this.price > 0) return price;
-    if (this.swimwear) return /swimsuit/.test(this.name) ? 2500 - 1 : 3500 - 1
-    if (this.showwear) return 3000 - 2
+    if (this.garmentType === "swimwear") return /swimsuit/.test(this.name) ? 3500 - 1 : 2500 - 1
+    if (this.garmentType === "showwear") return 3000 - 2
     if (/leather/.test(this.name)) return 1000 + 700 * this.slots.length - 3
     if (/dress/.test(this.name)) return 3000 + 200 * this.name.length - 4
     if (this.wear_layer === 2) return 1000 - 5
@@ -52,6 +65,8 @@ const WEARABLE_X = function (layer, slots) {
     }
     return 1000 + 100 * this.name.length - 7
   }
+  
+  res.pickupMsg = "'What are you doing with my {nm:garment}?' {nm:char:the} asks."
   
   return res
 }
@@ -63,7 +78,7 @@ const WEARABLE_THAT_PULLS_DOWN = function (layer, slots) {
   res.pulledDown = false
   res.getSlots = function() { return this.pulledDown ? [] : this.slots; };
   res.breakEnsemble = function() { return this.pulledDown };
-  res.getVerbs = function() {
+  res.getBaseVerbs = function() {
     if (!this.isAtLoc(game.player.name)) {
       return [VERBS.examine, VERBS.take];
     }
@@ -104,6 +119,7 @@ const WEARABLE_THAT_PULLS_DOWN = function (layer, slots) {
     if (this.worn && options.npc) {
       s += this.pulledDown ? " around " + w[this.loc].pronouns.poss_adj + " ankles" : ""; 
     }
+    if (options && options.capital) s = sentenceCase(s);
     return s;
   }
   res.pullDown = function(char) {
@@ -138,7 +154,7 @@ const WEARABLE_THAT_PULLS_UP = function (layer, slots, toDest) {
   res.getSlots = function() { return this.pulledUp ? [] : this.slots; };
   res.breakEnsemble = function() { return this.pulledUp };
   res.toDest = toDest
-  res.getVerbs = function() {
+  res.getBaseVerbs = function() {
     if (!this.isAtLoc(game.player.name)) {
       return [VERBS.examine, VERBS.take];
     }
@@ -179,6 +195,7 @@ const WEARABLE_THAT_PULLS_UP = function (layer, slots, toDest) {
     if (this.worn && options.npc) {
       s += this.pulledUp ? " pulled up around " + w[this.loc].pronouns.poss_adj + " " + this.toDest : ""; 
     }
+    if (options && options.capital) s = sentenceCase(s);
     return s;
   }
   res.pullUp = function(char) {
@@ -215,7 +232,7 @@ const WEARABLE_THAT_UNFASTENS = function (layer, slots, slots2) {
   res.breakEnsemble = function() { return this.unfastened };
   res.ripOff = erotica.ripOffButtoned
   res.pullsoff = "jacket"
-  res.getVerbs = function() {
+  res.getBaseVerbs = function() {
     if (!this.isAtLoc(game.player.name)) {
       return [VERBS.examine, VERBS.take];
     }
@@ -256,6 +273,7 @@ const WEARABLE_THAT_UNFASTENS = function (layer, slots, slots2) {
     if (this.worn && options.modified && (this.isAtLoc(game.player.name))) {
       s += this.unfastened ? " (worn unfastened)" : " (worn)"; 
     }
+    if (options && options.capital) s = sentenceCase(s);
     return s;
   }
   res.unfasten = function(char) {
@@ -728,7 +746,7 @@ const SWIMSUIT = function(backExposure) {
     return this.pulledDown === 1 ? ["crotch", "groin", "buttock"] : []; 
   };
   res.breakEnsemble = function() { return this.pulledDown !== 0 };
-  res.getVerbs = function() {
+  res.getBaseVerbs = function() {
     if (!this.isAtLoc(game.player.name)) {
       return [VERBS.examine, VERBS.take];
     }
@@ -772,6 +790,7 @@ const SWIMSUIT = function(backExposure) {
     else if (this.worn && options.npc) {
       s += this.pulledDown === 2 ? " around " + w[this.loc].pronouns.poss_adj + " ankles" : (this.pulledDown === 1 ? " around " + w[this.loc].pronouns.poss_adj + " waist" : ""); 
     }
+    if (options && options.capital) s = sentenceCase(s);
     return s;
   };
 
