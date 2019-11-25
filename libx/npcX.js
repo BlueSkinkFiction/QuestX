@@ -17,6 +17,7 @@ const ACTOR = function(isFemale, isPlayer) {
   res.actor = true
   res.getArousal = function() {return this.arousal}
   res.arousal = 10; // changes dynamically, 0 - 100
+  res.enjoysAnal = false;
   res.reputation = 0  // getting a reputation is BAD, as other characters will dislike you
   //res.responses = erotica.defaultResponses
   res.responseNotWhileTiedUp = "'Not while I'm tied up.'"
@@ -122,15 +123,26 @@ const ACTOR = function(isFemale, isPlayer) {
   
   // --------------  DESCRIBING ---------------------------
   
-  res.examine = function(isMultiple, char) { 
-    msg("{description} " + pronounVerb(this, "be", true) + " wearing {attire}.{ifposture: " + pronounVerb(this, "be", true) + " is {posture}.}{ifrestraint: " + pronounVerb(this, "be", true) + " is {restraint}.}", {item:this})
+  res.examine = function(isMultiple, char) {
+    let s = "{description} " + pronounVerb(this, "be", true) + " wearing {attire}."
+    if (this.posture && this.posture !== "standing") s += " " + pronounVerb(this, "be", true) + " {posture}."
+    const dict = erotica.findGroupedSubstances(this)
+    const sl = []
+    for (let key in dict) {
+      sl.push(key + " on " + this.pronouns.poss_adj + " " + formatList(dict[key], {lastJoiner:" and "}))
+    }
+    if (sl.length > 0) s +=  " " + pronounVerb(this, "have", true) + " " + formatList(sl, {sep:"; ", lastJoiner:"; and "}) + "."
+    msg(s, {item:this})
   }
   
   res.getPostureDescription = function(capitalise) {
     if (!this.posture || this.posture === "standing") return false;
 
     const pos = this.posture.replace("#", this.pronouns.poss_adj);
-    if (this.postureFurniture) {
+    if (this.restraint) {
+      return w[this.restraint].situation;  // ??? does this need personalising?
+    }
+    else if (this.postureFurniture) {
       return pos + " " + this.postureAdverb + " " + w[this.postureFurniture].byname({article:DEFINITE});
     }
     else if (this.postureAddFloor) {
@@ -408,6 +420,7 @@ const ACTOR = function(isFemale, isPlayer) {
     let modestyBoost = 0;
     const list = this.getBodyPartList();
     for (let i = 0; i < list.length; i++) {
+      if (list[i].agregate) continue
       const bpExpRating = list[i].getExposureRating(this);
       const g = list[i].getCovering(this);
       if (!g) {
@@ -508,40 +521,7 @@ const ACTOR = function(isFemale, isPlayer) {
 
 
 
-
-
-  
-  
-
-  
-  
-  // Handle responses to grope, kiss, etc.
-  // Character needs a dictionary, responsesToActions, with an entry for each
-  // suck, lick, kiss, smack and grope
-  // each should be a dictionary, with a penalty function and responses array
-  res.actionResponse = function(params) {
-    //console.log(params)
-    
-    for (let i = 0; i < erotica.defaultResponses[params.action].length; i++) {
-      const response = erotica.defaultResponses[params.action][i];
-      if (!response.test(params)) continue
-      //console.log(this.responses[i].rating)
-      //console.log(rating < this.responses[i].rating)
-      if (response.script) response.script(params)
-      if (response.msg) this.msg(response.msg, params)
-      //if (this.responses[i].attraction) this.modifyAttraction(char, this.responses[i].attraction)
-      //if (char === game.player) game.player.reputation += this.responses[i].reputation
-      if (!params.action) console.log(params)
-      let s = params.action.name + "_"
-      if (params.bodypart) s += "_" + params.bodypart.name
-      if (params.garment) s += "_" + params.garment.name
-      if (response.failed) s += "_failed"
-      params.target[s] = true
-      return true
-    }
-    return false;
-  }
-  
+ 
 
   // Is the character willing to perform the given action?
   res.getWillingToInteract = function(target, action, bodypart) {

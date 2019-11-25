@@ -4,6 +4,7 @@
 
 
 
+createItem("torso", AGREGATE_BODY_PART(3, false, /torso|body/));
 
 createItem("foot", BODY_PART(1, true, /foot|feet/), {pluralAlias:'feet'});
 createItem("calf", BODY_PART(1, true, /calf|calves|calfs/), {pluralAlias:'calves'});
@@ -71,7 +72,7 @@ createItem("cock", GENITALS(10, false, /cock|dick|phallus|penis|willy|manhood|or
   response_lick:function(char, object) {
     msg(nounVerb(char, "run", true) + " " + char.PRONOUNS.posessive + " tongue along the length of " + object.byname({article:DEFINITE}) + " hard cock.");
   },
-  getSlot:function(toHandle) { return toHandle ? "crotch" : "groin"; },
+  getSlot:function() { return "groin" },
 });
 createItem("pussy", GENITALS(10, false, /pussy|cunt|vagina|slit|putang|snatch|coochie/), {
   response_suck:function(char, object) {
@@ -100,7 +101,70 @@ for (let key in w) {
 
 
 
+createItem("substance_prototype", {
+});
 
+
+erotica.ejaculate = function(actor, dest, extra) {
+  const cum = cloneObject(w.substance_prototype)
+  cum.owner = actor.name
+  cum.substance = "cum"
+  cum.loc = dest.name ? dest.name : dest
+  cum.subloc = extra
+  return cum
+}
+
+erotica.pourOn = function(dest, substance, extra) {
+  const subst = cloneObject(w.substance_prototype)
+  subst.substance = substance
+  subst.loc = dest.name ? dest.name : dest
+  subst.subloc = extra
+  return subst
+}
+
+
+erotica.findCum = function(obj) {
+  const cumlist = []
+  for (let key in w) {
+    if (w[key].substance === "cum" && w[key].loc === obj.name) cumlist.push(w[key])
+  }
+  return cumlist
+}
+
+// Use for objects to get a list of substance objects
+erotica.findSubstances = function(obj) {
+  const list = []
+  for (let key in w) {
+    if (w[key].substance && w[key].loc === obj.name && !list.includes(w[key].substance)) {
+      list.push(w[key].substance)
+    }
+  }
+  return list
+}
+
+
+// Use for NPCs to get a dictionary of arrays, the key is the substance, the array the bodypart
+erotica.findGroupedSubstances = function(obj) {
+  const list = {}
+  for (let key in w) {
+    if (w[key].substance && w[key].loc === obj.name) {
+      const subst = w[key].substance
+      if (!list[subst]) list[subst] = []        
+      list[subst].push(w[key].subloc)
+    }
+  }
+  return list
+}
+
+erotica.findSource = function(actor, substance) {
+  const l = scopeHeldBy(actor);
+  for (let i = 0; i < l.length; i++) {
+    if (l[i].isSource && l[i].isSource(substance)) {
+      return l[i];
+    }
+  }
+  return false;
+}
 
 
 
@@ -130,6 +194,7 @@ erotica.verify = function() {
       }
     }
   }
+  util.verifyResponses(erotica.defaultResponses)
 };
 
 

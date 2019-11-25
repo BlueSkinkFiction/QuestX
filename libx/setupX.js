@@ -20,7 +20,7 @@ tp.addDirective("ifposture", function(arr, params) {
 });
 
 tp.addDirective("restraint", function(arr, params) {
-  if (!params.item.posture) return '';
+  if (!params.item.restraint) return '';
   return params.item.restraint.situation;
 });
 

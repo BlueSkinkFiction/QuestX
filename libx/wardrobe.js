@@ -74,12 +74,39 @@ erotica.createBikini = function(loc) {
   ensembleAlias = ensembleAlias.replace("black", color);
   const ensembleName = world.findUniqueName(halter.name.replace("_halter", "_ensemble"))
   
+  ensemble = createEnsemble(ensembleName, halter, briefs, ensembleAlias, desc);
+  return [halter, briefs]
+}
+
+
+
+erotica.createBikiniEnsemble = function(ensembleName, halter, briefs, ensembleAlias, desc) {
   ensemble = createEnsemble(ensembleName, [halter, briefs], {
     exam:desc,
     alias:ensembleAlias,
+    examine:function(isMultiple) {
+      const cumlist1 = erotica.findCum(this.members[0])
+      const cumlist2 = erotica.findCum(this.members[1])
+      let s = this.exam
+      if (cumlist1.length > 0) {
+        if (cumlist2.length > 0) {
+          s += " There is cum on both the halter and the briefs."
+        }
+        else {
+          s += " There is cum on the halter."
+        }
+      }
+      else if (cumlist2.length > 0) {
+        s += " There is cum on the briefs."
+      }
+      msg(prefix(this, isMultiple) + s)
+      return true
+    },
   });
-  return [halter, briefs]
+  return ensemble
 }
+
+
 
 
 erotica.createSwimwear = function(loc, addExtras) {
@@ -577,12 +604,12 @@ createItem("dress_goth", DRESS(["chest", "nipple", "upperback", "lowerback", "mi
 createItem("dress_pvc_red", DRESS(["chest", "nipple", "upperback", "lowerback", "midriff", "hip", "groin", "buttock", "thigh"]),
   {
     alias:"red PVC dress",
-    examine:function() {
+    examine:function(isMultiple) {
       if (this.worn) {
-        msg("The red PVC dress is very short; it is laced all the way up the back, leaving a strip of bare skin about an inch side that included her ass crack.");
+        msg(prefix(this, isMultiple) + "The red PVC dress is very short; it is laced all the way up the back, leaving a strip of bare skin about an inch side that included her ass crack.");
       }
       else {
-        msg("The red PVC dress is very short; it is fastens by lacing all the way up the back.");
+        msg(prefix(this, isMultiple) + "The red PVC dress is very short; it is fastens by lacing all the way up the back.");
       }
     },
     image:"dress_pvc_red",
@@ -592,12 +619,12 @@ createItem("dress_pvc_red", DRESS(["chest", "nipple", "upperback", "lowerback", 
 createItem("dress_mesh", DRESS(["chest", "cleavage", "nipple", "upperback", "lowerback", "midriff", "hip", "groin", "buttock", "thigh"]),
   {
     alias:"black mesh dress",
-    examine:function() {
+    examine:function(isMultiple) {
       if (this.worn) {
-        msg("The dress is very short, but more of an issue is it is made of a course mesh, so does not really hide much at all.");
+        msg(prefix(this, isMultiple) + "The dress is very short, but more of an issue is it is made of a course mesh, so does not really hide much at all.");
       }
       else {
-        msg("The dress is very short, and made of a mesh material that is more hole than fabric.");
+        msg(prefix(this, isMultiple) + "The dress is very short, and made of a mesh material that is more hole than fabric.");
       }
     },
     image:"dress_mesh",
@@ -848,12 +875,12 @@ createItem("leather_halter", BRA(), MADE_OF(materials.leather),
 createItem("leather_dress", DRESS(["chest", "nipple", "upperback", "lowerback", "midriff", "hip", "groin", "buttock", "thigh"]), MADE_OF(materials.leather),
   {
     alias:"black leather dress",
-    examine:function() {
+    examine:function(isMultiple) {
       if (this.worn) {
-        msg("Now she has it on, Lucy realises the black leather dress is even shorter at the back, and does not actually reach her crotch. The six inch hole over her cleavage also makes her feel rather exposed.");
+        msg(prefix(this, isMultiple) + "Now she has it on, Lucy realises the black leather dress is even shorter at the back, and does not actually reach her crotch. The six inch hole over her cleavage also makes her feel rather exposed.");
       }
       else {
-        msg("The black leather dress is so short it would barely be decent. It has a high neckline, but a gaping hole, six inches across, over the cleavage.");
+        msg(prefix(this, isMultiple) + "The black leather dress is so short it would barely be decent. It has a high neckline, but a gaping hole, six inches across, over the cleavage.");
       }
     },
     image:"dress_leather",

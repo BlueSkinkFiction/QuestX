@@ -22,9 +22,9 @@ const BODY_PART = function(intimateRating, paired, regex) {
       return garment.getSlots().include(this.getSlot());
     },
     // does the garment stop access to the body part?
-    isProtectedBy:function(garment) {
-      return this.coveredBy(garment);
-    },
+    //isProtectedBy:function(garment) {
+    //  return this.coveredBy(garment);
+    //},
     // gets the outer garment that hides this body part, or false if nothing does
     getCovering:function(char) {
       return char.getOuterWearable(this.getSlot());
@@ -40,15 +40,15 @@ const BODY_PART = function(intimateRating, paired, regex) {
     getReveal:function(char) {
       const clothing = this.getAllCoverings(char);
       let reveal = 5;
-      for (let i = 0; i < clothing.length; i++) {
-        if (!clothing[i].getRevealing) return false;
-        reveal = Math.min(reveal, clothing[i].getRevealing());
+      for (let garment of clothing) {
+        if (!garment.getRevealing) return false;
+        reveal = Math.min(reveal, garment.getRevealing());
       }
       return reveal;
     },    
     // gets the outer garment that protects this body part, or false if nothing does
-    getProtection:function(char) {
-      return char.getOuterWearable(this.getSlot());
+    getProtection:function(char, includeBondage) {
+      return char.getOuterWearable(this.getSlot(true), includeBondage);
     },
     // how sexual is it to touch the body part?
     getIntimateRating:function(char) {
@@ -73,23 +73,18 @@ const BODY_PART = function(intimateRating, paired, regex) {
 // and protected by "crotch", rather than their own clothing slot
 const GENITALS = function(intimateRating, paired, regex) {
   const res = BODY_PART(intimateRating, paired, regex);
-  res.getSlot = function() { return undefined; },  // hopefully never happens!
-  res.coveredBy = function(garment) {
-    return garment.slots.include("groin");
-  };
-  res.protectedBy = function(garment) {
-    return garment.slots.include("crotch");
-  };
   res.getCovering = function(char) {
     return char.getOuterWearable("groin");
-  };
-  res.getProtection = function(char) {
-    return char.getOuterWearable("crotch");
   };
   return res;
 }  
 
 
+const AGREGATE_BODY_PART = function(intimateRating, paired, regex) {
+  const res = BODY_PART(intimateRating, paired, regex);
+  res.agregate = true
+  return res;
+}  
 
 
 
@@ -113,7 +108,6 @@ const EROTIC_FURNITURE = function(options) {
       char.msg(success_msg(char, this));
     }
     else if (char.posture && this[char.posture + "_to_" + posture]) {
-      debugmsg(this[char.posture + "_to_" + posture])
       char.msg(this[char.posture + "_to_" + posture], {actor:char, item:this})
     }
     else {
@@ -197,6 +191,8 @@ const BONDAGE_DEVICE = function(canMove) {
     },
     restrain:function(char, target) {
       msg(this.restrainMsg(char, target))
+      target.posture = this.posture
+      delete target.postureFurniture
       target.restraint = this.name
       this.victim = target.name
     },
