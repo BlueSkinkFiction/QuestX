@@ -1,55 +1,11 @@
 "use strict";
 
-
-/*
-Lucy swears like a trooper. She is from Burnley and has a bit of a chip on her shoulder about it. Shy about her body and sex, but may discover she has a leather fetish. Tattoos? Usually wearing black tights, shorts and tee-shirt.
-
-Joanna is very feminist, and something of a hippy. She believes all sorts of mumbo-jumbo, and sees "signs" everywhere. Studying English, and likes to mediate and do yoga (naked?). Usually wearing loose skirt and top (no underwear)
-
-Carmen is very upper class. She has no inhibitions about being naked (and often poses for Elisha and her classmates). Hates dirt, almost obsessively. Studying politics. Tattoos? Usually wears ripped jeans and crop top.
-
-Nina is Danish. She is very sporting; good at tennis, netball and karate. Overly competitive. Studying chemistry. Goes jogging very early everyday, and wears very little make up. usually wearing leggings and halter top.
-
-Tina is studying physics; it just comes naturally to her so she does not work that hard though she says she does as she is a little embarrassed at how bright she is. Though quite shy, she is very adventurous in bed.
-
-Brooklyn is from the US, and a complete slut. Raised on a farm in Arkansas, her family were very religious and controlling; as soon as she was away from them she went wild. Maybe still religious, so feels guilty after the event. Never swears, and while happy to suck a cock, is reluctant to say the word. Studying English with Joanna. Usually wearing tiny denim shorts and crop top.
-
-Sung Hi (K-Goth) is from Korea, and studying physics with Tina, but is not that good at it, and wants to change or just drop out. In Korea she was quite submissive to her boyfriends, but has since fond out she really likes to be dominant. She is considering getting a tattoo on her back. Usually wearing black mini-skirt, black top and black boots .
-
-
-
-
-
-Priyanka is studying engineering. She wants to be a mechanic, and loves tinkers with her motor bike. Her parents wanted her to be a doctor or similar, so engineering is a compromise.
-
-
-
-Elisha is studying photography.
-
-Holly is Australian
-
-
-Goth
-
-Intellectual
-Ti chi
-Religious
-Fussy
-Leather fetish
-Fussy
-
-
-
-
-*/
-
-
 createItem("me",
   ACTOR(false, true), {
     loc:"lounge", 
-    regex:/^me|myself|player$/, 
-    examine:function() {
-      msg("You are wearing {attire}. {ifposture:You are {posture}.}", {item:this});
+    regex:/^(me|myself|player)$/, 
+    examine:function(isMultiple) {
+      msg(prefix(this, isMultiple) + "You are wearing {attire}. {ifposture:You are {posture}.}", {item:this});
       if (!this.hasCock && !this.hasPussy) msg("You have no genitals...");
       if (this.hasCock && this.hasPussy) msg("You have both male and female genitals...");
       if (this.hasCock && this.hasTits) msg("Your plump breasts contrast with the cock hanging between your legs.");
@@ -97,7 +53,6 @@ createRoom("balcony", {
 createItem("Joanna", ACTOR(true), {
   loc:"lounge", 
   properName:true,
-  examine:"A hot, blonde babe. She is wearing {attire}. {ifposture:She is {posture}.}",
   bodyPartAdjectives:{upperback:"tattooed"},
   willingToExpose:5,
   eyeColor:'blue',
@@ -108,6 +63,11 @@ createItem("Joanna", ACTOR(true), {
   hairColor:'dark blonde',
   hairLength:7,
   bust:3,
+  
+  features:[
+    { type:'hair', hairLength:8, form:'has', bp:'head', s:function(char) { return w.Joanna.pronouns.poss_adj + "long " + char.hairColor + " hair in a high ponytail that falls halfway down " + char.pronouns.poss_adj + " back"}},
+    { type:'eyes', form:'has', bp:'face', s:function(char) { return char.eyeColor + ' eyes'}},
+  ],
   insult:function(target) { return target.hasBodyPart("cock") ? "jerk" : "bitch" },
   exclaimHappy:"Hey, wow!",
   exclaimAngry:"Fuck off!",
@@ -125,20 +85,46 @@ createItem("Joanna", ACTOR(true), {
     }
     return true;
   },
+  
+  sayState:'waitingMaidButler',
+  sayBasePriority:10,
+  sayPriority:10,
+  sayResponse:function(s, verb) {
+    msg("Joanna responds to: " + s)
+    return true
+  },
+  sayCanHear:function(actor) {
+    return actor.loc === this.loc;
+  }
 });
 
 
-addResponse("suck", {
-    test:function(p) { return p.bodypart.name === "cock" && p.rating > 14 && p.target.arousal > 89 && p.actor.name === "Joanna"},
-    msg:"Joanna giggles as {nv:target:come} in her mouth, letting some cum dribble down her chin.",
-    script:function(p) { p.target.modifyAttraction(p.actor, 5); p.target.arousal = 10, p.actor.arousal += 12 },
+
+
+
+
+createItem("joanna_hello", TOPIC(true), {
+  loc:'Joanna',
+  alias:'Hello',
+  //nowShow:['naomi_maid', 'naomi_butler', 'naomi_neither'],
+  script:function() {
+    msg("'Hi,' you say to the maid.");
+    msg("'Hi,' she replies. 'I'm Joanna your personal maid. It's my pleasure to make your holiday with us as wonderful as possible.'");
+  },
 })
 
-addResponse("lick", {
-    test:function(p) { return p.bodypart.name === "pussy" && p.rating > 14 && p.target.arousal > 89 && p.target.name === "Joanna"},
-    msg:"{nv:actor:tickle} Joanna's throbbing clit; she squeals as she comes.",
+
+util.addResponse(["suck", "target not tied up", "happy", "cock"], {
+    test:function(p) { return p.actor.name === "Joanna" && p.target.arousal > 90 },
+    msg:"Joanna giggles as {nv:target:come} in her mouth, letting some cum dribble down her chin.",
+    script:function(p) { p.target.modifyAttraction(p.actor, 5); p.target.arousal = 10, p.actor.arousal += 12 },
+}, erotica.defaultResponses)
+
+util.addResponse(["lick", "happy"], {
+    test:function(p) { return p.bodypart.name === "pussy" && p.target.name === "Joanna" && p.target.arousal > 90},
+    msg:"{nv:actor:lick} Joanna's throbbing clit; she squeals as she comes.",
     script:function(p) { p.target.modifyAttraction(p.actor, 5); p.target.arousal += 10, p.actor.arousal += 12 },
-})
+}, erotica.defaultResponses)
 
 
 createItem("maid",
@@ -162,7 +148,7 @@ createItem("Clive",
 );
 
 
-createItem("halterblack", MADE_OF(materials.cloth), HALTER(),
+createItem("halterblack", HALTER(),
   {
     alias:"black bikini halter",
     regex:/bikini halter|halter/,
@@ -174,7 +160,7 @@ createItem("halterblack", MADE_OF(materials.cloth), HALTER(),
   }
 );
 
-createItem("briefsblack", MADE_OF(materials.cloth), BRIEFS(),
+createItem("briefsblack", BRIEFS(),
   {
     alias:"black bikini briefs",
     regex:/bikini briefs|briefs/,
@@ -185,23 +171,44 @@ createItem("briefsblack", MADE_OF(materials.cloth), BRIEFS(),
   }
 );
 
-createEnsemble("black_bikini", [w.halterblack, w.briefsblack], {
-  exam:'A black bikini.',
-  examine:function() {
-    msg(this.exam + (this.coveredInCum ? " " + pronounVerb(this, "be", true) + " covered in cum." : ""))
-    return true
-  },
-});
+erotica.createBikiniEnsemble("black_bikini", w.halterblack, w.briefsblack, 'black bikini', 'A black bikini.');
 
-createItem("thongred", MADE_OF(materials.cloth), THONG(),
+createItem("thongred", THONG(),
   {
     alias:"red thong",
     loc:"lounge",
   }
 );
 
+createItem("thongblackf", THONG(),
+  {
+    alias:"black thong",
+    exam:'A tiny black triangle and some thin cords.',
+  }
+);
 
-createItem("swimsuitred", MADE_OF(materials.cloth), SWIMSUIT(1),
+createItem("thongblackm", THONG(),
+  {
+    alias:"black thong",
+    exam:'A moulded pouch clearly designed for the male body, together with cords.',
+  }
+);
+
+createItem("bowtie", THONG(),
+  {
+    alias:"black bowtie",
+    exam:'A neat, black bowtie (that fixes with Velcro).',
+  }
+);
+
+createItem("heels2", SHOES(), MADE_OF(materials.leather),
+  {
+    alias:"heels",
+    exam:"A pair of black heels.",
+  }
+);
+
+createItem("swimsuitred", SWIMSUIT(1),
   {
     alias:"red swimsuit",
     loc:"lounge",
@@ -209,7 +216,7 @@ createItem("swimsuitred", MADE_OF(materials.cloth), SWIMSUIT(1),
   }
 );
 
-createItem("teeshirtwhite", MADE_OF(materials.cloth), TEE_SHIRT(),
+createItem("teeshirtwhite", TEE_SHIRT(),
   {
     alias:"white teeshirt",
     loc:"lounge",
@@ -217,7 +224,7 @@ createItem("teeshirtwhite", MADE_OF(materials.cloth), TEE_SHIRT(),
   }
 );
 
-createItem("teeshirtmesh", MADE_OF(materials.cloth), TEE_SHIRT(true),
+createItem("teeshirtmesh", TEE_SHIRT(true),
   {
     alias:"mesh teeshirt",
     loc:"lounge",
@@ -226,13 +233,13 @@ createItem("teeshirtmesh", MADE_OF(materials.cloth), TEE_SHIRT(true),
   }
 );
 
-createItem("swimsbriefsblack", MADE_OF(materials.cloth), BRIEFS(),
+createItem("swimsbriefsblack", BRIEFS(),
   {
     alias:"black Speedos",
   }
 );
 
-createItem("swimshortsblue", MADE_OF(materials.cloth), SHORTS(true),
+createItem("swimshortsblue", SHORTS(true),
   {
     alias:"blue swim shorts",
     loc:"Clive",
@@ -241,24 +248,25 @@ createItem("swimshortsblue", MADE_OF(materials.cloth), SHORTS(true),
   }
 );
 
-createItem("daisydukes", MADE_OF(materials.cloth), SHORTS(),
+createItem("daisydukes", SHORTS(),
   {
     alias:"Daisy Dukes",
     loc:"lounge",
-    pronouns:PRONOUNS.plural,
+    pronouns:lang.pronouns.plural,
   }
 );
 
-createItem("jeans2", MADE_OF(materials.cloth), PANTS(),
+createItem("jeans2", PANTS(),
   {
     alias:"jeans",
     loc:"lounge",
-    pronouns:PRONOUNS.plural,
+    exam:"A pair of grey jeans.", 
+    pronouns:lang.pronouns.plural,
   }
 );
 
 
-createItem("maidoutfit", MADE_OF(materials.cloth), DRESS(["chest", "nipple", "lowerback", "midriff", "hip", "groin", "buttock"]),
+createItem("maidoutfit", DRESS(["chest", "nipple", "lowerback", "midriff", "hip", "groin", "buttock"]),
   {
     alias:"maid outfit",
     loc:"maid",
@@ -300,6 +308,19 @@ createItem("whip", MADE_OF(materials.leather), TAKEABLE(),
   }
 );
 
+createItem("jug", MADE_OF(materials.ceramic), TAKEABLE(),
+  {
+    loc:"table",
+    examine:function(isMultiple) { msg(prefix(this, isMultiple) + "The jug contains " + this.contains + ", and is " + Math.floor(this.volume / this.capacity * 100) + "% full."); },
+    capacity:10,
+    isSource:function(subst) {
+      return (subst === this.contains && this.volume > 0)
+    },
+    volume:10,
+    contains:'custard',
+  }
+);
+
 
 createItem("knife", MADE_OF(materials.metal), TAKEABLE(),
   {
@@ -331,27 +352,55 @@ createItem("a_frame", MADE_OF(materials.metal), BONDAGE_DEVICE(false),
     armsOpen:false,
     points:["wrists", "ankles"],
     restrainMsg:function(char, victim) { 
-      return nounVerb(char, "manacle", true) + " " + victim.byname({article:DEFINITE, possessive:true}) + " wrists to the top of the A-frame, then " + conjugate(char, "make") + " " + victim.pronouns.objective + " open " + victim.pronouns.poss_adj + " legs wide, before manacling them too."
+      return lang.nounVerb(char, "manacle", true) + " " + victim.byname({article:DEFINITE, possessive:true}) + " wrists to the top of the A-frame, then " + lang.conjugate (char, "make") + " " + victim.pronouns.objective + " open " + victim.pronouns.poss_adj + " legs wide, before manacling them too."
     },
     releaseMsg:function(char, victim) {
-      return nounVerb(char, "release", true) + " the manacles on " + victim.byname({article:DEFINITE, possessive:true}) + " ankles, then " + conjugate(char, "reach") + " up and " + conjugate(char, "release") + " " + victim.pronouns.poss_adj + " wrists."
+      return lang.nounVerb(char, "release", true) + " the manacles on " + victim.byname({article:DEFINITE, possessive:true}) + " ankles, then " + lang.conjugate (char, "reach") + " up and " + lang.conjugate (char, "release") + " " + victim.pronouns.poss_adj + " wrists."
     },
   }
 );
 
-createItem("bondage_table", MADE_OF(materials.metal), BONDAGE_DEVICE(false),
+createItem("bondage_table", MADE_OF(materials.metal), BONDAGE_DEVICE(false), OPENABLE(false),
   {
     situation:"manacled to the metal table",
     legsOpen:true,
     armsOpen:true,
+    closed:true,
     points:["wrists", "ankles"],
     posture:'reclining',
-    getHides:function(actor) { return actor.posture === "reclining" ? ["buttock", "lowerback", "upperback"] : ["groin", "midriff", "chest", "tit", "nipple"] },
+    getHides:function(actor) { 
+      if (this.closed) {
+        return actor.posture === "reclining" ? ["buttock", "lowerback", "upperback"] : ["groin", "midriff", "chest", "tit", "nipple"] 
+      }
+      else {
+        return actor.posture === "reclining" ? ["lowerback", "upperback"] : ["midriff", "chest", "tit", "nipple"] 
+      }
+    },
     restrainMsg:function(char, victim) { 
-      return nounVerb(victim, "lie", true) + " back on the metal table and " + nounVerb(char, "secure") + " " + victim.pronouns.poss_adj + " wrists in the manacles above " + victim.pronouns.poss_adj + " head, then " + conjugate(char, "make") + " " + victim.pronouns.objective + " open " + victim.pronouns.poss_adj + " legs wide, so " + pronounVerb(char, "can") + " secure " + victim.pronouns.poss_adj + " ankles too."
+      return lang.nounVerb(victim, "lie", true) + " back on the metal table and " + lang.nounVerb(char, "secure") + " " + victim.pronouns.poss_adj + " wrists in the manacles above " + victim.pronouns.poss_adj + " head, then " + lang.conjugate (char, "make") + " " + victim.pronouns.objective + " open " + victim.pronouns.poss_adj + " legs wide, so " + lang.pronounVerb(char, "can") + " secure " + victim.pronouns.poss_adj + " ankles too."
     },
     releaseMsg:function(char, victim) {
-      return nounVerb(char, "unfasten", true) + " the manacles on " + victim.byname({article:DEFINITE, possessive:true}) + " ankles, then the ones on " + victim.pronouns.poss_adj + " wrists. " + nounVerb(victim, "get", true) + " off the table."
+      return lang.nounVerb(char, "unfasten", true) + " the manacles on " + victim.byname({article:DEFINITE, possessive:true}) + " ankles, then the ones on " + victim.pronouns.poss_adj + " wrists. " + lang.nounVerb(victim, "get", true) + " off the table."
+    },
+    openMsg:function(isMultiple, char) {
+      let s = lang.nounVerb(char, "slide", true) + " open the panel in the centre of the metal table, "
+      if (this.victim) {
+        s += "right under " + w[this.victim].byname({article:DEFINITE, possessive:true}) + " buttocks, leaving " + w[this.victim].pronouns.poss_adj + " ass exposed."
+      }
+      else {
+        s += "right about where the victim's ass would be."
+      }
+      msg(prefix(this, isMultiple) + s);
+    },
+    closeMsg:function(isMultiple, char) {
+      let s = lang.nounVerb(char, "slide", true) + " the panel in the centre of the metal table closed"
+      if (this.victim) {
+        s += "; " + w[this.victim].byname({article:DEFINITE, possessive:true}) + " buttocks rest on the cool metal."
+      }
+      else {
+        s += "."
+      }
+      msg(prefix(this, isMultiple) + s);
     },
   }
 );
@@ -359,7 +408,7 @@ createItem("bondage_table", MADE_OF(materials.metal), BONDAGE_DEVICE(false),
 
 
 
-createItem("thin_shirt", MADE_OF(materials.cloth), BUTTONED_SHIRT(), {
+createItem("thin_shirt", BUTTONED_SHIRT(), {
   alias:"thin white shirt",
   //loc:"me",
   wet:false,
@@ -367,19 +416,19 @@ createItem("thin_shirt", MADE_OF(materials.cloth), BUTTONED_SHIRT(), {
   exam:"the material this white shirt is made from is so thin it will be almost transparent when wet.",
 })
 
-createItem("dress_cursed", MADE_OF(materials.cloth), DRESS([]),
+createItem("dress_cursed", DRESS([]),
   {
     alias:"short, black, strapless dress",
-    examine:function() {
+    examine:function(isMultiple) {
       const n = Math.floor(this.count / this.countRate)
       if (n < this.states.length - 1) {
-        return this.states[n].desc;
+        msg(prefix(this, isMultiple) + this.states[n].desc);
       }
       else if (this.getWorn()) {
-        return "A red strap that goes round " + w[this.loc].byname({article:DEFINITE,possessive:true}) + " bust, without covering the nipples, held up by thin straps over " + w[this.loc].pronouns.poss_adj + " shoulders.";
+        msg(prefix(this, isMultiple) + "A red strap that goes round " + w[this.loc].byname({article:DEFINITE,possessive:true}) + " bust, without covering the nipples, held up by thin straps over " + w[this.loc].pronouns.poss_adj + " shoulders.");
       }
       else {
-        return "A red strap that would go round the bust, without covering much at all, held up by thin straps.";
+        msg(prefix(this, isMultiple) + "A red strap that would go round the bust, without covering much at all, held up by thin straps.");
       }
     },
     getSlots:function() {
@@ -488,42 +537,36 @@ createItem("dress_cursed", MADE_OF(materials.cloth), DRESS([]),
   }
 );
 
+createItem("butler_maid_question", QUESTION(), {
+  responses:[
+    {
+      regex:/^(maid)$/,
+      response:function() {
+        msg("'Can I have a maid?' you say to the receptionist.");
+        msg("'Sure. There will be someone in your room for you.'");
+        const maid = createWoman("your_room")
+        maid.dressUp("thongblackf", "maidoutfit", "heels2");
+      }
+    },
+    {
+      regex:/^(butler)$/,
+      response:function() {
+        msg("'Can I have a butler?' you say to the receptionist.");
+        msg("'Sure. There will be someone in your room for you.'");
+        const butler = createWoman("your_room")
+        butler.dressUp("thongblackm", "bowtie");
+      }
+    },
+    {
+      regex:/^(no)$/,
+      response:function() {
+        msg("'No thanks to the maid or butler,' you say.");
+        msg("'That's fine.'");
+      }
+    },
+  ],
+});  
 
 
-/*
-Shops, bars, restaurants
-Bondage, food fetish, water bondage
-Sports
-Casino
-
-*/
-
-createRoom("lobby", {
-  desc:"The lobby is all gold and marble. In the center is a large square planter, set at an angle to the wall, that contains verdant bushes and yellow flowers.",
-  north:new Exit("poolside"),
-  east:new Exit("bar"),
-});
 
 
-
-createRoom("poolside", {
-  desc:"The pool looks very inviting in this heat! The poolside area runs along its south side, and features a number of white loungers.",
-  south:new Exit("lobby"),
-  in:new Exit("pool"),
-  north:new Exit("pool"),
-});
-
-
-
-createRoom("pool", {
-  desc:"The pool is deep, the water warm.",
-  getPublicRating:function() { return 3; },
-  south:new Exit("poolside"),
-  out:new Exit("poolside"),
-});
-
-
-createRoom("bar", {
-  desc:"The bar is great!",
-  west:new Exit("lobby"),
-});

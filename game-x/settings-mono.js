@@ -13,7 +13,7 @@ const STATUS_PANE = "Status";  // Set to false to turn off
 const STATUS_WIDTH_LEFT = 120; // How wide the columns are in the status pane
 const STATUS_WIDTH_RIGHT = 40;
 
-const USE_DROPDOWN_FOR_CONV = true;
+const DROPDOWN_FOR_CONV = true;
 
 const FAILS_COUNT_AS_TURNS = false;
 const LOOK_COUNTS_AS_TURN = false;
@@ -30,8 +30,8 @@ const CUSTOM_EXITS = false;          // set to true to use custom exits, in exit
 const FILES = ["setupX", "responsesX", "npcX", "templatesX", "commandsX", "worldX", "madeof", "wearableX", "wardrobe", "code-mono"];
 const MAX_UNDO = 10;
 const ROOM_HEADINGS = true;
-const NO_TALK_TO = false;
-const NO_ASK_TELL = "ASK/TELL ABOUT is not a feature in this game.";
+const no_talk_to = false;
+const no_ask_tell = "ASK/TELL ABOUT is not a feature in this game.";
 const NPC_REACTIONS_AWAYS = false;
 
 const MONEY_FORMAT =  "!$1,2!($1,2)!";

@@ -14,7 +14,7 @@ const STATUS_PANE = "Status";  // Set to false to turn off
 const STATUS_WIDTH_LEFT = 120; // How wide the columns are in the status pane
 const STATUS_WIDTH_RIGHT = 40;
 
-const USE_DROPDOWN_FOR_CONV = true;
+const DROPDOWN_FOR_CONV = false;
 
 const FAILS_COUNT_AS_TURNS = false;
 const LOOK_COUNTS_AS_TURN = false;
@@ -32,10 +32,13 @@ const FILES_X = ["setupX", "responsesX", "npcX", "templatesX", "commandsX", "wor
 const FILES = ["code", "data"];
 const MAX_UNDO = 10;
 const ROOM_HEADINGS = true;
-const NO_TALK_TO = "TALK TO is not a feature in this game.";
-const NO_ASK_TELL = "ASK/TELL ABOUT is not a feature in this game.";
+const no_ask_tell = false;
+const no_talk_to = "TALK TO is not a feature in this game.";
+const TURNS_QUESTIONS_LAST_TURN = 5;
+const GIVE_PLAYER_SAY_MSG = false;
 const NPC_REACTIONS_AWAYS = true;
 const TYPEWRITER = false;
+const GIVE_PLAYER_ASK_TELL_MSG = true;
 
 const SPLIT_LINES_ON = "<br>";   // Strings sent to msg will be broken into separate lines
 
