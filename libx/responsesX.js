@@ -231,7 +231,7 @@ erotica.defaultResponses = [
               },
               {
                 name:"not tit or cock!!!",
-                msg:"SHOULD NOT HAPPEN!",
+                msg:"SHOULD not HAPPEN!",
               },
             ],
           },
@@ -281,7 +281,7 @@ erotica.defaultResponses = [
               },
               {
                 name:"not tit or cock!!!",
-                msg:"SHOULD NOT HAPPEN!",
+                msg:"SHOULD not HAPPEN!",
               },
             ],
           },
@@ -350,7 +350,7 @@ erotica.defaultResponses = [
               },
               {
                 name:"not tit or cock!!!",
-                msg:"SHOULD NOT HAPPEN!",
+                msg:"SHOULD not HAPPEN!",
               },
             ],
           },
@@ -498,7 +498,7 @@ erotica.defaultResponses = [
     ],
   },
 
-  // SNOG
+  // Snog
   // Requires some work
   {
     name:"snog",

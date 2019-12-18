@@ -87,11 +87,11 @@ const ACTOR = function(isFemale, isPlayer) {
   }
  
   res.assumePosture = function(posture, forced) {
-    if (this.posture === posture.desc && this.postureFurniture === undefined) return failedmsg(ALREADY(this));
+    if (this.posture === posture.desc && this.postureFurniture === undefined) return failedmsg(lang.already(this));
     if (!this.canPosture()) return FAILED;
     if (!forced && !this.getAgreement("Posture", posture.cmd)) return FAILED;
     if (this.postureFurniture) {
-      this.msg(STOP_POSTURE(this));  // STOP_POSTURE handles details
+      this.msg(stop_posture(this));  // stop_posture handles details
     }  
     this.msg(posture.getAssumePostureDescription(this, this.posture));
     this.posture = posture.desc;
@@ -124,14 +124,14 @@ const ACTOR = function(isFemale, isPlayer) {
   // --------------  DESCRIBING ---------------------------
   
   res.examine = function(isMultiple, char) {
-    let s = "{description} " + pronounVerb(this, "be", true) + " wearing {attire}."
-    if (this.posture && this.posture !== "standing") s += " " + pronounVerb(this, "be", true) + " {posture}."
+    let s = "{description} " + lang.pronounVerb(this, "be", true) + " wearing {attire}."
+    if (this.posture && this.posture !== "standing") s += " " + lang.pronounVerb(this, "be", true) + " {posture}."
     const dict = erotica.findGroupedSubstances(this)
     const sl = []
     for (let key in dict) {
       sl.push(key + " on " + this.pronouns.poss_adj + " " + formatList(dict[key], {lastJoiner:" and "}))
     }
-    if (sl.length > 0) s +=  " " + pronounVerb(this, "have", true) + " " + formatList(sl, {sep:"; ", lastJoiner:"; and "}) + "."
+    if (sl.length > 0) s +=  " " + lang.pronounVerb(this, "have", true) + " " + formatList(sl, {sep:"; ", lastJoiner:"; and "}) + "."
     msg(s, {item:this})
   }
   

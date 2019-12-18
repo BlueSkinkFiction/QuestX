@@ -237,10 +237,10 @@ erotica.canWearRemoveWithSize = function(char, toWear) {
   const garment = this.getWearRemoveBlocker(char, toWear);
   if (garment) {
     if (toWear) {
-      failedmsg(CANNOT_WEAR_OVER(char, this, garment));
+      failedmsg(cannot_wear_over(char, this, garment));
     }
     else {
-      failedmsg(CANNOT_REMOVE_UNDER(char, this, garment));
+      failedmsg(cannot_remove_under(char, this, garment));
     }
     return false;
   }
@@ -824,8 +824,8 @@ createItem("leather_corset", CORSET(), MADE_OF(materials.leather),
   {
     alias:"leather crset",
     exam:"The corset is made of soft black leather, and is fastens at the back with a series of loops and hooks. While it offered good support for her bust, it is barely high enough to cover her nipples.",
-    //wearmsg:nounVerb(char, "pull", true) + " on the corset, fastening it at the back before getting her breasts comfortable in the tight garment.",
-    //removemsg:nounVerb(char, "unfasten", true) + " her corset, and takes it off",
+    //wearmsg:lang.nounVerb(char, "pull", true) + " on the corset, fastening it at the back before getting her breasts comfortable in the tight garment.",
+    //removemsg:lang.nounVerb(char, "unfasten", true) + " her corset, and takes it off",
     image:"corset",
     pullsoff:true,
     stripper:function(char) {
@@ -842,10 +842,10 @@ createItem("leather_belt_skirt", SKIRT(0), MADE_OF(materials.leather),
     stripper:function(char) {
       const groin = game.player.getInnerWearable("groin");
       if (groin === this) {
-        msg("Slowly " + nounVerb(char, "unfasten") + " the belt, conscious she had no panties on. She pulls it off, her sex exposed; the men cheer and whistle.");
+        msg("Slowly " + lang.nounVerb(char, "unfasten") + " the belt, conscious she had no panties on. She pulls it off, her sex exposed; the men cheer and whistle.");
       }
       else {
-        msg(nounVerb(char, "unfasten", true) + " the belt, glad she is wearing underwear. She pulls it off, exposing her " + groin.byname() + ".");
+        msg(lang.nounVerb(char, "unfasten", true) + " the belt, glad she is wearing underwear. She pulls it off, exposing her " + groin.byname() + ".");
       }
     },
   }
@@ -866,7 +866,7 @@ createItem("leather_halter", BRA(), MADE_OF(materials.leather),
     alias:"leather halter",
     exam:"The halter is made of soft black leather; three thin bands crossed each breast, offering minimal coverage.",
     wearMsg:function(char) {
-      return nounVerb(char, "pull", true) + " on the halter, fastening it at the back, then adjusting the bands to cover " + char.pronouns.poss_adj + " nipples.";
+      return lang.nounVerb(char, "pull", true) + " on the halter, fastening it at the back, then adjusting the bands to cover " + char.pronouns.poss_adj + " nipples.";
     },
     image:"halter_leather",
   }

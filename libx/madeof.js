@@ -79,7 +79,7 @@ commands.unshift(new Cmd('Burn', {
     const char = extractChar(this, objects)
     if (!char) return FAILED;
     if (!haveFireSource(char)) {
-      failedmsg(nounVerb(char, "need", true) + " a source of fire to burn something.");
+      failedmsg(lang.nounVerb(char, "need", true) + " a source of fire to burn something.");
       return FAILED;
     }
     return cmdDamage("fire", char, objects[0], "#### will not burn.");
@@ -146,7 +146,7 @@ function cmdDamage(damage, char, objects, nomsg) {
 createItem("ash_flinders", 
   {
     regex:/ash|ashes/,
-    pronouns:PRONOUNS.plural,
+    pronouns:lang.pronouns.plural,
     examine:"A pile of ashes that used to be ####.",
     takemsg:"Why would anyone want to pick up a load of ashes?",
     damagemsg:"#### burnt to ashes.",
@@ -155,7 +155,7 @@ createItem("ash_flinders",
 
 createItem("rust_flinders", 
   {
-    pronouns:PRONOUNS.plural,
+    pronouns:lang.pronouns.plural,
     examine:"A pile of rusted metal that used to be ####.",
     destroyMsg:"#### rusted.",
     takemsg:"Why would anyone want to pick up a useless load of rusted metal?",
@@ -165,7 +165,7 @@ createItem("rust_flinders",
 
 createItem("cloth_flinders", 
   {
-    pronouns:PRONOUNS.plural,
+    pronouns:lang.pronouns.plural,
     examine:"A whole bunch of rags that used to be ####.",
     takemsg:"Why would anyone want to pick up a load of rags?",
     damagemsg:"#### is shredded.",
@@ -174,7 +174,7 @@ createItem("cloth_flinders",
 
 createItem("paper_flinders", 
   {
-    pronouns:PRONOUNS.plural,
+    pronouns:lang.pronouns.plural,
     examine:"A whole bunch of torn up paper that used to be ####.",
     takemsg:"Why would anyone want to pick up a load of ripped up paper?",
     damagemsg:"#### is ripped to shreds.",
@@ -183,7 +183,7 @@ createItem("paper_flinders",
 
 createItem("wood_flinders", 
   {
-    pronouns:PRONOUNS.plural,
+    pronouns:lang.pronouns.plural,
     examine:"A whole bunch of splintered wood that used to be ####.",
     takemsg:"Why would anyone want to pick up a load of broken wood? {i:Think of the splinters!}",
     damagemsg:"#### is smashed to splinters.",
@@ -192,7 +192,7 @@ createItem("wood_flinders",
 
 createItem("glass_flinders", 
   {
-    pronouns:PRONOUNS.plural,
+    pronouns:lang.pronouns.plural,
     examine:"Some broken bits of glass that used to be ####.",
     takemsg:"Why would anyone want to pick up a load of broken glass?",
     damagemsg:"#### is smashed.",
@@ -201,7 +201,7 @@ createItem("glass_flinders",
 
 createItem("ceramic_flinders", 
   {
-    pronouns:PRONOUNS.plural,
+    pronouns:lang.pronouns.plural,
     examine:"Some broken bits of pottery that used to be ####.",
     takemsg:"Why would anyone want to pick up a load of broken pottery?",
     damagemsg:"#### is smashed.",
@@ -210,7 +210,7 @@ createItem("ceramic_flinders",
 
   createItem("stone_flinders", 
   {
-    pronouns:PRONOUNS.plural,
+    pronouns:lang.pronouns.plural,
     examine:"Some broken bits of stone that used to be ####.",
     takemsg:"Why would anyone want to pick up a load of broken stones?",
     damagemsg:"#### is smashed.",

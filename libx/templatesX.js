@@ -97,14 +97,14 @@ const EROTIC_FURNITURE = function(options) {
   const res = FURNITURE(options);
   res.assumePosture = function(isMultiple, char, posture, success_msg, adverb) {
     if (char.posture === posture && char.postureFurniture === this.name) {
-      char.msg(ALREADY(char));
+      char.msg(already(char));
       return false;
     }
     if (!this.testForPosture(char, posture)) {
       return false;
     }
     if (char.posture && char.postureFurniture !== this.name) {
-      char.msg(STOP_POSTURE(char))
+      char.msg(stop_posture(char))
       char.msg(success_msg(char, this));
     }
     else if (char.posture && this[char.posture + "_to_" + posture]) {
@@ -124,17 +124,17 @@ const EROTIC_FURNITURE = function(options) {
 
   if (options.bendover) {
     res.bendover = function(isMultiple, char) {
-      return this.assumePosture(isMultiple, char, "bending", BENDOVER_SUCCESSFUL, "over");
+      return this.assumePosture(isMultiple, char, "bending", bendover_successful, "over");
     };
   }
   if (options.straddle) {
     res.straddle = function(isMultiple, char) {
-      return this.assumePosture(isMultiple, char, "straddling", STRADDLE_SUCCESSFUL, "");
+      return this.assumePosture(isMultiple, char, "straddling", straddle_successful, "");
     };
   }
   if (options.recline) {
     res.facedown = function(isMultiple, char) {
-      return this.assumePosture(isMultiple, char, "facedown", FACEDOWN_SUCCESSFUL, "");
+      return this.assumePosture(isMultiple, char, "facedown", facedown_successful, "");
     };
   }
   res.hidesWhen_sitting = ["buttock", "lowerback", "upperback"]
@@ -184,10 +184,10 @@ const BONDAGE_DEVICE = function(canMove) {
     cannotManipulateMsg:function(char, obj, verb) {
       if (verb === undefined) verb = "do anything with"
       const objName = obj ? obj.byname({article:DEFINITE}) : "anything"
-      return nounVerb(char, "can", true) + "not " + verb.toLowerCase() + " " + objName + " whilst " + pronounVerb(char, "be") + " " + this.situation + "."
+      return lang.nounVerb(char, "can", true) + "not " + verb.toLowerCase() + " " + objName + " whilst " + lang.pronounVerb(char, "be") + " " + this.situation + "."
     },
     cannotMoveMsg:function(char, obj, verb) {
-      return nounVerb(char, "can", true) + "not go anywhere whilst " + pronounVerb(char, "be") + " " + this.situation + "."
+      return lang.nounVerb(char, "can", true) + "not go anywhere whilst " + lang.pronounVerb(char, "be") + " " + this.situation + "."
     },
     restrain:function(char, target) {
       msg(this.restrainMsg(char, target))

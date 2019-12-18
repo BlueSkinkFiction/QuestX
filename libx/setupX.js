@@ -85,16 +85,16 @@ parser.isBondageDeviceHere = function(item) {
 
 
 
-function STOP_POSTURE(char) {
+function stop_posture(char) {
   if (!char.posture) char.posture = "standing"
   if (char.posture === "standing") return "";
   let s;
   // You could split up sitting, standing and lying
   if (char.postureFurniture) {
-    s = nounVerb(char, "get", true) + " off " + w[char.postureFurniture].byname({article:DEFINITE}) + ".";
+    s = lang.nounVerb(char, "get", true) + " off " + w[char.postureFurniture].byname({article:DEFINITE}) + ".";
   }
   else {
-    s = nounVerb(char, "stand", true) + " up.";
+    s = lang.nounVerb(char, "stand", true) + " up.";
   }
   char.posture = "standing"
   delete char.postureFurniture

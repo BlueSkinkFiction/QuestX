@@ -32,7 +32,7 @@ const WEARABLE_X = function (layer, slots) {
     
     const list = erotica.findSubstances(this)
     if (list.length > 0) {
-      s += " " + pronounVerb(this, "be", true) + " covered in " + formatList(list, {lastJoiner:", and "}) + "."
+      s += " " + lang.pronounVerb(this, "be", true) + " covered in " + formatList(list, {lastJoiner:", and "}) + "."
     }
     
     msg(s)
@@ -43,14 +43,14 @@ const WEARABLE_X = function (layer, slots) {
     if (!options) options = {};
     let s = "";
     if (options.article === DEFINITE) {
-      s = addDefiniteArticle(this);
+      s = lang.addDefiniteArticle(this);
     }
     if (options.article === INDEFINITE) {
       if (this.owner && this.owner !== this.loc) {
         s = this.owner + "'s ";
       }
       else {
-        s = addIndefiniteArticle(this);
+        s = lang.addIndefiniteArticle(this);
       }
     }
     s += this.alias;
@@ -100,25 +100,25 @@ const WEARABLE_THAT_PULLS_DOWN = function (layer, slots) {
   res.breakEnsemble = function() { return this.pulledDown };
   res.getBaseVerbs = function() {
     if (!this.isAtLoc(game.player.name)) {
-      return [VERBS.examine, VERBS.take];
+      return [lang.verbs.examine, lang.verbs.take];
     }
     else if (this.getWorn()) {
       if (this.getWearRemoveBlocker(game.player, false)) {
-        return [VERBS.examine];
+        return [lang.verbs.examine];
       }
       else if (this.pulledDown) {
-        return [VERBS.examine, VERBS.remove, "Pull up"];
+        return [lang.verbs.examine, lang.verbs.remove, "Pull up"];
       }
       else {
-        return [VERBS.examine, VERBS.remove, "Pull down"];
+        return [lang.verbs.examine, lang.verbs.remove, "Pull down"];
       }
     }
     else {
       if (this.getWearRemoveBlocker(game.player, true)) {
-        return [VERBS.examine, VERBS.drop];
+        return [lang.verbs.examine, lang.verbs.drop];
       }
       else {
-        return [VERBS.examine, VERBS.drop, VERBS.wear];
+        return [lang.verbs.examine, lang.verbs.drop, lang.verbs.wear];
       }
     }
   };
@@ -126,10 +126,10 @@ const WEARABLE_THAT_PULLS_DOWN = function (layer, slots) {
     if (!options) options = {};
     let s = "";
     if (options.article === DEFINITE) {
-      s = addDefiniteArticle(this);
+      s = lang.addDefiniteArticle(this);
     }
     if (options.article === INDEFINITE) {
-      s = addIndefiniteArticle(this);
+      s = lang.addIndefiniteArticle(this);
     }
     s += this.alias;
     if (options && options.possessive) s += "'s";
@@ -144,7 +144,7 @@ const WEARABLE_THAT_PULLS_DOWN = function (layer, slots) {
   }
   res.pullDown = function(char) {
     if (this.pulledDown) {
-      failedmsg(pronounVerb(this, "be", true) + " already.")
+      failedmsg(lang.pronounVerb(this, "be", true) + " already.")
       return FAILED
     }
     
@@ -176,25 +176,25 @@ const WEARABLE_THAT_PULLS_UP = function (layer, slots, toDest) {
   res.toDest = toDest
   res.getBaseVerbs = function() {
     if (!this.isAtLoc(game.player.name)) {
-      return [VERBS.examine, VERBS.take];
+      return [lang.verbs.examine, lang.verbs.take];
     }
     else if (this.getWorn()) {
       if (this.getWearRemoveBlocker(game.player, false)) {
-        return [VERBS.examine];
+        return [lang.verbs.examine];
       }
       else if (this.pulledUp) {
-        return [VERBS.examine, VERBS.remove, "Pull down"];
+        return [lang.verbs.examine, lang.verbs.remove, "Pull down"];
       }
       else {
-        return [VERBS.examine, VERBS.remove, "Pull up"];
+        return [lang.verbs.examine, lang.verbs.remove, "Pull up"];
       }
     }
     else {
       if (this.getWearRemoveBlocker(game.player, true)) {
-        return [VERBS.examine, VERBS.drop];
+        return [lang.verbs.examine, lang.verbs.drop];
       }
       else {
-        return [VERBS.examine, VERBS.drop, VERBS.wear];
+        return [lang.verbs.examine, lang.verbs.drop, lang.verbs.wear];
       }
     }
   };
@@ -202,10 +202,10 @@ const WEARABLE_THAT_PULLS_UP = function (layer, slots, toDest) {
     if (!options) options = {};
     let s = "";
     if (options.article === DEFINITE) {
-      s = addDefiniteArticle(this);
+      s = lang.addDefiniteArticle(this);
     }
     if (options.article === INDEFINITE) {
-      s = addIndefiniteArticle(this);
+      s = lang.addIndefiniteArticle(this);
     }
     s += this.alias;
     if (options && options.possessive) s += "'s";
@@ -220,7 +220,7 @@ const WEARABLE_THAT_PULLS_UP = function (layer, slots, toDest) {
   }
   res.pullUp = function(char) {
     if (this.pulledUp) {
-      failedmsg(pronounVerb(this, "be", true) + " already.")
+      failedmsg(lang.pronounVerb(this, "be", true) + " already.")
       return FAILED
     }
     
@@ -254,25 +254,25 @@ const WEARABLE_THAT_UNFASTENS = function (layer, slots, slots2) {
   res.pullsoff = "jacket"
   res.getBaseVerbs = function() {
     if (!this.isAtLoc(game.player.name)) {
-      return [VERBS.examine, VERBS.take];
+      return [lang.verbs.examine, lang.verbs.take];
     }
     else if (this.getWorn()) {
       if (this.getWearRemoveBlocker(game.player, false)) {
-        return [VERBS.examine];
+        return [lang.verbs.examine];
       }
       else if (this.unfastened) {
-        return [VERBS.examine, VERBS.remove, "Fasten"];
+        return [lang.verbs.examine, lang.verbs.remove, "Fasten"];
       }
       else {
-        return [VERBS.examine, VERBS.remove, "Unfasten"];
+        return [lang.verbs.examine, lang.verbs.remove, "Unfasten"];
       }
     }
     else {
       if (this.getWearRemoveBlocker(game.player, true)) {
-        return [VERBS.examine, VERBS.drop];
+        return [lang.verbs.examine, lang.verbs.drop];
       }
       else {
-        return [VERBS.examine, VERBS.drop, VERBS.wear];
+        return [lang.verbs.examine, lang.verbs.drop, lang.verbs.wear];
       }
     }
   };
@@ -280,10 +280,10 @@ const WEARABLE_THAT_UNFASTENS = function (layer, slots, slots2) {
     if (!options) options = {};
     let s = "";
     if (options.article === DEFINITE) {
-      s = addDefiniteArticle(this);
+      s = lang.addDefiniteArticle(this);
     }
     if (options.article === INDEFINITE) {
-      s = addIndefiniteArticle(this);
+      s = lang.addIndefiniteArticle(this);
     }
     if (this.worn && options.npc) {
       s += this.unfastened ? "unfastened " : ""; 
@@ -298,7 +298,7 @@ const WEARABLE_THAT_UNFASTENS = function (layer, slots, slots2) {
   }
   res.unfasten = function(char) {
     if (this.unfastened) {
-      failedmsg(pronounVerb(this, "be", true) + " already.")
+      failedmsg(lang.pronounVerb(this, "be", true) + " already.")
       return FAILED
     }
     
@@ -405,7 +405,7 @@ const SHORTS = function(long) {
   const slots = ["crotch", "groin", "buttock", "hip"];
   if (long) slots.push("thigh");
   const res = WEARABLE_THAT_PULLS_DOWN(4, slots);
-  res.pronouns = PRONOUNS.plural
+  res.pronouns = lang.pronouns.plural
   res.pullsoff = "down";
   res.strength = 1
   res.garmentType = "casual"
@@ -511,7 +511,7 @@ const PANTS = function() {
   res.pullsoff = "down";
   res.strength = 1
   res.garmentType = "smart"
-  res.pronouns = PRONOUNS.plural;
+  res.pronouns = lang.pronouns.plural;
   res.wearMsg = function(char) {
     return "{nv:actor:pull:true} the denim shorts up {pa:actor} long, smooth legs, pulling up the zip and fastening the button.";
   }
@@ -732,7 +732,7 @@ const BOXERS = function() {
 const TIGHTS = function() {
   const res = WEARABLE_THAT_PULLS_DOWN(3, ["crotch", "groin", "buttock", "hip", "thigh", "knee", "calf", "foot"]);
   res.pullsoff = "down";
-  res.pronouns = PRONOUNS.plural
+  res.pronouns = lang.pronouns.plural
   res.strength = 1
   res.garmentType = "underwear";
   res.wearMsg = function(char) {
@@ -790,28 +790,28 @@ const SWIMSUIT = function(backExposure) {
   res.breakEnsemble = function() { return this.pulledDown !== 0 };
   res.getBaseVerbs = function() {
     if (!this.isAtLoc(game.player.name)) {
-      return [VERBS.examine, VERBS.take];
+      return [lang.verbs.examine, lang.verbs.take];
     }
     else if (this.getWorn()) {
       if (this.getWearRemoveBlocker(game.player, false)) {
-        return [VERBS.examine];
+        return [lang.verbs.examine];
       }
       else if (this.pulledDown === 0) {
-        return [VERBS.examine, VERBS.remove, "Pull down"];
+        return [lang.verbs.examine, lang.verbs.remove, "Pull down"];
       }
       else if (this.pulledDown === 1) {
-        return [VERBS.examine, VERBS.remove, "Pull up", "Pull down"];
+        return [lang.verbs.examine, lang.verbs.remove, "Pull up", "Pull down"];
       }
       else {
-        return [VERBS.examine, VERBS.remove, "Pull up"];
+        return [lang.verbs.examine, lang.verbs.remove, "Pull up"];
       }
     }
     else {
       if (this.getWearRemoveBlocker(game.player, true)) {
-        return [VERBS.examine, VERBS.drop];
+        return [lang.verbs.examine, lang.verbs.drop];
       }
       else {
-        return [VERBS.examine, VERBS.drop, VERBS.wear];
+        return [lang.verbs.examine, lang.verbs.drop, lang.verbs.wear];
       }
     }
   };
@@ -819,10 +819,10 @@ const SWIMSUIT = function(backExposure) {
     if (!options) options = {};
     let s = "";
     if (options.article === DEFINITE) {
-      s = addDefiniteArticle(this);
+      s = lang.addDefiniteArticle(this);
     }
     if (options.article === INDEFINITE) {
-      s = addIndefiniteArticle(this);
+      s = lang.addIndefiniteArticle(this);
     }
     s += this.alias;
     if (options && options.possessive) s += "'s";
@@ -1106,7 +1106,7 @@ const BRIEFS = function() {
     }
   }
   res.pullsoff = "down";
-  res.pronouns = PRONOUNS.plural;
+  res.pronouns = lang.pronouns.plural;
   res.strength = 2
   res.garmentType = "swimwear";
   res.ripOff = erotica.ripOffPants
@@ -1138,9 +1138,9 @@ const BOOTS = function(slotCount) {
   res.removeMsg = function(char) {
     return "{nv:actor:pull:true} off {pa:actor} left boot, then the right.";
   };
-  res.pronouns = PRONOUNS.plural
+  res.pronouns = lang.pronouns.plural
   res.defArticle = "the pair of"
-  res.indefArticle = "the pair of"
+  res.indefArticle = "a pair of"
   res.ripOff = erotica.ripOffFootwear
   res.garmentType = "leatherwear"
   res.footwear =  true
@@ -1156,7 +1156,7 @@ const SHOES = function() {
   res.removeMsg = function(char) {
     return "{nv:actor:pull:true} off {pa:actor} left shoe, then the right.";
   };
-  res.pronouns = PRONOUNS.plural;
+  res.pronouns = lang.pronouns.plural;
   res.defArticle = "the pair of"
   res.indefArticle = "a pair of"
   res.ripOff = erotica.ripOffFootwear
@@ -1177,7 +1177,7 @@ const PASTIES = function() {
   res.removeMsg = function(char) {
     return "{nv:actor:gasp:true} slightly as {pv:actor:pull} the pastie off {pa:actor} left nipple; then {pv:actor:do} likewise for the right.";
   };
-  res.pronouns = PRONOUNS.plural;
+  res.pronouns = lang.pronouns.plural;
   res.garmentType = "erotica"
   res.ripOff = function(p) {
     this.loc = p.actor.loc
@@ -1294,7 +1294,7 @@ erotica.ripOffHalter = function(p) {
     p.target.arousalBomb(arousalBomb)
   }
   else if (this.pulledUp) {
-    failedmsg(pronounVerb(this, "be", true) + " already pulled up; it is not going any more than that.")
+    failedmsg(lang.pronounVerb(this, "be", true) + " already pulled up; it is not going any more than that.")
     this.worn = true
     this.loc = p.target.name
     return false
@@ -1338,7 +1338,7 @@ erotica.ripOffPants = function(p) {
   }
   else if (!p.restraint.legsOpen && this.pullsDown) {
     if (this.pulledDown) {
-      failedmsg(pronounVerb(this, "be", true) + " already pulled down; it is not going any more than that.")
+      failedmsg(lang.pronounVerb(this, "be", true) + " already pulled down; it is not going any more than that.")
       this.worn = true
       this.loc = p.target.name
       return false
@@ -1380,7 +1380,7 @@ erotica.ripOffTeeShirt = function(p) {
     p.target.arousalBomb(arousalBomb)
   }
   else if (this.pulledUp) {
-    failedmsg(pronounVerb(this, "be", true) + " already pulled up; it is not going any more than that.")
+    failedmsg(lang.pronounVerb(this, "be", true) + " already pulled up; it is not going any more than that.")
     this.worn = true
     this.loc = p.target.name
     return false
@@ -1414,7 +1414,7 @@ erotica.ripOffButtoned = function(p) {
     p.target.arousalBomb(arousalBomb)
   }
   else if (this.unfastened) {
-    failedmsg(pronounVerb(this, "be", true) + " already unfastened; it is not going any more than that.")
+    failedmsg(lang.pronounVerb(this, "be", true) + " already unfastened; it is not going any more than that.")
     this.worn = true
     this.loc = p.target.name
     return false

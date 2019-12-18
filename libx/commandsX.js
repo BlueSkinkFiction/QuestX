@@ -60,7 +60,7 @@ function cmdFuck(actor, target, bodypart, sextoy) {
 
 
 
-commands.unshift(new Cmd("Fuck1", {
+commands.unshift(new Cmd("Fuck", {
   npcCmd:true,
   cmdCategory:'InsertSextoy',
   regex:/^(fuck|penetrate|pleasure|shag|bonk) (.+)$/,
@@ -77,7 +77,7 @@ commands.unshift(new Cmd("Fuck1", {
   },
 }));
 
-commands.unshift(new Cmd("Fuck3", {
+commands.unshift(new Cmd("Fuck2", {
   npcCmd:true,
   cmdCategory:'InsertSextoy',
   regex:/^(push|insert|force|thrust)( my| your| his| her|) (cock|dick) in (.+)'s (.+)$/,
@@ -96,7 +96,7 @@ commands.unshift(new Cmd("Fuck3", {
   },
 }));
 
-commands.unshift(new Cmd("Fuck4", {
+commands.unshift(new Cmd("Fuck3", {
   npcCmd:true,
   cmdCategory:'InsertSextoy',
   regex:/^(fuck|penetrate|pleasure) (.+)'s (.+)$/,
@@ -114,7 +114,7 @@ commands.unshift(new Cmd("Fuck4", {
   },
 }));
 
-commands.unshift(new Cmd("Fuck5", {
+commands.unshift(new Cmd("Fuck4", {
   npcCmd:true,
   cmdCategory:'InsertSextoy',
   regex:/^(ass fuck) (.+)$/,
@@ -131,7 +131,7 @@ commands.unshift(new Cmd("Fuck5", {
   },
 }));
 
-commands.unshift(new Cmd("Fuck6", {
+commands.unshift(new Cmd("Fuck5", {
   npcCmd:true,
   cmdCategory:'InsertSextoy',
   regex:/^(face fuck) (.+)$/,
@@ -147,7 +147,7 @@ commands.unshift(new Cmd("Fuck6", {
   },
 }));
 
-commands.unshift(new Cmd("SextoyA", {
+commands.unshift(new Cmd("Sextoy", {
   npcCmd:true,
   cmdCategory:'InsertSextoy',
   regex:/^(fuck|penetrate|pleasure) (.+) with (.+)$/,
@@ -164,7 +164,7 @@ commands.unshift(new Cmd("SextoyA", {
   },
 }));
 
-commands.unshift(new Cmd("SextoyB", {
+commands.unshift(new Cmd("Sextoy2", {
   npcCmd:true,
   cmdCategory:'InsertSextoy',
   regex:/^(ass fuck) (.+) with (.+)$/,
@@ -181,7 +181,7 @@ commands.unshift(new Cmd("SextoyB", {
   },
 }));
 
-commands.unshift(new Cmd("SextoyC", {
+commands.unshift(new Cmd("Sextoy3", {
   npcCmd:true,
   cmdCategory:'InsertSextoy',
   regex:/^(face fuck) (.+) with (.+)$/,
@@ -198,7 +198,7 @@ commands.unshift(new Cmd("SextoyC", {
   },
 }));
 
-commands.unshift(new Cmd("SextoyD", {
+commands.unshift(new Cmd("Sextoy4", {
   npcCmd:true,
   cmdCategory:'InsertSextoy',
   regex:/^(push|insert|force|thrust) (.+) in (.+)$/,
@@ -216,7 +216,7 @@ commands.unshift(new Cmd("SextoyD", {
 }));
 
 
-commands.unshift(new Cmd("SextoyE", {
+commands.unshift(new Cmd("Sextoy5", {
   npcCmd:true,
   cmdCategory:'InsertSextoy',
   regex:/^(push|insert|force|thrust) (.+) in (.+)'s (.+)$/,
@@ -234,7 +234,7 @@ commands.unshift(new Cmd("SextoyE", {
   },
 }));
 
-commands.unshift(new Cmd("SextoyF", {
+commands.unshift(new Cmd("Sextoy6", {
   npcCmd:true,
   cmdCategory:'InsertSextoy',
   regex:/^(fuck|penetrate|pleasure) (.+)'s (.+) with (.+)$/,
@@ -265,7 +265,7 @@ erotica.blowJobScript = function(objects) {
     return cmdInteract("suck", actor, target, {bodypart:w.cock})
   }
   else {
-    failedmsg(nounVerb(actor, "can", true) + " only suck off character's with dicks.")
+    failedmsg(lang.nounVerb(actor, "can", true) + " only suck off character's with dicks.")
     return FAILED
   }
 }
@@ -304,7 +304,7 @@ erotica.goDownScript = function(objects) {
   if (target.hasBodyPart("pussy")) {
     return cmdInteract("lick", actor, target,{bodypart: w.pussy})
   }
-  failedmsg(nounVerb(actor, "can", true) + " only go down on character's with genitals.")
+  failedmsg(lang.nounVerb(actor, "can", true) + " only go down on character's with genitals.")
   return FAILED
 }
 commands.unshift(new Cmd('GoDownOn', {
@@ -328,7 +328,7 @@ erotica.cunnilingusScript = function(objects) {
   if (target.hasBodyPart("pussy")) {
     return cmdInteract("lick", actor, target, {bodypart:w.pussy})
   }
-  failedmsg(nounVerb(actor, "can", true) + " only do cunnilingus on character's with a pussy.")
+  failedmsg(lang.nounVerb(actor, "can", true) + " only do cunnilingus on character's with a pussy.")
   return FAILED
 }
 commands.unshift(new Cmd('Cunnilingus', {
@@ -352,7 +352,7 @@ erotica.teabagScript = function(objects) {
   if (target.hasBodyPart("bollock")) {
     return cmdInteract("suck", actor, target, {bodypart:w.bollock})
   }
-  failedmsg(nounVerb(actor, "can", true) + " only teabag character's with balls.")
+  failedmsg(lang.nounVerb(actor, "can", true) + " only teabag character's with balls.")
   return FAILED
 }
 commands.unshift(new Cmd('Teabag', {
@@ -583,15 +583,15 @@ erotica.ACTIONS = [
     intimateRating:10,
     getDefaultBodyPart:function(actor, target) { return target.hasBodyPart("pussy") ? "pussy" : "ass" },
     extraTests:function(actor, target, bodypart, sextoy) {
-      if (!bodypart.canBePenetrated) return falsemsg(nounVerb(actor, "cannot", true) + " put anything in " + bodypart.byname({article:INDEFINITE}) + ".")
+      if (!bodypart.canBePenetrated) return falsemsg(lang.nounVerb(actor, "cannot", true) + " put anything in " + bodypart.byname({article:INDEFINITE}) + ".")
       const g = target.getOuterWearable(bodypart.getSlot(), true)
       if (g) {
         console.log(g)
         if (g.wearable) {
-          return falsemsg(nounVerb(actor, "cannot", true) + " do that while " + nounVerb(target, "be") + " wearing " + g.byname({article:INDEFINITE}) + ".")
+          return falsemsg(lang.nounVerb(actor, "cannot", true) + " do that while " + lang.nounVerb(target, "be") + " wearing " + g.byname({article:INDEFINITE}) + ".")
         }
         else {
-          return falsemsg(nounVerb(actor, "cannot", true) + " do that while " + nounVerb(target, "be") + " secured to " + g.byname({article:DEFINITE}) + " like that.")
+          return falsemsg(lang.nounVerb(actor, "cannot", true) + " do that while " + lang.nounVerb(target, "be") + " secured to " + g.byname({article:DEFINITE}) + " like that.")
         }
       }
       const g2 = actor.getOuterWearable("crotch")
@@ -610,10 +610,10 @@ erotica.ACTIONS = [
       const g = target.getOuterWearable("crotch")
       if (g) {
         if (g.wearable) {
-          return falsemsg(nounVerb(actor, "cannot", true) + " do that while " + target.byname({article:DEFINITE}) + " is wearing " + g.byname({article:INDEFINITE}) + ".")
+          return falsemsg(lang.nounVerb(actor, "cannot", true) + " do that while " + target.byname({article:DEFINITE}) + " is wearing " + g.byname({article:INDEFINITE}) + ".")
         }
         else {
-          return falsemsg(nounVerb(actor, "cannot", true) + " do that while " + nounVerb(target, "be") + " tied to " + g.byname({article:INDEFINITE}) + " like that.")
+          return falsemsg(lang.nounVerb(actor, "cannot", true) + " do that while " + lang.nounVerb(target, "be") + " tied to " + g.byname({article:INDEFINITE}) + " like that.")
         }
       }
       
@@ -631,16 +631,16 @@ erotica.ACTIONS = [
     intimateRating:10,
     getDefaultBodyPart:function(actor, target) { return target.hasBodyPart("pussy") ? "pussy" : "ass" },
     extraTests:function(actor, target, bodypart, sextoy) {
-      if (!sextoy) return falsemsg(nounVerb(actor, "need", true) + " some kind of sex toy to do that.")
-      if (!sextoy.dildo) return falsemsg(nounVerb(actor, "can't", true) + " use " + sextoy.byname({article:DEFINITE}) + " that way.")
-      if (!bodypart.canBePenetrated) return falsemsg(nounVerb(actor, "cannot", true) + " put anything in " + bodypart.byname({article:INDEFINITE}) + ".")
+      if (!sextoy) return falsemsg(lang.nounVerb(actor, "need", true) + " some kind of sex toy to do that.")
+      if (!sextoy.dildo) return falsemsg(lang.nounVerb(actor, "can't", true) + " use " + sextoy.byname({article:DEFINITE}) + " that way.")
+      if (!bodypart.canBePenetrated) return falsemsg(lang.nounVerb(actor, "cannot", true) + " put anything in " + bodypart.byname({article:INDEFINITE}) + ".")
       const g = target.getOuterWearable(bodypart.getSlot(), true)
       if (g) {
         if (g.wearable) {
-          return falsemsg(nounVerb(actor, "cannot", true) + " do that while " + nounVerb(target, "be") + " wearing " + g.byname({article:INDEFINITE}) + ".")
+          return falsemsg(lang.nounVerb(actor, "cannot", true) + " do that while " + lang.nounVerb(target, "be") + " wearing " + g.byname({article:INDEFINITE}) + ".")
         }
         else {
-          return falsemsg(nounVerb(actor, "cannot", true) + " do that while " + nounVerb(target, "be") + " secured to " + g.byname({article:DEFINITE}) + " like that.")
+          return falsemsg(lang.nounVerb(actor, "cannot", true) + " do that while " + lang.nounVerb(target, "be") + " secured to " + g.byname({article:DEFINITE}) + " like that.")
         }
       }
       return true;
@@ -658,10 +658,10 @@ erotica.ACTIONS = [
       return postureData.getDefaultComeOverBodyPart() 
     },
     extraTests:function(actor, target, bodypart) {
-      if (!actor.hasBodyPart('cock')) return falsemsg(nounVerb(actor, "would", true) + " need a cock to do that!");
+      if (!actor.hasBodyPart('cock')) return falsemsg(lang.nounVerb(actor, "would", true) + " need a cock to do that!");
       if (!actor.canManipulate(null, "wank")) return FAILED;
-      if (actor.getOuterWearable("crotch")) return falsemsg(nounVerb(actor, "would", true) + " need your cock out to do that!");
-      if (actor.posture && !["standing", "kneeling"].includes(actor.posture)) return falsemsg(nounVerb(actor, "would", true) + " need to get up to do that!");
+      if (actor.getOuterWearable("crotch")) return falsemsg(lang.nounVerb(actor, "would", true) + " need your cock out to do that!");
+      if (actor.posture && !["standing", "kneeling"].includes(actor.posture)) return falsemsg(lang.nounVerb(actor, "would", true) + " need to get up to do that!");
       if (target.postureFurniture) {
        
       }
@@ -689,7 +689,7 @@ erotica.ACTIONS = [
     extraTests:function(actor, target, bodypart) {
       if (!target.hasBodyPart('pussy')) return falsemsg(target.byname({article:DEFINITE, capital:true}) + " would need a pussy for that.");
       if (!actor.canManipulate(null, "frig")) return FAILED;
-      if (target.getOuterWearable("crotch")) return falsemsg(nounVerb(actor, "would", true) + " have to get to " + target.byname({article:DEFINITE, capital:true}) + "'s " + target.getOuterWearable("crotch").byname() + " off " + target.pronouns.poss_adj + " to do that!");
+      if (target.getOuterWearable("crotch")) return falsemsg(lang.nounVerb(actor, "would", true) + " have to get to " + target.byname({article:DEFINITE, capital:true}) + "'s " + target.getOuterWearable("crotch").byname() + " off " + target.pronouns.poss_adj + " to do that!");
       return true
     },
   },
@@ -704,7 +704,7 @@ erotica.ACTIONS = [
     extraTests:function(actor, target, bodypart) {
       if (!target.hasBodyPart('cock')) return falsemsg(target.byname({article:DEFINITE, capital:true}) + " would need a cock for that.");
       if (!actor.canManipulate(null, "wank")) return FAILED;
-      if (target.getOuterWearable("crotch")) return falsemsg(nounVerb(actor, "would", true) + " have to get to " + target.byname({article:DEFINITE, capital:true}) + "'s " + target.getOuterWearable("crotch").byname() + " off " + target.pronouns.poss_adj + " to do that!");
+      if (target.getOuterWearable("crotch")) return falsemsg(lang.nounVerb(actor, "would", true) + " have to get to " + target.byname({article:DEFINITE, capital:true}) + "'s " + target.getOuterWearable("crotch").byname() + " off " + target.pronouns.poss_adj + " to do that!");
       return true
     },
   },
@@ -808,13 +808,13 @@ function cmdInteract(actionName, actor, object, options) {
   
   // Is the character doing it to him/herself? Does that make sense
   if (!verb.reflexive && (bodypart.name !== 'arm' || bodypart.name !== 'hand') && actor === object) {
-    failedmsg(nounVerb(actor, "would", true) + " need to be some sort of contortionist to do that!");
+    failedmsg(lang.nounVerb(actor, "would", true) + " need to be some sort of contortionist to do that!");
     return FAILED;
   }
   const side = options.side === '' ? undefined : options.side
   if (!bodypart.paired && side) return failedmsg("I was not expecting that body part to have a left and right!");
   if (verb.bodypartCheck && !verb.bodypartCheck(bodypart)) return failedmsg("That is not a body part you can do that with, is it?");
-  if (!object.hasBodyPart(bodypart)) return failedmsg(nounVerb(object, "don't", true) + " have " + bodypart.byname({article:INDEFINITE}) + ".");
+  if (!object.hasBodyPart(bodypart)) return failedmsg(lang.nounVerb(object, "don't", true) + " have " + bodypart.byname({article:INDEFINITE}) + ".");
 
   //console.log(bodypart)
 
@@ -823,7 +823,7 @@ function cmdInteract(actionName, actor, object, options) {
   if (!actor.getAgreement("Interact", object, verb, bodypart, options.altName ? options.altName : actionName)) return FAILED;
 
   const garment = bodypart.getProtection(object);
-  if (verb.mustBeBare && garment) return failedmsg(nounVerb(actor, "can't", true) + " do that when " + object.byname({article:DEFINITE}) + " is wearing " + garment.byname({article:DEFINITE}) + ".");
+  if (verb.mustBeBare && garment) return failedmsg(lang.nounVerb(actor, "can't", true) + " do that when " + object.byname({article:DEFINITE}) + " is wearing " + garment.byname({article:DEFINITE}) + ".");
   
   //console.log(actor.name + ":" + verb.name + ":" + bodypart.name + ":" + side + ":" + altName)
   let rating = object.attractionTo(actor) + object.arousal / 4
@@ -959,7 +959,7 @@ commands.unshift(new Cmd('BendOverFurniture', {
     {ignore:true},
     {scope:parser.isHere, attName:"assumePosture"},
   ],
-  defmsg:CANNOT_BEND_OVER,
+  defmsg:cannot_bend_over,
 }));
 commands.unshift(new Cmd('Straddle', {
   npcCmd:true,
@@ -969,7 +969,7 @@ commands.unshift(new Cmd('Straddle', {
     {ignore:true},
     {scope:parser.isHere, attName:"assumePosture"},
   ],
-  defmsg:CANNOT_STADDLE,
+  defmsg:cannot_staddle,
 }));
 commands.unshift(new Cmd('LieFaceDown', {
   npcCmd:true,
@@ -979,23 +979,23 @@ commands.unshift(new Cmd('LieFaceDown', {
     {ignore:true},
     {scope:parser.isHere, attName:"assumePosture"},
   ],
-  defmsg:CANNOT_RECLINE_ON,
+  defmsg:lang.cannot_recline_on,
 }));
 
-function CANNOT_BEND_OVER(actor, item) {
-  return pronounVerb(item, "'be", true) + " not something one can bend over.";
+function cannot_bend_over(actor, item) {
+  return lang.pronounVerb(item, "'be", true) + " not something one can bend over.";
 }
-function CANNOT_STADDLE(actor, item) {
-  return pronounVerb(item, "'be", true) + " not something one can straddle.";
+function cannot_staddle(actor, item) {
+  return lang.pronounVerb(item, "'be", true) + " not something one can straddle.";
 }
-function BENDOVER_SUCCESSFUL(actor, item) {
-  return nounVerb(actor, "bend", true) + " over " + item.byname({article:DEFINITE}) + ".";
+function bendover_successful(actor, item) {
+  return lang.nounVerb(actor, "bend", true) + " over " + item.byname({article:DEFINITE}) + ".";
 }
-function STRADDLE_SUCCESSFUL(actor, item) {
-  return nounVerb(actor, "straddle", true) + " " + item.byname({article:DEFINITE}) + ".";
+function straddle_successful(actor, item) {
+  return lang.nounVerb(actor, "straddle", true) + " " + item.byname({article:DEFINITE}) + ".";
 }
-function FACEDOWN_SUCCESSFUL(actor, item) {
-  return nounVerb(actor, "lie", true) + " face down on " + item.byname({article:DEFINITE}) + ".";
+function facedown_successful(actor, item) {
+  return lang.nounVerb(actor, "lie", true) + " face down on " + item.byname({article:DEFINITE}) + ".";
 }
 
 
@@ -1003,17 +1003,17 @@ function FACEDOWN_SUCCESSFUL(actor, item) {
 
 const cmdRollOver = function(actor) {
   if (actor.restraint) {
-    return failedmsg(nounVerb(actor, "can", true) + " not roll over whilst tied up.");
+    return failedmsg(lang.nounVerb(actor, "can", true) + " not roll over whilst tied up.");
   }
   if (!["reclining", "facedown"].includes(actor.posture)) {
-    return failedmsg(nounVerb(actor, "can", true) + " only roll over when lying down.");
+    return failedmsg(lang.nounVerb(actor, "can", true) + " only roll over when lying down.");
   }
   if (actor.posture === "reclining") {
-    msg(nounVerb(actor, "roll", true) + " on to " + actor.pronouns.poss_adj + " front.");
+    msg(lang.nounVerb(actor, "roll", true) + " on to " + actor.pronouns.poss_adj + " front.");
     actor.posture = "facedown"
   }
   else if (actor.posture === "facedown") {
-    msg(nounVerb(actor, "roll", true) + " on to " + actor.pronouns.poss_adj + " back.");
+    msg(lang.nounVerb(actor, "roll", true) + " on to " + actor.pronouns.poss_adj + " back.");
     actor.posture = "reclining"
   }
   return SUCCESS
@@ -1054,14 +1054,14 @@ commands.unshift(new Cmd('NpcRollOver1', {
 
 erotica.POSTURES_LIST = [
   {
-    cmd:'stand', desc:'standing', ignore:true, 
+    cmd:'stand', desc:'standing', ignore:true, pattern:'stand|stand up|get up',
     canComeOver:function(actor, target, bp) {
       if (!["foot", "calf", "thigh"].includes(bp) && actor.posture === "kneeling") return falsemsg(actor.byname({article:DEFINITE, capital:true}) + " would have to get up to do that.")
       if (["head", "face", "neck", "upperback", "chest", "cleavage", "arm", "hand", "mouth", "tit", "nipple"].includes(bp)) return falsemsg(actor.byname({article:DEFINITE, capital:true}) + " would need " + target.byname({article:DEFINITE}) + " to get lower to do that.")
       return true
     },
     getAssumePostureDescription:function(actor, previous) {
-      return nounVerb(actor, "stand", true) + " up."
+      return lang.nounVerb(actor, "stand", true) + " up."
     },
   },
   
@@ -1073,7 +1073,7 @@ erotica.POSTURES_LIST = [
       return true
     },
     getAssumePostureDescription:function(actor, previous) {
-      return nounVerb(actor, "kneel", true) + "."
+      return lang.nounVerb(actor, "kneel", true) + "."
     },
     getDefaultComeOverBodyPart:function() { return "face" },
   },
@@ -1083,10 +1083,10 @@ erotica.POSTURES_LIST = [
     canComeOver:function(actor, target, bp) {
       if (!["foot", "calf"].includes(bp) && actor.posture === "kneeling") return falsemsg(actor.byname({article:DEFINITE, capital:true}) + " would have to get up to do that.")
       if (["head", "face", "upperback", "lowerback", "buttock", "ass", "thigh"].includes(bp)) return true
-      return falsemsg(nounVerb(actor, "can't", true) + " while " + target.pronouns.subjective + " is bending over.")
+      return falsemsg(lang.nounVerb(actor, "can't", true) + " while " + target.pronouns.subjective + " is bending over.")
     },
     getAssumePostureDescription:function(actor, previous) {
-      return nounVerb(actor, "bend", true) + " over, and grip " + actor.pronouns.poss_adj + " ankles."
+      return lang.nounVerb(actor, "bend", true) + " over, and grip " + actor.pronouns.poss_adj + " ankles."
     },
   },
   
@@ -1095,10 +1095,10 @@ erotica.POSTURES_LIST = [
     canComeOver:function(actor, target, bp) {
       if (!["foot", "calf"].includes(bp) && actor.posture === "kneeling") return falsemsg(actor.byname({article:DEFINITE, capital:true}) + " would have to get up to do that.")
       if (!["buttock", "ass"].includes(bp)) return true
-      return falsemsg(nounVerb(actor, "can't", true) + " while " + target.pronouns.subjective + " is sitting.")
+      return falsemsg(lang.nounVerb(actor, "can't", true) + " while " + target.pronouns.subjective + " is sitting.")
     },
     getAssumePostureDescription:function(actor, previous) {
-      return nounVerb(actor, "sit", true) + " on the " + (w[actor.loc].postureSurface || "floor") + "."
+      return lang.nounVerb(actor, "sit", true) + " on the " + (w[actor.loc].postureSurface || "floor") + "."
     },
     getDefaultComeOverBodyPart:function() { return "face" },
   },
@@ -1108,14 +1108,14 @@ erotica.POSTURES_LIST = [
     canComeOver:function(actor, target, bp) {
       if (!actor.posture || actor.posture === "standing") return falsemsg(actor.byname({article:DEFINITE, capital:true}) + " needs to get lower for any decent aim.")
       if (!["head", "face", "upperback", "lowerback", "buttock", "ass", "thigh", "calf", "foot", "arm", "hand"].includes(bp)) return true
-      return falsemsg(nounVerb(actor, "can't", true) + " while " + target.pronouns.subjective + " is lying on " + target.pronouns.poss_adj + " front.")
+      return falsemsg(lang.nounVerb(actor, "can't", true) + " while " + target.pronouns.subjective + " is lying on " + target.pronouns.poss_adj + " front.")
     },
     getAssumePostureDescription:function(actor, previous) {
       if (previous === 'reclining') {
-        return nounVerb(actor, "roll", true) + " over, to lie face down."
+        return lang.nounVerb(actor, "roll", true) + " over, to lie face down."
       }
       else {
-        return nounVerb(actor, "lie", true) + " back on the " + (w[this.loc].postureSurface || "floor") + ", face down."
+        return lang.nounVerb(actor, "lie", true) + " back on the " + (w[this.loc].postureSurface || "floor") + ", face down."
       }
     },
   },
@@ -1125,14 +1125,14 @@ erotica.POSTURES_LIST = [
     canComeOver:function(actor, target, bp) {
       if (!actor.posture || actor.posture === "standing") return falsemsg(actor.byname({article:DEFINITE, capital:true}) + " needs to get lower for any decent aim.")
       if (!["head", "face", "mouth", "chest", "tit", "nipple", "midriff", "groin", "thigh", "calf", "foot", "arm", "hand"].includes(bp)) return true
-      return falsemsg(nounVerb(actor, "can't", true) + " while " + target.pronouns.subjective + " is lying on " + target.pronouns.poss_adj + " back.")
+      return falsemsg(lang.nounVerb(actor, "can't", true) + " while " + target.pronouns.subjective + " is lying on " + target.pronouns.poss_adj + " back.")
     },
     getAssumePostureDescription:function(actor, previous) {
       if (previous === 'facedown') {
-        return nounVerb(actor, "rolls", true) + " over, to lie face up."
+        return lang.nounVerb(actor, "rolls", true) + " over, to lie face up."
       }
       else {
-        return nounVerb(actor, "lie", true) + " back on the " + (w[actor.loc].postureSurface || "floor") + "."
+        return lang.nounVerb(actor, "lie", true) + " back on the " + (w[actor.loc].postureSurface || "floor") + "."
       }
     },
     getDefaultComeOverBodyPart:function() { return "face" },
@@ -1142,17 +1142,18 @@ erotica.POSTURES_LIST = [
     cmd:'crawl', desc:'on # hands and knees', pattern:'crawl|get on hands and knees', 
     canComeOver:function(actor, target, bp) {
       if (["head", "face", "upperback", "lowerback", "buttock", "ass", "thigh"].includes(bp)) return true
-      return falsemsg(nounVerb(actor, "can't", true) + " while " + target.pronouns.subjective + " on " + target.pronouns.poss_adj + " hands and knees.")
+      return falsemsg(lang.nounVerb(actor, "can't", true) + " while " + target.pronouns.subjective + " on " + target.pronouns.poss_adj + " hands and knees.")
     },
     getAssumePostureDescription:function(actor) {
-      return nounVerb(actor, "go", true) + " down on " + actor.pronouns.poss_adj + " hands and knees."
+      return lang.nounVerb(actor, "go", true) + " down on " + actor.pronouns.poss_adj + " hands and knees."
     },
   },
 ];
 
 for (let posture of erotica.POSTURES_LIST) {
-  commands.unshift(new Cmd('Position_' + posture.cmd, {
+  commands.unshift(new Cmd('Position' + sentenceCase(posture.cmd), {
     npcCmd:true,
+    score:2, // ensure we override the built-in version
     //cmdCategory:sentenceCase(posture.cmd),
     regex:new RegExp("^" + (posture.pattern ? posture.pattern : posture.cmd) + "$"),
     objects:[
@@ -1160,14 +1161,14 @@ for (let posture of erotica.POSTURES_LIST) {
     useThisScriptForNpcs:true,
     posture:posture,
     script:function(objects) {
-      const cmd = /Position_([a-z]+)[12]?$/.exec(this.name)[1];
+      const cmd = /Position([A-Za-z]+)[12]?$/.exec(this.name)[1].toLowerCase();
       const posture = erotica.POSTURES_LIST.find(function(el) { return el.cmd === cmd} );
       
       let actor;
       if (this.forNpc) {
         actor = objects[0][0];
         if (!actor.npc) {
-          failedmsg(NOT_NPC(actor));
+          failedmsg(not_npc(actor));
           return FAILED; 
         }
         objects.shift();
@@ -1212,7 +1213,7 @@ commands.unshift(new Cmd('NpcUndress1', {
   script:function(objects) {
     const npc = objects[0][0];
     if (!npc.npc) {
-      failedmsg(NOT_NPC(npc));
+      failedmsg(lang.not_npc(npc));
       return FAILED; 
     }
     return cmdUndress(npc);
@@ -1229,7 +1230,7 @@ commands.unshift(new Cmd('NpcUndress2', {
   script:function(objects) {
     const npc = objects[0][0];
     if (!npc.npc) {
-      failedmsg(NOT_NPC(npc));
+      failedmsg(lang.not_npc(npc));
       return FAILED; 
     }
     return cmdUndress(npc);
@@ -1239,7 +1240,7 @@ commands.unshift(new Cmd('NpcUndress2', {
 
 function cmdUndress(actor) {
   if (actor.isNaked()) {
-    failedmsg(nounVerb(actor, "be", true) + " already naked.");
+    failedmsg(lang.nounVerb(actor, "be", true) + " already naked.");
     return FAILED;
   }
   const garment = actor.firstToRemove();
@@ -1269,11 +1270,11 @@ commands.unshift(new Cmd('UndressOther', {
     const target = objects[0][0];
     if (!target.isHere()) {
       // actor not here (this is checked in cmdRemoveGarment, but should be before naked check
-      failedmsg(nounVerb(target, "be", true) + " not here.");
+      failedmsg(lang.nounVerb(target, "be", true) + " not here.");
       return FAILED;
     }
     if (target.isNaked()) {
-      failedmsg(nounVerb(target, "be", true) + " already naked.");
+      failedmsg(lang.nounVerb(target, "be", true) + " already naked.");
       return FAILED;
     }
     return cmdRemoveGarment(actor, target, target.firstToRemove(), 0);
@@ -1518,32 +1519,32 @@ commands.unshift(new Cmd("Unfasten", {
 function cmdRemoveGarment(actor, target, garment, strength) {
   if (!actor.isHere()) {
     // actor not here
-    failedmsg(nounVerb(actor, "be", true) + " not here.");
+    failedmsg(lang.nounVerb(actor, "be", true) + " not here.");
     return FAILED;
   }
   
   if (!target.isHere()) {
     // target not here
-    failedmsg(nounVerb(target, "be", true) + " not here.");
+    failedmsg(lang.nounVerb(target, "be", true) + " not here.");
     return FAILED;
   }
   
   if (!garment.getWorn() || !garment.isAtLoc(target.name)) {
     // garment not worn by target
-    failedmsg(nounVerb(target, "be", true) + " not wearing " + garment.byname({article:INDEFINITE}) + ".");
+    failedmsg(lang.nounVerb(target, "be", true) + " not wearing " + garment.byname({article:INDEFINITE}) + ".");
     return FAILED;
   }
 
   const cutter = actor.findCutter()
   if (strength > 2 && !cutter) {
     // garment not worn by target
-    failedmsg(nounVerb(actor, "need", true) + " a knife or something to do that.");
+    failedmsg(lang.nounVerb(actor, "need", true) + " a knife or something to do that.");
     return FAILED;
   }
 
   const blocker = garment.getWearRemoveBlocker(target, false);
   if (blocker) {
-    failedmsg(nounVerb(actor, "can", true) + " not remove " + garment.byname({article:DEFINITE}) + " whilst " + target.byname({article:DEFINITE}) + " is wearing " + blocker.byname({article:INDEFINITE}) + ".");
+    failedmsg(lang.nounVerb(actor, "can", true) + " not remove " + garment.byname({article:DEFINITE}) + " whilst " + target.byname({article:DEFINITE}) + " is wearing " + blocker.byname({article:INDEFINITE}) + ".");
     return FAILED; 
   }
 
@@ -1617,15 +1618,15 @@ function cmdRestrain (actor, target, item) {
     item = objs[0]
   }
   if (!item.bondage) {
-    return failedmsg(nounVerb(item, "be", true) + " not something you can tie people to.")
+    return failedmsg(lang.nounVerb(item, "be", true) + " not something you can tie people to.")
   }
   if (target.restraint || item.victim) {
-    return failedmsg(nounVerb(target, "be", true) + " already " + w[target.restraint].situation + ".")
+    return failedmsg(lang.nounVerb(target, "be", true) + " already " + w[target.restraint].situation + ".")
   }
   const held = target.getHolding()
   if (held.length > 0) {
-    const it_them = held.length > 1 || held[0].pronouns === PRONOUNS.plural  || held[0].pronouns === PRONOUNS.massnoun ? "them" : "it"
-    msg(nounVerb(actor, "take", true) + " " + formatList(held, {article:DEFINITE, lastJoiner:" and "}) + " from " + target.byname({article:DEFINITE}) + " and " + pronounVerb(actor, "put") + " " + it_them + " on the ground.")
+    const it_them = held.length > 1 || held[0].pronouns === lang.pronouns.plural  || held[0].pronouns === lang.pronouns.massnoun ? "them" : "it"
+    msg(lang.nounVerb(actor, "take", true) + " " + formatList(held, {article:DEFINITE, lastJoiner:" and "}) + " from " + target.byname({article:DEFINITE}) + " and " + lang.pronounVerb(actor, "put") + " " + it_them + " on the ground.")
     for (let item of held) {
       item.moveToFrom(actor.loc)
     }
@@ -1669,7 +1670,7 @@ commands.unshift(new Cmd("Restrain", {
     return cmdRestrain(actor, objects[0][0]);
   },
 }));
-commands.unshift(new Cmd("RestrainA", {
+commands.unshift(new Cmd("Restrain2", {
   npcCmd:true,
   cmdCategory:'Restrain',
   rules:[cmdRules.isHere, cmdRules.canManipulate],
@@ -1701,7 +1702,7 @@ commands.unshift(new Cmd("Release", {
     if (!actor) return FAILED;
     const target = objects[0][0]
     if (!target.restraint) {
-      failedmsg(nounVerb(target, "do", true) + " not need to be released.");
+      failedmsg(lang.nounVerb(target, "do", true) + " not need to be released.");
       return FAILED;
     }
     w[target.restraint].release(actor, target)
@@ -1718,7 +1719,7 @@ commands.unshift(new Cmd("Release", {
 //--  DEBUGGING --
 
 
-commands.unshift(new Cmd('testnpc', {
+commands.unshift(new Cmd('DebugTestNpc', {
   regex:/^npc (.+)$/,
   objects:[
     {scope:parser.isInWorld}
@@ -1732,7 +1733,7 @@ commands.unshift(new Cmd('testnpc', {
 }));
 
 
-commands.unshift(new Cmd('testbikini', {
+commands.unshift(new Cmd('DebugTestBikini', {
   regex:/^bikini$/,
   objects:[
   ],
