@@ -274,6 +274,18 @@ test.tests = function() {
   w.Joanna.getDescription = 'Joanna has a warm smile, and long blonde hair.'
 
 
+  // COMMANDS - LOOK AT
+
+  
+  test.title("Look at");
+  test.assertCmd("look at joanna's thigh", "She has smooth thighs.");
+  test.assertCmd("look at joanna's pussy", "You wonder what her pussy looks like under her clothes.");
+  test.assertCmd("look at joanna's tits", "She has firm tits.");
+  test.assertCmd("look at joanna's face", "She has a pretty face.");
+  w.Joanna.bodyPartDescs.tit = 'She has perfect breasts.'
+  test.assertCmd("look at joanna's tits", 'She has perfect breasts.');
+  
+
   // COMMANDS - GROPE
 
   
@@ -657,10 +669,10 @@ test.tests = function() {
   const c = commands.find(function(el) { return el.name === "NpcPullDown1" })
   
   
- /*
 
-  //for (let i = 0; i < 1000; i++) {
-  //  erotica.createSwimwearF("Joanna")
+
+  //for (let i = 0; i < 1; i++) {
+  //  console.log(erotica.createBikini("Joanna"))
   //}
   //console.log(createMan("lounge"));
   //const w1 = createWoman("lounge");
