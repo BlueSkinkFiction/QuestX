@@ -3,6 +3,9 @@
 
 
 
+// This can be used in commands to catch when the bodypart is not specified.
+createItem("default", BODY_PART(0, false, /asdlj_khj__fgfghl_ljkhjhj/));
+
 
 createItem("torso", AGREGATE_BODY_PART(3, false, /torso|body/));
 

@@ -54,11 +54,12 @@ erotica.createBikini = function(loc) {
     halter = erotica.createGarment(w.halter_us, loc)
     briefs = erotica.createGarment(w.briefs_us, loc)
     desc = 'A "stars and stripes" bikini.'
+    color = 'stars and stripes'
   }
   else if (randomChance(3)) {
     halter = erotica.createGarment(w.halter_minimal_black, loc, color)
     briefs = erotica.createGarment(w.thong_black_sw, loc, color)
-    desc = 'A ' + color + ' thong bikini.' 
+    desc = 'A ' + color + ' thong bikini.'
   }
   else if (randomChance(30)) {
     halter = erotica.createGarment(w.bandeau_black, loc, color)
@@ -74,8 +75,8 @@ erotica.createBikini = function(loc) {
   ensembleAlias = ensembleAlias.replace("black", color);
   const ensembleName = world.findUniqueName(halter.name.replace("_halter", "_ensemble"))
   
-  ensemble = createEnsemble(ensembleName, halter, briefs, ensembleAlias, desc);
-  return [halter, briefs]
+  ensemble = erotica.createBikiniEnsemble(ensembleName, halter, briefs, ensembleAlias, desc);
+  return [halter, briefs, color]
 }
 
 
@@ -730,7 +731,7 @@ createItem("swimsuit_yellow_panel", SWIMSUIT(0),
 
 createItem("halter_black", HALTER(),
   {
-    alias:"halter_black",
+    alias:randomFromArray(["black halter", "skimpy black halter"]),
     colors:erotica.colorListSwimwearF,
     image:"halter_black",
     exam:"A black, halter-neck bikini top.",

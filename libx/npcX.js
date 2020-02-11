@@ -185,6 +185,18 @@ const ACTOR = function(isFemale, isPlayer) {
     if (typeof bp === "string") bp = w[bp];
     return (this.getOuterWearable(bp.getSlot()) === false)
   }
+  res.describeBodyPart = function(bp_name) {
+    if (bp_name === 'cock' && !this.isBodyPartBare('cock')) return 'You wonder what ' + this.pronouns.poss_adj + ' cock looks like under ' + this.pronouns.poss_adj + ' clothes.'
+    if (bp_name === 'bollock' && !this.isBodyPartBare('bollock')) return 'You wonder what ' + this.pronouns.poss_adj + ' balls looks like under ' + this.pronouns.poss_adj + ' clothes.'
+    if (bp_name === 'pussy' && !this.isBodyPartBare('pussy')) return 'You wonder what ' + this.pronouns.poss_adj + ' pussy looks like under ' + this.pronouns.poss_adj + ' clothes.'
+    if (bp_name === 'face' && !this.isBodyPartBare('face')) return 'You wonder what ' + this.pronouns.poss_adj + ' face looks like.'
+
+    if (this.bodyPartDescs[bp_name]) return this.bodyPartDescs[bp_name]
+
+    if (w[bp_name].paired) return lang.pronounVerb(this, "have", true) + " " + this.getBodyPartAdjective(bp_name) + " " + w[bp_name].pluralAlias + "."
+    return lang.pronounVerb(this, "have", true) + " a " + this.getBodyPartAdjective(bp_name) + " " + bp_name + "."
+  }
+  
   // You can override this to give a specific body part an adjective
   // Could also be done dynamically, say to reflect the erection
   // Alternatively, set bodyPartAdjectives
@@ -194,6 +206,7 @@ const ACTOR = function(isFemale, isPlayer) {
     if (bp_name === "cock") return "hard";
     if (bp_name === "bollock") return "hot";
     if (bp_name === "pussy") return "hot";
+    if (bp_name === "face") return this.hasCock ? "handsome" : "pretty";
     return this.getDefaultBodyPartAdjective();
   }
   res.descCock = function() {
@@ -205,6 +218,7 @@ const ACTOR = function(isFemale, isPlayer) {
   res.descPussy = function() {
     return this.getBodyPartAdjective("pussy") + " pussy"
   }
+  res.bodyPartDescs = {}
   res.bodyPartAdjectives = {},  
   // Do not override
   // Effectively unit tested

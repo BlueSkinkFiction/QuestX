@@ -1071,6 +1071,23 @@ erotica.defaultResponses = [
   },
 
 
+  // LOOK AT
+  // Already checked target has a cock and actor has pussy and both exposed
+  {
+    name:"look at",
+    test:function(p) { return p.action === "look at" },
+    responses:[
+      {
+        name:"any",
+        //test:function(p) { return p.bodypart.name === "face" },
+        script:function(p) {
+          msg(p.target.describeBodyPart(p.bodypart.name))
+        },
+      },
+    ],
+  },
+
+
 
 
   // POUR ON

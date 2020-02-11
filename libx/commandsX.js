@@ -576,6 +576,15 @@ erotica.ACTIONS = [
     intimateRating:0,
     getDefaultBodyPart:function() { return "face" },
   },
+  
+  {
+    name:'look at',
+    pattern:'look at|look|x|examine|check out|ogle|stare at',
+    intimateRating:0,
+    reflexive:true,
+    getDefaultBodyPart:function() { return "default" },
+    handleSeparately:true,
+  },
 
   {
     name:'fuck',
@@ -714,7 +723,7 @@ erotica.ACTIONS = [
 // This constructs a list of verbs to match against from the above array, using both the name and pattern
 erotica.ACTIONS_LIST = []
 for (let action of erotica.ACTIONS) {
-  erotica.ACTIONS_LIST.push(action.pattern ? action.pattern : action.name);
+  if (!action.handleSeparately) erotica.ACTIONS_LIST.push(action.pattern ? action.pattern : action.name);
 }
 erotica.ACTIONS_PATTERN = erotica.ACTIONS_LIST.join('|')
 
@@ -735,6 +744,26 @@ commands.unshift(new Cmd('SexActionsMy', {
     return cmdInteract(objects[0], actor, game.player, {bodypart:objects[2][0], side:objects[1]});
   },
 }));
+
+
+
+
+commands.unshift(new Cmd("LookAtBP", {
+  regex:new RegExp("^(look at|look|x|examine|check out|ogle|stare at) (.+)'s (left |right |)(.+)$"),
+  objects:[
+    {text:true},
+    {scope:parser.isNpcAndHere},
+    {text:true},
+    {scope:parser.isBodyPart}
+  ],
+  script:function(objects) {
+    const actor = extractChar(this, objects)
+    if (!actor) return FAILED;
+    return cmdInteract(objects[0], actor, objects[1][0], {bodypart:objects[3][0], side:objects[2]});
+  },
+}));
+
+
 
 commands.unshift(new Cmd("SexActions", {
   npcCmd:true,
@@ -771,9 +800,6 @@ commands.unshift(new Cmd("SexActionsNoBP", {
 
 function cmdInteract(actionName, actor, object, options) {
   if (options === undefined) options = {}
-  //console.log(actionName)
-  //console.log(actor.name)
-  //console.log(options)
   
   // Find the action dictionary, assign to verb
   const regex = new RegExp("\\b" + actionName + "\\b");
