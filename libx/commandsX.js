@@ -578,15 +578,6 @@ erotica.ACTIONS = [
   },
   
   {
-    name:'look at',
-    pattern:'look at|look|x|examine|check out|ogle|stare at',
-    intimateRating:0,
-    reflexive:true,
-    getDefaultBodyPart:function() { return "default" },
-    handleSeparately:true,
-  },
-
-  {
     name:'fuck',
     mustBeBare:true,
     intimateRating:10,
@@ -747,21 +738,6 @@ commands.unshift(new Cmd('SexActionsMy', {
 
 
 
-
-commands.unshift(new Cmd("LookAtBP", {
-  regex:new RegExp("^(look at|look|x|examine|check out|ogle|stare at) (.+)'s (left |right |)(.+)$"),
-  objects:[
-    {text:true},
-    {scope:parser.isNpcAndHere},
-    {text:true},
-    {scope:parser.isBodyPart}
-  ],
-  script:function(objects) {
-    const actor = extractChar(this, objects)
-    if (!actor) return FAILED;
-    return cmdInteract(objects[0], actor, objects[1][0], {bodypart:objects[3][0], side:objects[2]});
-  },
-}));
 
 
 
@@ -964,7 +940,26 @@ commands.unshift(new Cmd('Masturbate3', {
 
 
 
-
+commands.unshift(new Cmd("LookAtBP", {
+  regex:new RegExp("^(look at|look|x|examine|check out|ogle|stare at) (.+)'s (left |right |)(.+)$"),
+  objects:[
+    {text:true},
+    {scope:parser.isNpcAndHere},
+    {ignore:true},
+    {scope:parser.isBodyPartOrHere}
+  ],
+  script:function(objects) {
+    const target = objects[1][0]
+    const item = objects[2][0]
+    if (item.isBodyPart) {
+      msg(target.describeBodyPart(item.name))
+    }
+    else {
+      printOrRun(game.player, item, "examine", {multi:false, match:false, verb:objects[0]});
+      return SUCCESS;
+    }
+  },
+}));
 
 
 
@@ -1757,35 +1752,6 @@ commands.unshift(new Cmd('DebugTestNpc', {
     return SUCCESS;
   },
 }));
-
-
-commands.unshift(new Cmd('DebugTestBikini', {
-  regex:/^bikini$/,
-  objects:[
-  ],
-  script:function(objects) {
-    console.log("briefs loc = " + w.briefsblack.loc);
-    console.log("briefs in lounge? " + w.briefsblack.isAtLoc("lounge", display.PARSER));
-    console.log("briefs with Joanna? " + w.briefsblack.isAtLoc("Joanna", display.PARSER));
-    console.log("briefs worn? " + w.briefsblack.getWorn());
-    
-    console.log("halter loc = " + w.halterblack.loc);
-    console.log("halter in lounge? " + w.halterblack.isAtLoc("lounge", display.PARSER));
-    console.log("halter with Joanna? " + w.halterblack.isAtLoc("Joanna", display.PARSER));
-    console.log("halter worn? " + w.halterblack.getWorn());
-
-    console.log("bikini in lounge? " + w.black_bikini.isAtLoc("lounge", display.PARSER));
-    console.log("bikini with Joanna? " + w.black_bikini.isAtLoc("Joanna", display.PARSER));
-    console.log("bikini worn? " + w.black_bikini.getWorn());
-    console.log("bikini alias " + w.black_bikini.alias);
-    console.log("bikini pattern " + w.black_bikini.regex);
-    console.log(parser.scope(parser.isHere));
-    console.log(parser.isHere(w.black_bikini));
-    return SUCCESS;
-  },
-}));
-
-
 
 
 

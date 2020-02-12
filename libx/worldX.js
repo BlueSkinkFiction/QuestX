@@ -57,10 +57,12 @@ createItem("face", BODY_PART(3, false, /face/), {
 // These body parts are not in the garment slots, which use chest, buttock, groin, groin and crotch
 createItem("tit", BODY_PART(8, true, /tits?|boobs?|breasts?|gazongas?|mammary|mammaries|jugs?|hooters?|knockers?|melons?|baps?|rack/), {
   modestyBoost:true,
+  indirect:true,
   getSlot:function() { return "chest"; },
 });
 createItem("ass", BODY_PART(8, false, /ass|arse|backside|bottom|tush|rump|butt|booty|can|clacker|bum/), {
   getSlot:function() { return "buttock"; },
+  indirect:true,
   canBePenetrated:true,
 });
 createItem("bollock", GENITALS(9, true, /bollocks?|balls?|testicles?|nadgers?|nuts?/), {
@@ -201,6 +203,14 @@ erotica.verify = function() {
 };
 
 
+
+
+// Should not do this, but sometimes useful!
+const renameObject = function(o, name) {
+  delete w[o.name]
+  o.name = name
+  w[name] = o
+}
 
 
 /*

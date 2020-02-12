@@ -1,3 +1,5 @@
+"use strict";
+
 
 // This file is optional
 
@@ -9,7 +11,7 @@ erotica.createGarment = function(proto, loc, color, otherOptions) {
     if (w[proto] === undefined) console.log("Failed to find a garment called " + proto + " for createGarment.")
     proto = w[proto]
   }
-  o = cloneObject(proto, loc)
+  const o = cloneObject(proto, loc)
   if (!color) color = proto.colors
   if (Array.isArray(color)) color = randomFromArray(color)
   if (o.variFunc) {
@@ -48,7 +50,7 @@ erotica.createGarment = function(proto, loc, color, otherOptions) {
 
 
 erotica.createBikini = function(loc) {
-  color = randomFromArray(erotica.colorListSwimwearF)
+  let color = randomFromArray(erotica.colorListSwimwearF)
   let halter, briefs, desc
   if (randomChance(1)) {
     halter = erotica.createGarment(w.halter_us, loc)
@@ -71,18 +73,18 @@ erotica.createBikini = function(loc) {
     briefs = erotica.createGarment(w.briefs_black, loc, color)
     desc = 'A ' + color + ' side-tie bikini.' 
   }
-  let ensembleAlias = halter.bikiniAlias ? halter.bikiniAlias : halter.alias.replace(" halter", "");
+  let ensembleAlias = halter.bikiniAlias ? halter.bikiniAlias : halter.alias.replace(/ (bikini )?halter/, " bikini");
   ensembleAlias = ensembleAlias.replace("black", color);
   const ensembleName = world.findUniqueName(halter.name.replace("_halter", "_ensemble"))
   
-  ensemble = erotica.createBikiniEnsemble(ensembleName, halter, briefs, ensembleAlias, desc);
-  return [halter, briefs, color]
+  const ensemble = erotica.createBikiniEnsemble(ensembleName, halter, briefs, ensembleAlias, desc);
+  return [halter, briefs, color, ensemble]
 }
 
 
 
 erotica.createBikiniEnsemble = function(ensembleName, halter, briefs, ensembleAlias, desc) {
-  ensemble = createEnsemble(ensembleName, [halter, briefs], {
+  const ensemble = createEnsemble(ensembleName, [halter, briefs], {
     exam:desc,
     alias:ensembleAlias,
     examine:function(isMultiple) {
@@ -282,14 +284,14 @@ createItem("heels", SHOES(), MADE_OF(materials.leather),
   }
 );
 
-createItem("sandals", SHOES(), MADE_OF(materials.plastic),
+createItem("sandals", SHOES('sandal'), MADE_OF(materials.plastic),
   {
     alias:"sandals",
     exam:"A pair of black sandals.",
   }
 );
 
-createItem("trainers", SHOES(), MADE_OF(materials.plastic),
+createItem("trainers", SHOES('trainer'), MADE_OF(materials.plastic),
   {
     alias:"trainers",
     exam:"A pair of black trainers.",
@@ -512,7 +514,7 @@ createItem("daisy_dukes", SHORTS(),
   }
 );
 
-createItem("jeans", PANTS(),
+createItem("jeans", PANTS("jeans"),
   {
     alias:"tight jeans",
     exam:"A pair of tight jeans.",
@@ -520,14 +522,14 @@ createItem("jeans", PANTS(),
   }
 );
 
-createItem("ripped_jeans", PANTS(),
+createItem("ripped_jeans", PANTS("jeans"),
   {
     exam:"A pair of tight jeans, ripped across the knees to give a tantalising glimpse of bare skin beneath.",
     wrapSkirt:true,
   }
 );
 
-createItem("leggings_black", PANTS(),
+createItem("leggings_black", PANTS("leggings"),
   {
     alias:"tight leggings",
     exam:"A pair of tight black leggings.",
@@ -751,6 +753,7 @@ createItem("bandeau_black", HALTER(),
 createItem("briefs_black", BRIEFS(),
   {
     alias:"black bikini briefs",
+    regex:/bikini bottoms?$/,
     colors:erotica.colorListSwimwearF,
     exam:"A pair of black bikini briefs that tie up at the side.",
     image:"briefs_black",

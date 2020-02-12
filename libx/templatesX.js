@@ -73,6 +73,7 @@ const BODY_PART = function(intimateRating, paired, regex) {
 // and protected by "crotch", rather than their own clothing slot
 const GENITALS = function(intimateRating, paired, regex) {
   const res = BODY_PART(intimateRating, paired, regex);
+  res.indirect = true
   res.getCovering = function(char) {
     return char.getOuterWearable("groin");
   };

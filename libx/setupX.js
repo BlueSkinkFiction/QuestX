@@ -74,6 +74,9 @@ const erotica = {
 parser.isBodyPart = function(item) {
   return item.isBodyPart;
 }
+parser.isBodyPartOrHere = function(item) {
+  return item.isBodyPart || parser.isHeldByNpc(item) || parser.isHeld(item) || item.isAtLoc(game.player.loc);
+}
 parser.isWornByChar = function(item) {
   return (parser.isHeldByNpc(item) || parser.isHeld(item)) && item.getWorn();
 }

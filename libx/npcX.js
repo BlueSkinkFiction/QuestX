@@ -13,8 +13,12 @@ const ACTOR = function(isFemale, isPlayer) {
     res = NPC(isFemale)
   }
   
+  res.hasCock = !isFemale
+  res.hasPussy = isFemale
+  res.hasTits = isFemale
   res.posture = "standing"
   res.actor = true
+  res.properName = true,
   res.getArousal = function() {return this.arousal}
   res.arousal = 10; // changes dynamically, 0 - 100
   res.enjoysAnal = false;
@@ -173,11 +177,11 @@ const ACTOR = function(isFemale, isPlayer) {
   // Unit tested
   res.hasBodyPart = function(bp) {
     if (typeof bp !== "string") bp = bp.name;
-    if (this.isFemale && bp === "cock") return false;
-    if (this.isFemale && bp === "bollock") return false;
-    if (!this.isFemale && bp === "cleavage") return false;
-    if (!this.isFemale && bp === "pussy") return false;
-    if (!this.isFemale && bp === "tit") return false;
+    if (bp === "cock") return this.hasCock;
+    if (bp === "bollock") return this.hasCock;
+    if (bp === "cleavage") return this.hasTits;
+    if (bp === "pussy") return this.hasPussy;
+    if (bp === "tit") return this.hasTits;
     if (w[bp].notStd) return false;
     return true;
   }  
@@ -252,6 +256,7 @@ const ACTOR = function(isFemale, isPlayer) {
   
   
   res.getOuterWearable = function(slot, considerBondage) {
+   
     if (considerBondage && this.restraint) {
       const slots = w[this.restraint].getHides(this)
       if (slots.includes(slot)) return w[this.restraint]

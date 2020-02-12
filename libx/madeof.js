@@ -131,6 +131,9 @@ function cmdDamage(damage, char, objects, nomsg) {
       continue;
     }
     // Should be here anyway
+    else if (objects[i][damage]) {
+      success = objects[i][damage]();
+    }
     else if (objects[i].damageable === undefined || !objects[i].damageable(damage)) {
       failedmsg(sentenceCase(nomsg.replace("####", objects[i].byname({article:DEFINITE}))));
     }
