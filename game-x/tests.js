@@ -284,6 +284,7 @@ test.tests = function() {
   test.assertCmd("look at joanna's face", "She has a pretty face.");
   w.Joanna.bodyPartDescs.tit = 'She has perfect breasts.'
   test.assertCmd("look at joanna's tits", 'She has perfect breasts.');
+  test.assertCmd("look at joanna's halter", 'A bikini halter that is black.');
   
 
   // COMMANDS - GROPE
@@ -400,7 +401,7 @@ test.tests = function() {
   w.Joanna.dressUp("jeans2", "teeshirtwhite", "halterblack", "briefsblack", "heels");
   test.assertCmd("j,undress", ["'Sure thing!'", "Joanna pulls off her left shoe, then the right."]);
   test.assertCmd("j,undress", ["'Sure thing!'", "Joanna pulls the tee-shirt up and over her head."]);
-  test.assertCmd("j,strip", ["'Sure thing!'", "Joanna unfastens the button on her denim shorts, and pulls down the zip. After a bit of a wriggle, they slid down her smooth legs, and she steps out of them."]);
+  test.assertCmd("j,strip", ["'Sure thing!'", "Joanna unfastens her jeans, and pulls them down her smooth legs, before stepping out of them."]);
   test.assertCmd("j,undress", ["'I guess...'", "Joanna unfastens her black bikini halter, pulling it off to bare her tits."]);
   w.Joanna.dressUp("halterblack", "briefsblack");
   w.Joanna.willingToExpose = 3;
@@ -671,9 +672,10 @@ test.tests = function() {
   
 
 
-  //for (let i = 0; i < 1; i++) {
-  //  console.log(erotica.createBikini("Joanna"))
-  //}
+  for (let i = 0; i < 100; i++) {
+    erotica.createBikini("Joanna")
+    //console.log(erotica.createBikini("Joanna")[1].alias)
+  }
   //console.log(createMan("lounge"));
   //const w1 = createWoman("lounge");
   //for (let i = 0; i < 900; i++){

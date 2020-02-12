@@ -248,7 +248,7 @@ createItem("swimshortsblue", SHORTS(true),
   }
 );
 
-createItem("daisydukes", SHORTS(),
+createItem("daisydukes", DAISY_DUKES(),
   {
     alias:"Daisy Dukes",
     loc:"lounge",
@@ -256,7 +256,7 @@ createItem("daisydukes", SHORTS(),
   }
 );
 
-createItem("jeans2", PANTS(),
+createItem("jeans2", PANTS("jeans"),
   {
     alias:"jeans",
     loc:"lounge",
