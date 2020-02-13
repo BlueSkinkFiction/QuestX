@@ -184,18 +184,25 @@ const ACTOR = function(isFemale, isPlayer) {
     if (bp === "tit") return this.hasTits;
     if (w[bp].notStd) return false;
     return true;
-  }  
+  }
+  
   res.isBodyPartBare = function(bp) {
     if (typeof bp === "string") bp = w[bp];
     return (this.getOuterWearable(bp.getSlot()) === false)
   }
+  
   res.describeBodyPart = function(bp_name) {
     if (bp_name === 'cock' && !this.isBodyPartBare('cock')) return 'You wonder what ' + this.pronouns.poss_adj + ' cock looks like under ' + this.pronouns.poss_adj + ' clothes.'
     if (bp_name === 'bollock' && !this.isBodyPartBare('bollock')) return 'You wonder what ' + this.pronouns.poss_adj + ' balls looks like under ' + this.pronouns.poss_adj + ' clothes.'
     if (bp_name === 'pussy' && !this.isBodyPartBare('pussy')) return 'You wonder what ' + this.pronouns.poss_adj + ' pussy looks like under ' + this.pronouns.poss_adj + ' clothes.'
     if (bp_name === 'face' && !this.isBodyPartBare('face')) return 'You wonder what ' + this.pronouns.poss_adj + ' face looks like.'
 
-    if (this.bodyPartDescs[bp_name]) return this.bodyPartDescs[bp_name]
+    if (typeof this.bodyPartDescs[bp_name] === 'string') {
+      return this.bodyPartDescs[bp_name]
+    }
+    if (typeof this.bodyPartDescs[bp_name] === 'function') {
+      return this.bodyPartDescs[bp_name]()
+    }
 
     if (w[bp_name].paired) return lang.pronounVerb(this, "have", true) + " " + this.getBodyPartAdjective(bp_name) + " " + w[bp_name].pluralAlias + "."
     return lang.pronounVerb(this, "have", true) + " a " + this.getBodyPartAdjective(bp_name) + " " + bp_name + "."
@@ -213,16 +220,13 @@ const ACTOR = function(isFemale, isPlayer) {
     if (bp_name === "face") return this.hasCock ? "handsome" : "pretty";
     return this.getDefaultBodyPartAdjective();
   }
-  res.descCock = function() {
-    return erotica.erectionStates[Math.floor(this.arousal / 10) + 1];
-  }
-  res.descTits = function() {
-    return this.getBodyPartAdjective("tit") + " tits"
-  }
-  res.descPussy = function() {
-    return this.getBodyPartAdjective("pussy") + " pussy"
-  }
-  res.bodyPartDescs = {}
+
+  res.bodyPartDescs = {
+    cock:function() {
+      return erotica.erectionStates[Math.floor(this.arousal / 10) + 1];
+    },
+  },
+  
   res.bodyPartAdjectives = {},  
   // Do not override
   // Effectively unit tested

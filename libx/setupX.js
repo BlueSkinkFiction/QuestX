@@ -46,19 +46,25 @@ tp.addDirective("arouse", function(arr, params) {
 tp.addDirective("cock", function(arr, params) {
   const chr = tp.findSubject(arr, params);
   if (!chr) return false;
-  return chr.descCock();
+  return chr.getBodyPartAdjective('cock') + " cock";
 });
 
 tp.addDirective("tits", function(arr, params) {
   const chr = tp.findSubject(arr, params);
   if (!chr) return false;
-  return chr.descTits();
+  return chr.getBodyPartAdjective('tit') + " tits";
 });
 
 tp.addDirective("pussy", function(arr, params) {
   const chr = tp.findSubject(arr, params);
   if (!chr) return false;
-  return chr.descPussy();
+  return chr.getBodyPartAdjective('pussy') + " pussy";
+});
+
+tp.addDirective("ass", function(arr, params) {
+  const chr = tp.findSubject(arr, params);
+  if (!chr) return false;
+  return chr.getBodyPartAdjective('ass') + " ass";
 });
 
 
