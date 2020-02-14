@@ -46,13 +46,16 @@ tp.addDirective("arouse", function(arr, params) {
 tp.addDirective("cock", function(arr, params) {
   const chr = tp.findSubject(arr, params);
   if (!chr) return false;
+  if (chr.arousal < 30) return chr.getBodyPartAdjective('cock') + " willy";
+  if (chr.arousal < 60) return chr.getBodyPartAdjective('cock') + " dick";
+  if (chr.hasHugeCock)  return "huge, " + chr.getBodyPartAdjective('cock') + " cock";
   return chr.getBodyPartAdjective('cock') + " cock";
 });
 
 tp.addDirective("tits", function(arr, params) {
   const chr = tp.findSubject(arr, params);
   if (!chr) return false;
-  return chr.getBodyPartAdjective('tit') + " tits";
+  return chr.getBodyPartAdjective('tit') + " " + randomFromArray(chr.hasHugeBoobs ? erotica.bigTitsSynonyms : erotica.titsSynonyms);
 });
 
 tp.addDirective("pussy", function(arr, params) {

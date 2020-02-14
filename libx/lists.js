@@ -5,6 +5,13 @@
 // form can be
 // "is", "are", "has" to indicate the phrase can follow "she is" etc.
 // "iso" to indicate a complete phrase, including verb
+
+
+erotica.titsSynonyms = ['tits', 'boobs', 'breasts']
+erotica.bigTitsSynonyms = ['tits', 'cans', 'hooters', 'gazongas', 'melons']
+
+
+
 erotica.smallBustFeature = { type:'bust', form:'has', s:'{random:modest tits:slight breasts:little in the way of tits:small tits:hardly any boobs}'},
 erotica.bigBustFeature = { type:'bust', form:'has', s:'{random:impressive:good-sized:great} {random:tits:boobs}'},
 erotica.hugeBustFeature = { type:'bust', form:'has', s:'{random:large:huge} {random:tits:gazongas:jugs}'},
@@ -152,18 +159,18 @@ erotica.skinToneFeatures = [
 ]
 
 erotica.erectionStates = [
-  "shrivelled little willy",
-  "lifeless willy",
-  "limp willy",
-  "swelling dick",
-  "semi-erect dick",
-  "erect dick",
-  "swollen cock",
-  "hard cock",
-  "hard cock",
-  "steel-hard cock",
-  "cum-dripping cock",
-  "ready-to-explode cock",
+  "shrivelled little",
+  "lifeless",
+  "limp",
+  "dangling",
+  "semi-erect",
+  "erect",
+  "swollen",
+  "hard",
+  "hard",
+  "steel-hard",
+  "cum-dripping",
+  "ready-to-explode",
 ]
 
 erotica.paleSkinTones = [

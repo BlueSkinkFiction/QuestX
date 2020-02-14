@@ -201,7 +201,7 @@ const ACTOR = function(isFemale, isPlayer) {
       return this.bodyPartDescs[bp_name]
     }
     if (typeof this.bodyPartDescs[bp_name] === 'function') {
-      return this.bodyPartDescs[bp_name]()
+      return this.bodyPartDescs[bp_name](this)
     }
 
     if (w[bp_name].paired) return lang.pronounVerb(this, "have", true) + " " + this.getBodyPartAdjective(bp_name) + " " + w[bp_name].pluralAlias + "."
@@ -214,7 +214,7 @@ const ACTOR = function(isFemale, isPlayer) {
   res.getBodyPartAdjective = function(bp_name) {
     if (bp_name in this.bodyPartAdjectives) return this.bodyPartAdjectives[bp_name];
     if (bp_name === "tit") return "firm";
-    if (bp_name === "cock") return "hard";
+    if (bp_name === "cock") return erotica.erectionStates[Math.floor(this.arousal / 10) + 1];
     if (bp_name === "bollock") return "hot";
     if (bp_name === "pussy") return "hot";
     if (bp_name === "face") return this.hasCock ? "handsome" : "pretty";
@@ -222,12 +222,9 @@ const ACTOR = function(isFemale, isPlayer) {
   }
 
   res.bodyPartDescs = {
-    cock:function() {
-      return erotica.erectionStates[Math.floor(this.arousal / 10) + 1];
-    },
   },
   
-  res.bodyPartAdjectives = {},  
+  res.bodyPartAdjectives = {},
   // Do not override
   // Effectively unit tested
   res.getBodyPartList = function() {
