@@ -2,6 +2,7 @@
 
 
 
+
 test.tests = function() {
 
   erotica.verify();
@@ -280,7 +281,7 @@ test.tests = function() {
   test.title("Look at");
   test.assertCmd("look at joanna's thigh", "She has smooth thighs.");
   test.assertCmd("look at joanna's pussy", "You wonder what her pussy looks like under her clothes.");
-  test.assertCmd("look at joanna's tits", "She has firm tits.");
+  test.assertCmd("look at joanna's tits", /She has firm /);
   test.assertCmd("look at joanna's face", "She has a pretty face.");
   w.Joanna.bodyPartDescs.tit = 'She has perfect breasts.'
   test.assertCmd("look at joanna's tits", 'She has perfect breasts.');
@@ -309,8 +310,8 @@ test.tests = function() {
   test.assertCmd("clive, grope joanna's left thigh", "Joanna smiles as Clive strokes her smooth left thigh.", true);
   test.assertCmd("grope joanna's tits", "You spend a few minutes running your fingers over Joanna's tits, through her black bikini halter.");
   test.assertCmd("grope joanna's back", "Joanna smiles as you stroke her tattooed back.");
-  test.assertCmd("grope my cock", "You smile as you eagerly stroke your hard cock.");
-  test.assertCmd("maid, grope my cock", "You smile as the maid strokes your hard cock.");
+  test.assertCmd("grope my cock", "You smile as you eagerly stroke your erect cock.");
+  test.assertCmd("maid, grope my cock", "You smile as the maid strokes your erect cock.");
   w.maid.attraction_me = 100
   test.assertCmd("grope maid's thigh", "The maid smiles as you stroke her tanned thighs.");
 
@@ -416,7 +417,7 @@ test.tests = function() {
   test.assertCmd("x j", ["Joanna has a warm smile, and long blonde hair. She is wearing some black bikini briefs around her ankles and a black bikini halter."]);
   test.assertCmd("j,pull up briefs", ["Joanna pulls up her black bikini briefs."]);
   w.Joanna.dressUp("swimsuitred");
-  test.assertCmd("j,pull down swimsuit", ["Joanna pulls the straps of her red swimsuit off her shoulders, letting it fall to her waist, baring her firm tits."]);
+  test.assertCmd("j,pull down swimsuit", [/Joanna pulls the straps of her red swimsuit off her shoulders, letting it fall to her waist, baring her firm /]);
   test.assertCmd("x j", ["Joanna has a warm smile, and long blonde hair. She is wearing a red swimsuit around her waist."]);
   test.assertCmd("j,pull down swimsuit", ["Joanna pushes her red swimsuit down, over her hips, exposing her hot pussy. It slips down her legs to her ankles."]);
   test.assertCmd("x j", ["Joanna has a warm smile, and long blonde hair. She is wearing a red swimsuit around her ankles."]);
@@ -461,14 +462,14 @@ test.tests = function() {
   test.assertCmd("remove t from j", ["You push Joanna's white teeshirt up, revealing her black bikini halter."]);
   test.assertCmd("remove t from j", ["It is already pulled up; it is not going any more than that."]);
   test.assertCmd("x jo", ["Joanna has a warm smile, and long blonde hair. She is wearing a black bikini and a white teeshirt pulled up around her neck."]);
-  test.assertCmd("remove h from j", ["You untie Joanna's black bikini halter at the back and pull it away, baring her firm tits, dropping the garment to the floor."]);
+  test.assertCmd("remove h from j", [/You untie Joanna's black bikini halter at the back and pull it away, baring her firm /]);
   test.assertCmd("remove briefs from j", ["You unfasten Joanna's black bikini briefs at the left hip, baring her pussy, then on the right too before letting them drop to the ground."]);
 
  
   test.title("Bondage 2");
   w.Joanna.dressUp("swimsuitred");  
   test.assertCmd("remove swimsuit from j", ["You try to remove Joanna's red swimsuit, but cannot whilst she is tied up like that."]);
-  test.assertCmd("rip swimsuit from j", ["You rip the shoulder straps of Joanna's red swimsuit and it falls to her waist, baring her firm tits. Then You rip the sides and crotch o the red swimsuit, letting the shredded remains drop to the floor, baring her pussy."]);
+  test.assertCmd("rip swimsuit from j", [/You rip the shoulder straps of Joanna's red swimsuit and it falls to her waist, baring her firm [a-z]+\. Then You rip the sides and crotch o the red swimsuit, letting the shredded remains drop to the floor, baring her pussy/]);
   test.assertCmd("free j", ["You release the manacles on Joanna's ankles, then reach up and release her wrists."]);
   w.Joanna.dressUp("halterblack", "briefsblack");  
 
@@ -524,17 +525,19 @@ test.tests = function() {
   w.Joanna.updateArousal()
   w.Clive.updateArousal()
   w.me.updateArousal()
-  test.assertEqual("lifeless willy", w.Clive.descCock())
+  w.swimshortsblue.worn = false
+  test.assertEqual("lifeless", w.Clive.getBodyPartAdjective('cock'))
+  
   test.assertAlmostEqual(4.4, w.Joanna.arousal)
   test.assertAlmostEqual(2, w.Clive.arousal)
   test.assertAlmostEqual(4.4, w.me.arousal)
   w.Joanna.updateArousal()
   w.Clive.updateArousal()
-  test.assertAlmostEqual(8.36, w.Joanna.arousal)
+  test.assertAlmostEqual(8.56, w.Joanna.arousal)
   test.assertAlmostEqual(3.8, w.Clive.arousal)
   w.Joanna.updateArousal()
   w.Clive.updateArousal()
-  test.assertAlmostEqual(11.924, w.Joanna.arousal)
+  test.assertAlmostEqual(12.3, w.Joanna.arousal)
   test.assertAlmostEqual(5.42, w.Clive.arousal)
 
   for (let i = 0; i < 100; i++) {
@@ -542,31 +545,34 @@ test.tests = function() {
     w.Clive.updateArousal()
     w.me.updateArousal()
   }
-  test.assertAlmostEqual(44, w.Joanna.arousal)
+  test.assertAlmostEqual(46, w.Joanna.arousal)
   test.assertAlmostEqual(20, w.Clive.arousal)
-  test.assertEqual("limp willy", w.Clive.descCock())
-  test.assertEqual("erect dick", w.me.descCock())
+  test.assertEqual("limp", w.Clive.getBodyPartAdjective('cock'))
+  test.assertEqual("erect", w.me.getBodyPartAdjective('cock'))
   test.assertCmd("j, remove halter", ["'I guess...'", "Joanna unfastens her black bikini halter, pulling it off to bare her tits."])
-  test.assertAlmostEqual(44, w.Joanna.arousal)
+  test.assertAlmostEqual(46, w.Joanna.arousal)
   test.assertAlmostEqual(25.06, w.Clive.arousal)
-  test.assertAlmostEqual(49.1, w.me.arousal)
-  test.assertEqual("erect dick", w.me.descCock())
+  test.assertAlmostEqual(51.06, w.me.arousal)
+  test.assertEqual("swollen", w.me.getBodyPartAdjective('cock'))
   w.Joanna.willingToExpose = 10
   test.assertCmd("j, remove briefs", ["'I guess...'", "Joanna pulls down her briefs, baring her pussy. They slide down her legs and she steps out of them."])
-  test.assertAlmostEqual(44, w.Joanna.arousal)
+  test.assertAlmostEqual(46, w.Joanna.arousal)
   test.assertAlmostEqual(31.23, w.Clive.arousal)
-  test.assertAlmostEqual(55.23, w.me.arousal)
-  test.assertEqual("swollen cock", w.me.descCock())
+  test.assertAlmostEqual(57.23, w.me.arousal)
+  test.assertEqual("swollen", w.me.getBodyPartAdjective('cock'))
+  w.swimshortsblue.worn = true
   
 
   test.title("Suck cock")
   w.Joanna.arousal = 0
   w.me.arousal = 0
+  test.assertEqual("lifeless", w.me.getBodyPartAdjective('cock'))
   test.assertCmd("j, suck my cock", ["'Hmm!' you sigh as Joanna sucks on your limp willy. It is starting to get harder!"])
-  test.assertCmd("j, suck my cock", ["'Hmm!' you sigh as Joanna sucks on your swelling dick. It is starting to get harder!"])
+  
+  test.assertCmd("j, suck my cock", ["'Hmm!' you sigh as Joanna sucks on your dangling willy. It is starting to get harder!"])
   test.assertCmd("j, suck my cock", ["'Keep going,' you gasp as Joanna sucks on your semi-erect dick."])
   test.assertCmd("j, suck my cock", ["'Keep going,' you gasp as Joanna sucks on your erect dick."])
-  test.assertCmd("j, suck my cock", ["'Keep going,' you gasp as Joanna sucks on your swollen cock."])
+  test.assertCmd("j, suck my cock", ["'Keep going,' you gasp as Joanna sucks on your swollen dick."])
   test.assertCmd("j, suck my cock", ["You grin as Joanna sucks on your hard cock."])
   test.assertCmd("j, suck my cock", ["You grin as Joanna sucks on your hard cock."])
   test.assertCmd("j, suck my cock", ["You grin as Joanna sucks on your steel-hard cock."])  
