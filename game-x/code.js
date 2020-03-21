@@ -2,9 +2,6 @@
 
 
 
-function setup() {
-}
-
 
 commands.unshift(new Cmd('DebugTestBikini', {
   regex:/^bikini$/,

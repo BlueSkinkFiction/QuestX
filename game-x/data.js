@@ -129,7 +129,8 @@ util.addResponse(["lick", "happy"], {
 
 createItem("maid",
   ACTOR(true), {
-    loc:"lounge", 
+    loc:"lounge",
+    properName:false,
     examine: "A helpful brunette, with a big smile. She is wearing {attire}. {ifposture:She is {posture}.}",
     willingToExpose:10,
     getDefaultBodyPartAdjective:function() {
