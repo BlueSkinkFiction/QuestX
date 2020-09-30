@@ -5,7 +5,7 @@ createItem("me",
     loc:"lounge", 
     regex:/^(me|myself|player)$/, 
     examine:function(isMultiple) {
-      msg(prefix(this, isMultiple) + "You are wearing {attire}. {ifposture:You are {posture}.}", {item:this});
+      msg(prefix(this, isMultiple) + "You are wearing {attire}. {ifPosture:You are {posture}.}", {item:this});
       if (!this.hasCock && !this.hasPussy) msg("You have no genitals...");
       if (this.hasCock && this.hasPussy) msg("You have both male and female genitals...");
       if (this.hasCock && this.hasTits) msg("Your plump breasts contrast with the cock hanging between your legs.");
@@ -131,7 +131,7 @@ createItem("maid",
   ACTOR(true), {
     loc:"lounge",
     properName:false,
-    examine: "A helpful brunette, with a big smile. She is wearing {attire}. {ifposture:She is {posture}.}",
+    examine: "A helpful brunette, with a big smile. She is wearing {attire}. {ifPosture:She is {posture}.}",
     willingToExpose:10,
     getDefaultBodyPartAdjective:function() {
       return "tanned";
@@ -144,7 +144,7 @@ createItem("Clive",
   ACTOR(false), {
     loc:"lounge", 
     properName:true,
-    examine: "A cool dude. He is wearing {attire}. {ifposture:He is {posture}.}", 
+    examine: "A cool dude. He is wearing {attire}. {ifPosture:He is {posture}.}", 
   }
 );
 
@@ -353,10 +353,10 @@ createItem("a_frame", MADE_OF(materials.metal), BONDAGE_DEVICE(false),
     armsOpen:false,
     points:["wrists", "ankles"],
     restrainMsg:function(char, victim) { 
-      return lang.nounVerb(char, "manacle", true) + " " + victim.byname({article:DEFINITE, possessive:true}) + " wrists to the top of the A-frame, then " + lang.conjugate (char, "make") + " " + victim.pronouns.objective + " open " + victim.pronouns.poss_adj + " legs wide, before manacling them too."
+      return lang.nounVerb(char, "manacle", true) + " " + lang.getName(victim, {article:DEFINITE, possessive:true}) + " wrists to the top of the A-frame, then " + lang.conjugate (char, "make") + " " + victim.pronouns.objective + " open " + victim.pronouns.poss_adj + " legs wide, before manacling them too."
     },
     releaseMsg:function(char, victim) {
-      return lang.nounVerb(char, "release", true) + " the manacles on " + victim.byname({article:DEFINITE, possessive:true}) + " ankles, then " + lang.conjugate (char, "reach") + " up and " + lang.conjugate (char, "release") + " " + victim.pronouns.poss_adj + " wrists."
+      return lang.nounVerb(char, "release", true) + " the manacles on " + lang.getName(victim, {article:DEFINITE, possessive:true}) + " ankles, then " + lang.conjugate (char, "reach") + " up and " + lang.conjugate (char, "release") + " " + victim.pronouns.poss_adj + " wrists."
     },
   }
 );
@@ -381,22 +381,23 @@ createItem("bondage_table", MADE_OF(materials.metal), BONDAGE_DEVICE(false), OPE
       return lang.nounVerb(victim, "lie", true) + " back on the metal table and " + lang.nounVerb(char, "secure") + " " + victim.pronouns.poss_adj + " wrists in the manacles above " + victim.pronouns.poss_adj + " head, then " + lang.conjugate (char, "make") + " " + victim.pronouns.objective + " open " + victim.pronouns.poss_adj + " legs wide, so " + lang.pronounVerb(char, "can") + " secure " + victim.pronouns.poss_adj + " ankles too."
     },
     releaseMsg:function(char, victim) {
-      return lang.nounVerb(char, "unfasten", true) + " the manacles on " + victim.byname({article:DEFINITE, possessive:true}) + " ankles, then the ones on " + victim.pronouns.poss_adj + " wrists. " + lang.nounVerb(victim, "get", true) + " off the table."
+      return lang.nounVerb(char, "unfasten", true) + " the manacles on " + lang.getName(victim, {article:DEFINITE, possessive:true}) + " ankles, then the ones on " + victim.pronouns.poss_adj + " wrists. " + lang.nounVerb(victim, "get", true) + " off the table."
     },
-    openMsg:function(isMultiple, char) {
-      let s = lang.nounVerb(char, "slide", true) + " open the panel in the centre of the metal table, "
+    openMsg:function(isMultiple, tpParams) {
+      tpParams.victim = this.victim
+      let s = "{nv:char:slide:true} open the panel in the centre of the metal table, "
       if (this.victim) {
-        s += "right under " + w[this.victim].byname({article:DEFINITE, possessive:true}) + " buttocks, leaving " + w[this.victim].pronouns.poss_adj + " ass exposed."
+        s += "right under {nms:victim:the} buttocks, leaving {pa:victim} ass exposed."
       }
       else {
         s += "right about where the victim's ass would be."
       }
-      msg(prefix(this, isMultiple) + s);
+      msg(prefix(this, isMultiple) + s, tpParams);
     },
     closeMsg:function(isMultiple, char) {
       let s = lang.nounVerb(char, "slide", true) + " the panel in the centre of the metal table closed"
       if (this.victim) {
-        s += "; " + w[this.victim].byname({article:DEFINITE, possessive:true}) + " buttocks rest on the cool metal."
+        s += "; " + lang.getName(w[this.victim], {article:DEFINITE, possessive:true}) + " buttocks rest on the cool metal."
       }
       else {
         s += "."
@@ -426,7 +427,7 @@ createItem("dress_cursed", DRESS([]),
         msg(prefix(this, isMultiple) + this.states[n].desc);
       }
       else if (this.getWorn()) {
-        msg(prefix(this, isMultiple) + "A red strap that goes round " + w[this.loc].byname({article:DEFINITE,possessive:true}) + " bust, without covering the nipples, held up by thin straps over " + w[this.loc].pronouns.poss_adj + " shoulders.");
+        msg(prefix(this, isMultiple) + "A red strap that goes round " + lang.getName(w[this.loc], {article:DEFINITE,possessive:true}) + " bust, without covering the nipples, held up by thin straps over " + w[this.loc].pronouns.poss_adj + " shoulders.");
       }
       else {
         msg(prefix(this, isMultiple) + "A red strap that would go round the bust, without covering much at all, held up by thin straps.");
@@ -449,22 +450,6 @@ createItem("dress_cursed", DRESS([]),
       else {
         return this.states[this.states.length - 1].slots;
       }
-    },
-    byname:function(options) {
-      let s;
-      if (options && options.article === DEFINITE) {
-        s = "the " + this.getAlias();
-      }
-      else if (options && options.article === INDEFINITE) {
-        s =  "a " + this.getAlias();
-      }
-      else {
-        s =  this.getAlias();
-      }
-      if (options && options.possessive) {
-        s += "'s";
-      }
-      return s;
     },
     count:0,
     countRate:2,

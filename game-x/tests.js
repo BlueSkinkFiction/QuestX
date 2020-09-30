@@ -15,9 +15,9 @@ test.tests = function() {
   // General stuff used by other parts
 
   test.title("pairs");
-  test.assertEqual("heels", w.heels.byname())
-  test.assertEqual("the pair of heels", w.heels.byname({article:DEFINITE}))
-  test.assertEqual("a pair of heels", w.heels.byname({article:INDEFINITE}))
+  test.assertEqual("heels", lang.getName(w.heels, ))
+  test.assertEqual("the pair of heels", lang.getName(w.heels, {article:DEFINITE}))
+  test.assertEqual("a pair of heels", lang.getName(w.heels, {article:INDEFINITE}))
   
   
   test.title("responses");
@@ -25,12 +25,12 @@ test.tests = function() {
   test.assertEqual("Joanna giggles as {nv:target:come} in her mouth, letting some cum dribble down her chin.", sublist[0].msg)
   
   commands.unshift(new Cmd("test response", {
-    regex:/^response$/,
+    regexes:[/^response$/],
     objects:[
     ],
     script:function(objects) {
       respond({action:'nonsense', actor:w.Joanna, target:w.me}, erotica.defaultResponses)
-      return SUCCESS;
+      return world.SUCCESS;
     },
   }));  
   test.assertCmd("response", "THIS SHOULD NEVER HAPPEN: nonsense", )
@@ -42,7 +42,7 @@ test.tests = function() {
   w.briefsblack.loc = "lounge"
   w.halterblack.loc = "lounge"
   game.update();
-  test.assertCmd("look", ["#The lounge", "The lounge is lavishly appointed.", "You can see an A-frame, a black bikini, Clive (wearing some blue swim shorts), some Daisy Dukes, some jeans, Joanna, a maid (wearing a maid outfit), a settee, a red swimsuit, a table (with a dildo, a jug and a whip on it), a mesh teeshirt, a white teeshirt and a red thong here."]);
+  test.assertCmd("look", ["The lounge", "The lounge is lavishly appointed.", "You can see an A-frame, a black bikini, Clive (wearing some blue swim shorts), some Daisy Dukes, some jeans, Joanna, a maid (wearing a maid outfit), a settee, a red swimsuit, a table (with a dildo, a jug and a whip on it), a mesh teeshirt, a white teeshirt and a red thong here."]);
   test.assertCmd("x halter", "A bikini halter that is black.")
   test.assertCmd("x briefs", "Some bikini briefs that are black.")
   test.assertCmd("x bikini", "A black bikini.")
@@ -55,14 +55,14 @@ test.tests = function() {
   w.halterblack.loc = "lounge"
   w.briefsblack.loc = "balcony"
   world.scopeSnapshot();
-  test.assertCmd("look", ["#The lounge", "The lounge is lavishly appointed.", "You can see an A-frame, Clive (wearing some blue swim shorts), some Daisy Dukes, a black bikini halter, some jeans, Joanna, a maid (wearing a maid outfit), a settee, a red swimsuit, a table (with a dildo, a jug and a whip on it), a mesh teeshirt, a white teeshirt and a red thong here."]);
+  test.assertCmd("look", ["The lounge", "The lounge is lavishly appointed.", "You can see an A-frame, Clive (wearing some blue swim shorts), some Daisy Dukes, a black bikini halter, some jeans, Joanna, a maid (wearing a maid outfit), a settee, a red swimsuit, a table (with a dildo, a jug and a whip on it), a mesh teeshirt, a white teeshirt and a red thong here."]);
   test.assertCmd("x halter", "A bikini halter that is black.")
   test.assertCmd("x briefs", "You can't see anything you might call 'briefs' here.")
   test.assertCmd("x bikini", "A bikini halter that is black.")
   w.briefsblack.loc = "lounge"
   w.halterblack.loc = "balcony"
   world.scopeSnapshot();
-  test.assertCmd("look", ["#The lounge", "The lounge is lavishly appointed.", "You can see an A-frame, some black bikini briefs, Clive (wearing some blue swim shorts), some Daisy Dukes, some jeans, Joanna, a maid (wearing a maid outfit), a settee, a red swimsuit, a table (with a dildo, a jug and a whip on it), a mesh teeshirt, a white teeshirt and a red thong here."]);
+  test.assertCmd("look", ["The lounge", "The lounge is lavishly appointed.", "You can see an A-frame, some black bikini briefs, Clive (wearing some blue swim shorts), some Daisy Dukes, some jeans, Joanna, a maid (wearing a maid outfit), a settee, a red swimsuit, a table (with a dildo, a jug and a whip on it), a mesh teeshirt, a white teeshirt and a red thong here."]);
   w.Joanna.dressUp("halterblack", "briefsblack");
   world.scopeSnapshot();
   
@@ -77,7 +77,9 @@ test.tests = function() {
   test.assertEqual(1, w.Joanna.getWearingSlottedVisible().length);
   test.assertEqual(1, w.Joanna.getWearingUnslotted().length);
   test.assertEqual("some black bikini briefs around her ankles and a black bikini halter", processText("{attire}", {item:w.Joanna}));
-  test.assertCmd("look", ["#The lounge", "The lounge is lavishly appointed.", "You can see an A-frame, Clive (wearing some blue swim shorts), some Daisy Dukes, some jeans, Joanna (wearing some black bikini briefs around her ankles and a black bikini halter), a maid (wearing a maid outfit), a settee, a red swimsuit, a table (with a dildo, a jug and a whip on it), a mesh teeshirt, a white teeshirt and a red thong here."]);
+  
+  
+  test.assertCmd("look", ["The lounge", "The lounge is lavishly appointed.", "You can see an A-frame, Clive (wearing some blue swim shorts), some Daisy Dukes, some jeans, Joanna (wearing some black bikini briefs and a black bikini halter), a maid (wearing a maid outfit), a settee, a red swimsuit, a table (with a dildo, a jug and a whip on it), a mesh teeshirt, a white teeshirt and a red thong here."]);
   test.assertCmd("x jo", ["Joanna has a warm smile, and long blonde hair. She is wearing some black bikini briefs around her ankles and a black bikini halter."]);
   w.briefsblack.pulledDown = false
   
@@ -458,7 +460,7 @@ test.tests = function() {
   test.assertCmd("j, undress", ["'Not while I'm tied up.'"]);
   test.assertCmd("j, e", ["'Not while I'm tied up.'"]);
   test.assertCmd("j, get whip", ["'Not while I'm tied up.'"]);
-  test.assertCmd("look", ["#The lounge", "The lounge is lavishly appointed.", "You can see an A-frame, Clive (wearing some blue swim shorts), a pair of heels, some jeans, Joanna (manacled to the A-frame; and wearing a black bikini and a white teeshirt), a maid (wearing a maid outfit), a settee and a table (with a dildo, a jug and a whip on it) here."]);
+  test.assertCmd("look", ["The lounge", "The lounge is lavishly appointed.", "You can see an A-frame, Clive (wearing some blue swim shorts), a pair of heels, some jeans, Joanna (manacled to the A-frame; and wearing a black bikini and a white teeshirt), a maid (wearing a maid outfit), a settee and a table (with a dildo, a jug and a whip on it) here."]);
   test.assertCmd("remove t from j", ["You push Joanna's white teeshirt up, revealing her black bikini halter."]);
   test.assertCmd("remove t from j", ["It is already pulled up; it is not going any more than that."]);
   test.assertCmd("x jo", ["Joanna has a warm smile, and long blonde hair. She is wearing a black bikini and a white teeshirt pulled up around her neck."]);

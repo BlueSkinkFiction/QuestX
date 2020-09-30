@@ -11,6 +11,7 @@ settings.customLibraries.push({folder:'libx', files:["setupX", "responsesX", "np
 
 settings.noAskTell = false
 
+settings.playMode = 'dev'
 settings.tests = true
 settings.givePlayerSayMsg = false
 settings.npcReactionsAlways = true
