@@ -13,7 +13,7 @@ erotica.createGarment = function(proto, loc, color, otherOptions) {
   }
   const o = cloneObject(proto, loc)
   if (!color) color = proto.colors
-  if (Array.isArray(color)) color = randomFromArray(color)
+  if (Array.isArray(color)) color = random.fromArray(color)
   if (o.variFunc) {
     o.variFunc(color)
   }
@@ -38,7 +38,7 @@ erotica.createGarment = function(proto, loc, color, otherOptions) {
     o.owner = loc;
     o.onMove = function(toLoc, fromLoc) {
       // garment picked up from room by player, whilst owner present
-      if (w[fromLoc].room && toLoc === game.player.name && w[this.owner].here()) {
+      if (w[fromLoc].room && toLoc === game.player.name && w[this.owner].isHere()) {
         w[this.owner].pause()
         msg(this.pickupMsg, {char:this.owner, garment:this})
       }
@@ -50,20 +50,20 @@ erotica.createGarment = function(proto, loc, color, otherOptions) {
 
 
 erotica.createBikini = function(loc) {
-  let color = randomFromArray(erotica.colorListSwimwearF)
+  let color = random.fromArray(erotica.colorListSwimwearF)
   let halter, briefs, desc
-  if (randomChance(1)) {
+  if (random.chance(1)) {
     halter = erotica.createGarment(w.halter_us, loc)
     briefs = erotica.createGarment(w.briefs_us, loc)
     desc = 'A "stars and stripes" bikini.'
     color = 'stars and stripes'
   }
-  else if (randomChance(3)) {
+  else if (random.chance(3)) {
     halter = erotica.createGarment(w.halter_minimal_black, loc, color)
     briefs = erotica.createGarment(w.thong_black_sw, loc, color)
     desc = 'A ' + color + ' thong bikini.'
   }
-  else if (randomChance(30)) {
+  else if (random.chance(30)) {
     halter = erotica.createGarment(w.bandeau_black, loc, color)
     briefs = erotica.createGarment(w.briefs_black, loc, color)
     desc = 'A ' + color + ' bikini, with a strapless bandeau halter.' 
@@ -123,39 +123,39 @@ erotica.createSwimwear = function(loc, addExtras) {
 
 
 erotica.createSwimwearF = function(loc, addExtras) {
-  if (randomChance(65)) {
+  if (random.chance(65)) {
     erotica.createBikini(loc);
-    if (addExtras && randomChance(20)) {
+    if (addExtras && random.chance(20)) {
       erotica.createGarment(w.daisy_dukes, loc)
     }
-    if (addExtras && randomChance(30)) {
+    if (addExtras && random.chance(30)) {
       erotica.createGarment(w.teeshirt_black, loc)
     }
   }
-  else if (randomChance(1)) {
+  else if (random.chance(1)) {
     erotica.createGarment(w.sling_black, loc)
   }
-  else if (randomChance(1)) {
+  else if (random.chance(1)) {
     erotica.createGarment(w.briefs_black, loc)
   }
-  else if (randomChance(1)) {
+  else if (random.chance(1)) {
     erotica.createGarment(w.thong_black, loc)
   }
-  else if (randomChance(3)) {
+  else if (random.chance(3)) {
     erotica.createGarment(w.swimsuit_yellow_panel, loc)
   }
-  else if (randomChance(25)) {
+  else if (random.chance(25)) {
     erotica.createGarment(w.swimsuit_black, loc)
-    if (addExtras && randomChance(35)) {
+    if (addExtras && random.chance(35)) {
       erotica.createGarment(w.teeshirt_black, loc)
     }
-    else if (addExtras && randomChance(20)) {
+    else if (addExtras && random.chance(20)) {
       erotica.createGarment(w.skirt_black, loc)
     }
   }
   else {
     erotica.createGarment(w.swimsuit_black_scooped, loc)
-    if (addExtras && randomChance(25)) {
+    if (addExtras && random.chance(25)) {
       erotica.createGarment(w.teeshirt_black, loc)
     }
   }
@@ -164,16 +164,16 @@ erotica.createSwimwearF = function(loc, addExtras) {
 
 
 erotica.createSwimwearM = function(loc, addExtras) {
-  if (randomChance(1)) {
+  if (random.chance(1)) {
     erotica.createGarment(w.posing_pouch, loc)
   }
-  else if (randomChance(20)) {
+  else if (random.chance(20)) {
     erotica.createGarment(w.shorts_black, loc)
   }
   else {
     erotica.createGarment(w.briefs_black_m, loc)
   }
-  if (addExtras && randomChance(15)) {
+  if (addExtras && random.chance(15)) {
     erotica.createGarment(w.teeshirt_black, loc)
   }
 }
@@ -235,7 +235,7 @@ erotica.colorListSwimwearM = [
 
 erotica.canWearRemoveWithSize = function(char, toWear) {
   if (toWear && char.size && char.size > this.size) {
-    return failedmsg("No way is " + char.byname({article:DEFINITE}) + " getting into something that small!");
+    return failedmsg("No way is " + lang.getName(char, {article:DEFINITE}) + " getting into something that small!");
   }
   const garment = this.getWearRemoveBlocker(char, toWear);
   if (garment) {
@@ -295,6 +295,7 @@ createItem("trainers", SHOES('trainer'), MADE_OF(materials.plastic),
   {
     alias:"trainers",
     exam:"A pair of black trainers.",
+    garmentType:"casual",
   }
 );
 
@@ -408,8 +409,8 @@ createItem("teeshirt_black_with_logo", TEE_SHIRT(),
     logos:["a rock band logo", "a stylized sunbust"],
     image:"teeshirt_white",
     variFunc:function() {
-      const color = randomFromArray(this.colors)
-      const logo = randomFromArray(this.logos)
+      const color = random.fromArray(this.colors)
+      const logo = random.fromArray(this.logos)
       this.alias = this.alias.replace("black", color.toLowerCase());
       if (this.image) this.image = this.image.replace("black", color);
       this.listalias = this.alias.replace("Black", sentenceCase(color));
@@ -533,6 +534,7 @@ createItem("leggings_black", PANTS("leggings"),
   {
     alias:"tight leggings",
     exam:"A pair of tight black leggings.",
+    garmentType:"casual",
   }
 );
 
@@ -719,9 +721,9 @@ createItem("swimsuit_yellow_panel", SWIMSUIT(0),
     alias:"yellow-panelled swimsuit",
     exam:"The swimsuit is black with a yellow panel down the front; it had a scooped back and high legs.",
     variFunc:function() {
-      let color = randomFromArray(erotica.colorListSwimwearF)
+      let color = random.fromArray(erotica.colorListSwimwearF)
       while (color === "black") {
-        color = randomFromArray(erotica.colorListSwimwearF)
+        color = random.fromArray(erotica.colorListSwimwearF)
       }
       this.alias = this.alias.replace("yellow", color.toLowerCase());
       if (this.image) this.image = this.image.replace("yellow", color.toLowerCase());
@@ -733,7 +735,7 @@ createItem("swimsuit_yellow_panel", SWIMSUIT(0),
 
 createItem("halter_black", HALTER(),
   {
-    alias:randomFromArray(["black halter", "skimpy black halter"]),
+    alias:random.fromArray(["black halter", "skimpy black halter"]),
     colors:erotica.colorListSwimwearF,
     image:"halter_black",
     exam:"A black, halter-neck bikini top.",
@@ -766,7 +768,13 @@ createItem("sling_black", SLING_BIKINI(1, ["crotch", "groin", "nipple"]),
     alias:"black sling bikini",
     exam:"A rather revealing one-piece, this is little more than a 'V', from from crotch, over the shoulders.",
     colors:erotica.colorListSwimwearF,
-    swimwear:true,
+  }
+);
+
+createItem("sling_red", SLING_BIKINI(1, ["crotch", "groin", "nipple"]),
+  {
+    alias:"red sling bikini",
+    exam:"A rather revealing one-piece, this is little more than a 'V', from from crotch, over the shoulders.",
   }
 );
 
@@ -827,6 +835,7 @@ createItem("halter_leopard", BRA(),
 createItem("leather_corset", CORSET(), MADE_OF(materials.leather),
   {
     alias:"leather crset",
+    garmentType:'leatherwear',
     exam:"The corset is made of soft black leather, and is fastens at the back with a series of loops and hooks. While it offered good support for her bust, it is barely high enough to cover her nipples.",
     //wearmsg:lang.nounVerb(char, "pull", true) + " on the corset, fastening it at the back before getting her breasts comfortable in the tight garment.",
     //removemsg:lang.nounVerb(char, "unfasten", true) + " her corset, and takes it off",
@@ -841,6 +850,7 @@ createItem("leather_corset", CORSET(), MADE_OF(materials.leather),
 createItem("leather_belt_skirt", SKIRT(0), MADE_OF(materials.leather),
   {
     alias:"belt skirt",
+    garmentType:'leatherwear',
     slots:["groin", "buttock", "hip"],
     exam:"A wide leather belt that is just about thick enough to wear as a belt.",
     stripper:function(char) {
@@ -849,7 +859,7 @@ createItem("leather_belt_skirt", SKIRT(0), MADE_OF(materials.leather),
         msg("Slowly " + lang.nounVerb(char, "unfasten") + " the belt, conscious she had no panties on. She pulls it off, her sex exposed; the men cheer and whistle.");
       }
       else {
-        msg(lang.nounVerb(char, "unfasten", true) + " the belt, glad she is wearing underwear. She pulls it off, exposing her " + groin.byname() + ".");
+        msg(lang.nounVerb(char, "unfasten", true) + " the belt, glad she is wearing underwear. She pulls it off, exposing her " + lang.getName(groin, ) + ".");
       }
     },
   }
@@ -859,8 +869,10 @@ createItem("leather_belt_skirt", SKIRT(0), MADE_OF(materials.leather),
 createItem("leather_thong", THONG(), MADE_OF(materials.leather),
   {
     alias:"leather thong",
+    garmentType:'leatherwear',
     exam:"The thong is made of soft black black, and where one might have expected a triangle of leather to preserve her modesty at least a little there is merely two straps, with studs at each end.",
     image:"thong_leather",
+    garmentType:'leatherwear',
     getRevealing:function() { return 3; },
   }
 );
@@ -868,6 +880,7 @@ createItem("leather_thong", THONG(), MADE_OF(materials.leather),
 createItem("leather_halter", BRA(), MADE_OF(materials.leather),
   {
     alias:"leather halter",
+    garmentType:'leatherwear',
     exam:"The halter is made of soft black leather; three thin bands crossed each breast, offering minimal coverage.",
     wearMsg:function(char) {
       return lang.nounVerb(char, "pull", true) + " on the halter, fastening it at the back, then adjusting the bands to cover " + char.pronouns.poss_adj + " nipples.";
@@ -879,6 +892,7 @@ createItem("leather_halter", BRA(), MADE_OF(materials.leather),
 createItem("leather_dress", DRESS(["chest", "nipple", "upperback", "lowerback", "midriff", "hip", "groin", "buttock", "thigh"]), MADE_OF(materials.leather),
   {
     alias:"black leather dress",
+    garmentType:'leatherwear',
     examine:function(isMultiple) {
       if (this.worn) {
         msg(prefix(this, isMultiple) + "Now she has it on, Lucy realises the black leather dress is even shorter at the back, and does not actually reach her crotch. The six inch hole over her cleavage also makes her feel rather exposed.");
@@ -894,6 +908,7 @@ createItem("leather_dress", DRESS(["chest", "nipple", "upperback", "lowerback", 
 createItem("leather_mini_skirt", SKIRT(0), MADE_OF(materials.leather),
   {
     alias:"leather mini-skirt",
+    garmentType:'leatherwear',
     exam:"A tight black leather skirt, hardly covering the legs at all",
   }
 );

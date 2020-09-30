@@ -43,8 +43,8 @@ const MADE_OF = function(material) {
       flinders = cloneObject(w[flindersName], this.loc);
       let s = flinders["damagemsg"];
       if (s === undefined) s = "#### " + damage + ".";
-      s = sentenceCase(s.replace("####", this.byname({article:DEFINITE})));
-      flinders.examine = flinders.examine.replace("####", this.byname({article:DEFINITE}));
+      s = sentenceCase(s.replace("####", lang.getName(this, {article:DEFINITE})));
+      flinders.examine = flinders.examine.replace("####", lang.getName(this, {article:DEFINITE}));
       this.loc = undefined;
       if (report) msg(s);
       return true;
@@ -77,10 +77,10 @@ commands.unshift(new Cmd('Burn', {
   useThisScriptForNpcs:true,
   script:function(objects) {
     const char = extractChar(this, objects)
-    if (!char) return FAILED;
+    if (!char) return world.FAILED;
     if (!haveFireSource(char)) {
       failedmsg(lang.nounVerb(char, "need", true) + " a source of fire to burn something.");
-      return FAILED;
+      return world.FAILED;
     }
     return cmdDamage("fire", char, objects[0], "#### will not burn.");
   },
@@ -97,7 +97,7 @@ commands.unshift(new Cmd('Smash', {
   useThisScriptForNpcs:true,
   script:function(objects) {
     const char = extractChar(this, objects)
-    if (!char) return FAILED;
+    if (!char) return world.FAILED;
     return cmdDamage("smash", char, objects[0], "#### cannot be smashed up.");
   },
 }));
@@ -113,7 +113,7 @@ commands.unshift(new Cmd('Shred', {
   useThisScriptForNpcs:true,
   script:function(objects) {
     const char = extractChar(this, objects)
-    if (!char) return FAILED;
+    if (!char) return world.FAILED;
     return cmdDamage("rip", char, objects[0], "#### cannot be ripped.");
   },
 }));
@@ -123,7 +123,7 @@ function cmdDamage(damage, char, objects, nomsg) {
   let success = false;
   const multiple = objects.length > 1 || parser.currentCommand.all;
   if (!char.canManipulate(objects[0], "damage")) {
-    return FAILED;
+    return world.FAILED;
   }
   for (let i = 0; i < objects.length; i++) {
     if (!char.getAgreement("Destroy", objects[i])) {
@@ -135,13 +135,13 @@ function cmdDamage(damage, char, objects, nomsg) {
       success = objects[i][damage]();
     }
     else if (objects[i].damageable === undefined || !objects[i].damageable(damage)) {
-      failedmsg(sentenceCase(nomsg.replace("####", objects[i].byname({article:DEFINITE}))));
+      failedmsg(sentenceCase(nomsg.replace("####", lang.getName(objects[i], {article:DEFINITE}))));
     }
     else {
       success = objects[i].damage(damage, true);
     }
   }
-  return success ? SUCCESS : FAILED;
+  return success ? world.SUCCESS : world.FAILED;
 }  
 
 

@@ -7,7 +7,7 @@ tp.addDirective("description", function(arr, params) {
 
 tp.addDirective("attire", function(arr, params) {
   const l = params.item.getWearingVisible()
-  return formatList(l, {article:INDEFINITE, lastJoiner:" and ", nothing:"nothing", npc:true});
+  return formatList(l, {article:INDEFINITE, lastJoiner:" and ", nothing:"nothing", npc:true, modified:true});
 });
 
 tp.addDirective("posture", function(arr, params) {
@@ -15,7 +15,7 @@ tp.addDirective("posture", function(arr, params) {
   return params.item.getPostureDescription();
 });
 
-tp.addDirective("ifposture", function(arr, params) {
+tp.addDirective("ifPosture", function(arr, params) {
   return params.item.posture && params.item.posture !== "standing" ? arr.join(":") : "";
 });
 
@@ -28,7 +28,7 @@ tp.addDirective("ifrestraint", function(arr, params) {
   return params.item.restraint ? arr.join(":") : "";
 });
 
-tp.addDirective("ifbare", function(arr, params) {
+tp.addDirective("ifBare", function(arr, params) {
   const bodyPart = w[arr.shift()];
   return params.item.isBodyPartBare(bodyPart) ? arr.join(":") : "";
 });
@@ -55,7 +55,7 @@ tp.addDirective("cock", function(arr, params) {
 tp.addDirective("tits", function(arr, params) {
   const chr = tp.findSubject(arr, params);
   if (!chr) return false;
-  return chr.getBodyPartAdjective('tit') + " " + randomFromArray(chr.hasHugeBoobs ? erotica.bigTitsSynonyms : erotica.titsSynonyms);
+  return chr.getBodyPartAdjective('tit') + " " + random.fromArray(chr.hasHugeBoobs ? erotica.bigTitsSynonyms : erotica.titsSynonyms);
 });
 
 tp.addDirective("pussy", function(arr, params) {
@@ -103,7 +103,7 @@ function stop_posture(char) {
   let s;
   // You could split up sitting, standing and lying
   if (char.postureFurniture) {
-    s = lang.nounVerb(char, "get", true) + " off " + w[char.postureFurniture].byname({article:DEFINITE}) + ".";
+    s = lang.nounVerb(char, "get", true) + " off " + lang.getName(w[char.postureFurniture], {article:DEFINITE}) + ".";
   }
   else {
     s = lang.nounVerb(char, "stand", true) + " up.";

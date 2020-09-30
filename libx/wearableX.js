@@ -39,26 +39,9 @@ const WEARABLE_X = function (layer, slots) {
     return true
   }
   
-  res.byname = function(options) {
-    if (!options) options = {};
-    let s = "";
-    if (options.article === DEFINITE) {
-      s = lang.addDefiniteArticle(this);
-    }
-    if (options.article === INDEFINITE) {
-      if (this.owner && this.owner !== this.loc) {
-        s = this.owner + "'s ";
-      }
-      else {
-        s = lang.addIndefiniteArticle(this);
-      }
-    }
-    s += this.alias;
-    if (options && options.possessive) s += "'s";
-    if (this.worn && options.modified && (this.isAtLoc(game.player.name))) { s += " (worn)"; }
-    if (options && options.capital) s = sentenceCase(s);
-    return s;
-  };
+  //res.getNameModifier = function() {
+  //  return this.worn && this.isAtLoc(game.player.name) ? " (worn)" : ''
+  //}
   
 
   // Assumes the item is already held  
@@ -66,9 +49,13 @@ const WEARABLE_X = function (layer, slots) {
     if (!this.canWearRemove(char, false)) { return false; }
     if (!char.canManipulate(this, "remove")) { return false; }
     msg(prefix(this, isMultiple) + this.removeMsg(char, this), {garment:this, actor:char});
+    const startExposure = char.getExposure()
     this.worn = false;
-    if (this.afterRemove) this.afterRemove(char);
+    if (this.afterRemove) this.afterRemove(char)
     char.arousalBomb(char.getExposure() / 3)
+    for (let npc of scopeNpcHere()) {
+      npc.stripReaction(char, this, startExposure, char.getExposure())
+    }
     return true;
   };
   
@@ -122,45 +109,34 @@ const WEARABLE_THAT_PULLS_DOWN = function (layer, slots) {
       }
     }
   };
-  res.byname = function(options) {
-    if (!options) options = {};
-    let s = "";
-    if (options.article === DEFINITE) {
-      s = lang.addDefiniteArticle(this);
+  res.getNameModifier = function(options) {
+    if (!this.worn) return ''
+    if (options.npc) {
+      return this.pulledDown ? " around " + w[this.loc].pronouns.poss_adj + " ankles" : ""; 
     }
-    if (options.article === INDEFINITE) {
-      s = lang.addIndefiniteArticle(this);
+    else {
+      return this.pulledDown ? " (around " + game.player.pronouns.poss_adj + " ankles)" : " (worn)"; 
     }
-    s += this.alias;
-    if (options && options.possessive) s += "'s";
-    if (this.worn && options.modified && (this.isAtLoc(game.player.name))) {
-      s += this.pulledDown ? " (around " + game.player.pronouns.poss_adj + " ankles)" : " (worn)"; 
-    }
-    if (this.worn && options.npc) {
-      s += this.pulledDown ? " around " + w[this.loc].pronouns.poss_adj + " ankles" : ""; 
-    }
-    if (options && options.capital) s = sentenceCase(s);
-    return s;
   }
   res.pullDown = function(char) {
     if (this.pulledDown) {
       failedmsg(lang.pronounVerb(this, "be", true) + " already.")
-      return FAILED
+      return world.FAILED
     }
     
     this.pulledDown = true
     char.msg("{nv:actor:pull:true} down {pa:actor} {nm:garment}.", {garment:this, actor:char})
-    return SUCCESS
+    return world.SUCCESS
   }
   res.pullUp = function(char) {
     if (!this.pulledDown) {
       failedmsg("That does not need pulling up.")
-      return FAILED
+      return world.FAILED
     }
     
     delete this.pulledDown
     char.msg("{nv:actor:pull:true} up {pa:actor} {nm:garment}.", {garment:this, actor:char})
-    return SUCCESS
+    return world.SUCCESS
   }
 
   return res
@@ -198,45 +174,34 @@ const WEARABLE_THAT_PULLS_UP = function (layer, slots, toDest) {
       }
     }
   };
-  res.byname = function(options) {
-    if (!options) options = {};
-    let s = "";
-    if (options.article === DEFINITE) {
-      s = lang.addDefiniteArticle(this);
+  res.getNameModifier = function(options) {
+    if (!this.worn) return ''
+    if (options.npc) {
+      return this.pulledUp ? " pulled up around " + w[this.loc].pronouns.poss_adj + " " + this.toDest : ""
     }
-    if (options.article === INDEFINITE) {
-      s = lang.addIndefiniteArticle(this);
+    else {
+      return this.pulledUp ? " (around " + game.player.pronouns.poss_adj + " " + this.toDest + ")" : " (worn)"
     }
-    s += this.alias;
-    if (options && options.possessive) s += "'s";
-    if (this.worn && options.modified && (this.isAtLoc(game.player.name))) {
-      s += this.pulledUp ? " (around " + game.player.pronouns.poss_adj + " " + this.toDest + ")" : " (worn)"; 
-    }
-    if (this.worn && options.npc) {
-      s += this.pulledUp ? " pulled up around " + w[this.loc].pronouns.poss_adj + " " + this.toDest : ""; 
-    }
-    if (options && options.capital) s = sentenceCase(s);
-    return s;
   }
   res.pullUp = function(char) {
     if (this.pulledUp) {
       failedmsg(lang.pronounVerb(this, "be", true) + " already.")
-      return FAILED
+      return world.FAILED
     }
     
     this.pulledUp = true
     char.msg("{nv:actor:pull:true} up {pa:actor} {nm:garment}.", {garment:this, actor:char})
-    return SUCCESS
+    return world.SUCCESS
   }
   res.pullDown = function(char) {
     if (!this.pulledUp) {
       failedmsg("That does not need pulling up.")
-      return FAILED
+      return world.FAILED
     }
     
     delete this.pulledUp
     char.msg("{nv:actor:pull:true} down {pa:actor} {nm:garment}.", {garment:this, actor:char})
-    return SUCCESS
+    return world.SUCCESS
   }
 
   return res
@@ -276,45 +241,35 @@ const WEARABLE_THAT_UNFASTENS = function (layer, slots, slots2) {
       }
     }
   };
-  res.byname = function(options) {
-    if (!options) options = {};
-    let s = "";
-    if (options.article === DEFINITE) {
-      s = lang.addDefiniteArticle(this);
+  res.getNameModifier = function(options) {
+    if (!this.worn) return ''
+    if (options.npc) {
+      return this.unfastened ? " that is unfastened" : ""
     }
-    if (options.article === INDEFINITE) {
-      s = lang.addIndefiniteArticle(this);
+    else {
+      return this.unfastened ? " (worn unfastened)" : " (worn)"
     }
-    if (this.worn && options.npc) {
-      s += this.unfastened ? "unfastened " : ""; 
-    }
-    s += this.alias;
-    if (options && options.possessive) s += "'s";
-    if (this.worn && options.modified && (this.isAtLoc(game.player.name))) {
-      s += this.unfastened ? " (worn unfastened)" : " (worn)"; 
-    }
-    if (options && options.capital) s = sentenceCase(s);
-    return s;
+    return ''
   }
   res.unfasten = function(char) {
     if (this.unfastened) {
       failedmsg(lang.pronounVerb(this, "be", true) + " already.")
-      return FAILED
+      return world.FAILED
     }
     
     this.unfastened = true
     char.msg("{nv:actor:unfasten:true} {pa:actor} {nm:garment}.", {garment:this, actor:char})
-    return SUCCESS
+    return world.SUCCESS
   }
   res.fasten = function(char) {
     if (!this.unfastened) {
       failedmsg("That does not need pulling up.")
-      return FAILED
+      return world.FAILED
     }
     
     delete this.unfastened
     char.msg("{nv:actor:fasten:true} {pa:actor} {nm:garment}.", {garment:this, actor:char})
-    return SUCCESS
+    return world.SUCCESS
   }
 
   return res
@@ -582,7 +537,7 @@ const DRESS = function(slots, overHead) {
       char.msg("Slowly {nv:actor:unfasten} the dress, glad {nv:actor:be} at least wearing {nm:groin:a}. She pulls the dress off, her body almost bare, her {tits:char} exposed. The men cheer and whistle at her.", {garment:this, actor:char, groin:groin});
     }
     else if (!groin) {
-      char.msg("Slowly {nv:actor:unfasten} the dress, conscious she had no panties on. She pulls it off, her body bare, apart from her " + chest.byname() + ", her sex exposed; the men cheer and whistle.", {garment:this, actor:char});
+      char.msg("Slowly {nv:actor:unfasten} the dress, conscious she had no panties on. She pulls it off, her body bare, apart from her " + lang.getName(chest, ) + ", her sex exposed; the men cheer and whistle.", {garment:this, actor:char});
     }
     else {
       char.msg("{nv:actor:unfasten:true} the dress, glad {nv:actor:be} wearing underwear on. She pulls it off, her body bare, her sex exposed; the men cheer and whistle.", {garment:this, actor:char});
@@ -621,7 +576,7 @@ const JUMPSUIT = function(cleavageHidden) {
       char.msg("Slowly {nv:actor:un" + this.fastenVerb + "} {nm:garment:the}, glad {nv:actor:be} at least wearing {nm:groin:a}. She pulls it off, her body almost bare, her {tits:char} exposed. The men cheer and whistle at her.", {garment:this, actor:char, groin:groin});
     }
     else if (!groin) {
-      char.msg("Slowly {nv:actor:un" + this.fastenVerb + "} {nm:garment:the}, conscious she had no panties on. She pulls it off, her body bare, apart from her " + chest.byname() + ", her sex exposed; the men cheer and whistle.", {garment:this, actor:char});
+      char.msg("Slowly {nv:actor:un" + this.fastenVerb + "} {nm:garment:the}, conscious she had no panties on. She pulls it off, her body bare, apart from her " + lang.getName(chest, ) + ", her sex exposed; the men cheer and whistle.", {garment:this, actor:char});
     }
     else {
       char.msg("{nv:actor:un" + this.fastenVerb + ":true} {nm:garment:the}, glad {nv:actor:be} wearing underwear on. She pulls it off, her body bare, her sex exposed; the men cheer and whistle.", {garment:this, actor:char});
@@ -830,32 +785,21 @@ const SWIMSUIT = function(backExposure) {
       }
     }
   };
-  res.byname = function(options) {
-    if (!options) options = {};
-    let s = "";
-    if (options.article === DEFINITE) {
-      s = lang.addDefiniteArticle(this);
+  res.getNameModifier = function(options) {
+    if (!this.worn) return ''
+    if (options.npc) {
+      return this.pulledDown === 2 ? " around " + w[this.loc].pronouns.poss_adj + " ankles" : (this.pulledDown === 1 ? " around " + w[this.loc].pronouns.poss_adj + " waist" : ""); 
     }
-    if (options.article === INDEFINITE) {
-      s = lang.addIndefiniteArticle(this);
+    else {
+      return this.pulledDown === 2 ? " (around " + game.player.pronouns.poss_adj + " ankles)" : (this.pulledDown === 1 ? " (around " + game.player.pronouns.poss_adj + " waist)" : " (worn)"); 
     }
-    s += this.alias;
-    if (options && options.possessive) s += "'s";
-    if (this.worn && options.modified && (this.isAtLoc(game.player.name))) {
-      s += this.pulledDown === 2 ? " (around " + game.player.pronouns.poss_adj + " ankles)" : (this.pulledDown === 1 ? " (around " + game.player.pronouns.poss_adj + " waist)" : " (worn)"); 
-    }
-    else if (this.worn && options.npc) {
-      s += this.pulledDown === 2 ? " around " + w[this.loc].pronouns.poss_adj + " ankles" : (this.pulledDown === 1 ? " around " + w[this.loc].pronouns.poss_adj + " waist" : ""); 
-    }
-    if (options && options.capital) s = sentenceCase(s);
-    return s;
   };
 
 
   res.pullDown = function(char) {
     if (this.pulledDown === 2) {
       failedmsg("It's pulled up already.")
-      return FAILED
+      return world.FAILED
     }
     
     const target = w[this.loc]
@@ -891,12 +835,12 @@ const SWIMSUIT = function(backExposure) {
     }
     char.msg(s, {target:target, actor:char, garment:this})
     this.pulledDown++
-    return SUCCESS
+    return world.SUCCESS
   }
   res.pullUp = function(char) {
     if (!this.pulledDown === 0) {
       failedmsg("It does not need pulling up.")
-      return FAILED
+      return world.FAILED
     }
     
     const target = w[this.loc]
@@ -941,7 +885,7 @@ const SWIMSUIT = function(backExposure) {
       this.pulledDown--
     }
     char.msg(s, {garment:this, actor:char, target:target})
-    return SUCCESS
+    return world.SUCCESS
   }
 
   return res;
@@ -952,6 +896,7 @@ const SLING_BIKINI = function() {
   const res = WEARABLE_THAT_PULLS_DOWN(2, ["crotch", "groin", "nipple"])
   res.pullsoff = "swimsuit";
   res.strength = 2
+  res.regex = /sling bikini/
   res.wearMsg = function(char) {
     return "{nv:actor:step:true} into the sling bikini, and {cj:actor:pull} it up {pa:actor} legs, and over {pa:actor} shoulders. It does not cover much at all!";
   };
@@ -973,7 +918,7 @@ const SLING_BIKINI = function() {
   res.pullDown = function(char) {
     if (this.pulledDown) {
       failedmsg("It's pulled up already.")
-      return FAILED
+      return world.FAILED
     }
     
     const target = w[this.loc]
@@ -1003,12 +948,12 @@ const SLING_BIKINI = function() {
     s += "."
     char.msg(s, {target:target, actor:char, garment:this})
     this.pulledDown = true
-    return SUCCESS
+    return world.SUCCESS
   }
   res.pullUp = function(char) {
     if (!this.pulledDown) {
       failedmsg("It does not need pulling up.")
-      return FAILED
+      return world.FAILED
     }
     
     const target = w[this.loc]
@@ -1026,7 +971,7 @@ const SLING_BIKINI = function() {
     s += "."
     this.pulledDown = false
     char.msg(s, {garment:this, actor:char, target:target})
-    return SUCCESS
+    return world.SUCCESS
   }
 
   return res;
@@ -1100,6 +1045,7 @@ const HALTER = function() {
 
 const BRIEFS = function() {
   const res = WEARABLE_THAT_PULLS_DOWN(2, ["crotch", "groin", "buttock"]);
+  res.parsePriority = 5 // for ensembles, so one garment gets priority
   res.wearMsg = function(char) {
     if (char.hasBodyPart("cock")) {
       return "{nv:actor:pull:true} the briefs up {pa:actor} legs and over {pa:actor} hips, covering {pa:actor} {cock:actor}.";
@@ -1233,7 +1179,7 @@ const LOIN_CLOTH = function(backToo) {
   res.garmentType = "erotica"
   res.wearMsg = function(char) {
     let s = "{nv:actor:hold:true} the loin cloth around {pa:actor} waist, and tie it at the side.";
-    if (char === game.player) s += "{once: it feels like one gust of wind and evetything is on display.}"
+    if (char === game.player) s += "{once: it feels like one gust of wind and evetything is on world.}"
     return s
   };
   res.removeMsg = function(char) {

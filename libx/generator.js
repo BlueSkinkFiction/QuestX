@@ -6,11 +6,11 @@
 
 
 function createMan(loc) {
-  res = createItem(randomFromArray(erotica.boysNames, true), ACTOR(false), {
+  res = createItem(random.fromArray(erotica.boysNames, true), ACTOR(false), {
     loc:loc, 
-    willingToExpose:randomInt(1,5) + 3,
-    attactedToMen:randomInt(0,5),
-    attactedToWomen:randomInt(1,3) + 2,
+    willingToExpose:random.int(1,5) + 3,
+    attactedToMen:random.int(0,5),
+    attactedToWomen:random.int(1,3) + 2,
   })
   erotica.generate(res, erotica.maleFeatures, 6);
   console.log(res)
@@ -19,11 +19,15 @@ function createMan(loc) {
 
 
 function createWoman(loc) {
-  res = createItem(randomFromArray(erotica.girlsNames, true), ACTOR(true), {
+  res = createItem(random.fromArray(erotica.girlsNames, true), ACTOR(true), {
     loc:loc,
-    willingToExpose:randomInt(1,8),
-    attactedToWomen:randomInt(0,5),
-    attactedToMen:randomInt(1,3) + 2,
+    willingToExpose:random.int(1,8),
+    attactedToWomen:random.int(0,5),
+    attactedToMen:random.int(1,3) + 2,
+    slutty:random.int(0,5),
+    exhibitionist:random.int(0,5),
+    kinky:random.int(0,5),
+    dirtyTalk:random.int(0,5),
   })
   erotica.generate(res, erotica.femaleFeatures, 4);
   console.log(res)
@@ -33,11 +37,11 @@ function createWoman(loc) {
   
   
 erotica.generate = function(char, list, averageSize) {
-  char.eyeColor = randomFromArray(erotica.eyeColors)
+  char.eyeColor = random.fromArray(erotica.eyeColors)
   char.getDescription = erotica.getDescription
   char.properName = true
-  char.size = randomInt(1,3) + randomInt(1,3) + averageSize - 4
-  char.appearance = randomInt(1,3) + randomInt(1,3) + 4
+  char.size = random.int(1,3) + random.int(1,3) + averageSize - 4
+  char.appearance = random.int(1,3) + random.int(1,3) + 4
   
   char.features = []
   char.featuresDone = []
@@ -47,7 +51,7 @@ erotica.generate = function(char, list, averageSize) {
   if (res.size < averageSize - 1) res.features.push(list.small)
   
   if (char.hasBodyPart("cock")) {
-    char.cock = randomInt(1,3) + randomInt(1,3) - 1
+    char.cock = random.int(1,3) + random.int(1,3) - 1
     if (char.cock === 5) {
       char.hasHugeCock = true
       char.features.push(erotica.hugeCockFeature)
@@ -57,7 +61,7 @@ erotica.generate = function(char, list, averageSize) {
   }
 
   if (char.hasBodyPart("tit")) {
-    char.bust = randomInt(1,3) + randomInt(1,3) - 1
+    char.bust = random.int(1,3) + random.int(1,3) - 1
     if (char.bust === 5) {
       char.hasHugeBoobs = true
       char.features.push(erotica.hugeBustFeature)
@@ -67,37 +71,37 @@ erotica.generate = function(char, list, averageSize) {
   }
 
 
-  if (randomChance(50)) {
-    char.skinTone = randomFromArray(erotica.skinTones)
-    char.hairColor = randomChance(50) ? "black" : randomFromArray(erotica.naturalHairColors.concat(erotica.altHairColors))
-    erotica.addFeature(char, randomFromArray(erotica.skinToneFeatures));
+  if (random.chance(50)) {
+    char.skinTone = random.fromArray(erotica.skinTones)
+    char.hairColor = random.chance(50) ? "black" : random.fromArray(erotica.naturalHairColors.concat(erotica.altHairColors))
+    erotica.addFeature(char, random.fromArray(erotica.skinToneFeatures));
   }
-  else if (randomChance(20)) {  
-    char.skinTone = randomFromArray(erotica.paleSkinTones)
-    char.hairColor = randomChance(50) ? randomFromArray(erotica.redHairColors) : randomFromArray(erotica.naturalHairColors.concat(erotica.altHairColors))
-    erotica.addFeature(char, randomFromArray(erotica.skinToneFeatures));
+  else if (random.chance(20)) {  
+    char.skinTone = random.fromArray(erotica.paleSkinTones)
+    char.hairColor = random.chance(50) ? random.fromArray(erotica.redHairColors) : random.fromArray(erotica.naturalHairColors.concat(erotica.altHairColors))
+    erotica.addFeature(char, random.fromArray(erotica.skinToneFeatures));
   }
   else {  
-    char.hairColor = randomFromArray(erotica.naturalHairColors.concat(erotica.altHairColors))
+    char.hairColor = random.fromArray(erotica.naturalHairColors.concat(erotica.altHairColors))
   }
 
 
   
-  const hairStyle = randomFromArray(list.hairStyles)
+  const hairStyle = random.fromArray(list.hairStyles)
   char.features.push(hairStyle)
   char.hairLength = hairStyle.hairLength
-  if (randomChance(30)) {
-    erotica.addFeature(char, randomFromArray(list.eye));
+  if (random.chance(30)) {
+    erotica.addFeature(char, random.fromArray(list.eye));
   }
   else {
     erotica.addFeature(char, list.eyeGeneric);
   }
-  const total = randomInt(1, 2) + randomInt(1, 3) - 1
-  for (let i = 0; i < randomInt(1, 3); i++) {
-    erotica.addFeature(char, randomFromArray(list.features));
+  const total = random.int(1, 2) + random.int(1, 3) - 1
+  for (let i = 0; i < random.int(1, 3); i++) {
+    erotica.addFeature(char, random.fromArray(list.features));
   }
-  if (randomChance(40)) {
-    erotica.addFeature(char, randomFromArray(list.tattoos));
+  if (random.chance(40)) {
+    erotica.addFeature(char, random.fromArray(list.tattoos));
   }
 }
   
@@ -124,11 +128,11 @@ erotica.addFeature = function(char, f) {
 }
 
 erotica.setTattooQuote = function(char) {
-  char.tattooQuote = randomFromArray(erotica.tattooQuotes);
+  char.tattooQuote = random.fromArray(erotica.tattooQuotes);
 }
 
 erotica.setTattooImage = function(char) {
-  char.tattooImage = randomFromArray(erotica.tattooImages);
+  char.tattooImage = random.fromArray(erotica.tattooImages);
 }
 
 

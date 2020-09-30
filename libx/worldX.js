@@ -72,10 +72,10 @@ createItem("bollock", GENITALS(9, true, /bollocks?|balls?|testicles?|nadgers?|nu
 createItem("cock", GENITALS(10, false, /cock|dick|phallus|penis|willy|manhood|organ|tool|pecker|schlong|prick|member|wang|knob|dong/), {
   modestyBoost:true,
   response_suck:function(char, object) {
-    msg(lang.nounVerb(char, "suck", true) + " " + object.byname({article:DEFINITE}) + " {cock:target}.", {target:object});
+    msg(lang.nounVerb(char, "suck", true) + " " + lang.getName(object, {article:DEFINITE}) + " {cock:target}.", {target:object});
   },
   response_lick:function(char, object) {
-    msg(lang.nounVerb(char, "run", true) + " " + char.pronouns.posessive + " tongue along the length of " + object.byname({article:DEFINITE}) + " hard cock.");
+    msg(lang.nounVerb(char, "run", true) + " " + char.pronouns.posessive + " tongue along the length of " + lang.getName(object, {article:DEFINITE}) + " hard cock.");
   },
   getSlot:function() { return "groin" },
 });
@@ -221,11 +221,11 @@ P("You put your hands round your cock, rubbing it for a few moments, thinking ab
 P("'What...' exclaims Natasha, looking horrified. It does not stop her watching, though.")
 P("Suddenly you ejaculate, your cum spurting across the bed. For a couple of minutes yoiu just lie there, getting your breath back.")
 P("Suddenly you ejaculate, your cum spurting across the bed. For a couple of minutes you just stand there, getting your breath back.")
-P("Suddenly you ejaculate, your cum spurting over " + object.byname({possessive:true}) + " belly. 'Urg!' she exclaims. 'That's disgusting!' For a couple of minutes you just lie there, getting your breath back.")
-P("Suddenly you ejaculate, your cum spurting across the bed on to " + object.byname({possessive:true}) + " face. 'Urg!' she exclaims, as she wipes the muck off with the sheet. 'That's disgusting! It went in my eye, you filthy animal!' For a couple of minutes you just stand there, getting your breath back, a big grin on your face.")
+P("Suddenly you ejaculate, your cum spurting over " + lang.getName(object, {possessive:true}) + " belly. 'Urg!' she exclaims. 'That's disgusting!' For a couple of minutes you just lie there, getting your breath back.")
+P("Suddenly you ejaculate, your cum spurting across the bed on to " + lang.getName(object, {possessive:true}) + " face. 'Urg!' she exclaims, as she wipes the muck off with the sheet. 'That's disgusting! It went in my eye, you filthy animal!' For a couple of minutes you just stand there, getting your breath back, a big grin on your face.")
 P("Hearing you gasp, " + object.alias + " looks away from the TV, and at you, just as you ejaculate, your cum spurting over her face. 'Urg!' she exclaims, as she wipes the muck off with her hand. She is still smiling, despite her protests 'That's disgusting! It went in my eye, you filthy animal!' For a couple of minutes you just stand there, getting your breath back, a big grin on your face, that gets even broader as she licks the cum from her hand.")
 do(natasha_licked_cum, "show")
-P("Suddenly you ejaculate, your cum spurting over " + object.byname({possessive:true}) + " belly. 'Urg!' she exclaims. 'That's disgusting!' For a couple of minutes you just stand there, getting your breath back, as she tries to wipe your muck off her midriff.")
+P("Suddenly you ejaculate, your cum spurting over " + lang.getName(object, {possessive:true}) + " belly. 'Urg!' she exclaims. 'That's disgusting!' For a couple of minutes you just stand there, getting your breath back, as she tries to wipe your muck off her midriff.")
 P("Your cock is now {select:mplayer.erection:flacid:semi-erect:erect:hard:very hard:dripping pre-cum}.")
 
 

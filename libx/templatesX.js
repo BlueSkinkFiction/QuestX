@@ -97,6 +97,7 @@ const AGREGATE_BODY_PART = function(intimateRating, paired, regex) {
 const EROTIC_FURNITURE = function(options) {
   const res = FURNITURE(options);
   res.assumePosture = function(isMultiple, char, posture, success_msg, adverb) {
+    const tpParams = {char:char, item:this}
     if (char.posture === posture && char.postureFurniture === this.name) {
       char.msg(already(char));
       return false;
@@ -106,13 +107,13 @@ const EROTIC_FURNITURE = function(options) {
     }
     if (char.posture && char.postureFurniture !== this.name) {
       char.msg(stop_posture(char))
-      char.msg(success_msg(char, this));
+      char.msg(success_msg, tpParams);
     }
     else if (char.posture && this[char.posture + "_to_" + posture]) {
       char.msg(this[char.posture + "_to_" + posture], {actor:char, item:this})
     }
     else {
-      char.msg(success_msg(char, this));
+      char.msg(success_msg, tpParams);
     }
     
     char.posture = posture;
@@ -125,17 +126,17 @@ const EROTIC_FURNITURE = function(options) {
 
   if (options.bendover) {
     res.bendover = function(isMultiple, char) {
-      return this.assumePosture(isMultiple, char, "bending", bendover_successful, "over");
+      return this.assumePosture(isMultiple, char, "bending", lang.bendover_successful, "over");
     };
   }
   if (options.straddle) {
     res.straddle = function(isMultiple, char) {
-      return this.assumePosture(isMultiple, char, "straddling", straddle_successful, "");
+      return this.assumePosture(isMultiple, char, "straddling", lang.straddle_successful, "");
     };
   }
   if (options.recline) {
     res.facedown = function(isMultiple, char) {
-      return this.assumePosture(isMultiple, char, "facedown", facedown_successful, "");
+      return this.assumePosture(isMultiple, char, "facedown", lang.facedown_successful, "");
     };
   }
   res.hidesWhen_sitting = ["buttock", "lowerback", "upperback"]
@@ -184,7 +185,7 @@ const BONDAGE_DEVICE = function(canMove) {
     getHides:function(actor) { return [] },
     cannotManipulateMsg:function(char, obj, verb) {
       if (verb === undefined) verb = "do anything with"
-      const objName = obj ? obj.byname({article:DEFINITE}) : "anything"
+      const objName = obj ? lang.getName(obj, {article:DEFINITE}) : "anything"
       return lang.nounVerb(char, "can", true) + "not " + verb.toLowerCase() + " " + objName + " whilst " + lang.pronounVerb(char, "be") + " " + this.situation + "."
     },
     cannotMoveMsg:function(char, obj, verb) {
