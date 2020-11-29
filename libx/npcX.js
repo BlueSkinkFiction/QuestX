@@ -793,6 +793,16 @@ agenda.stripTo = function(npc, arr) {
   return npc.firstToRemove().name === arr[0];
 }
 
+// Remove one item per turn until wearing specified number (which is not taken off)
+agenda.stripToN = function(npc, arr) {
+  const g = npc.firstToRemove()
+  if (!g.wearable || g.loc !== npc.name) console.log(arr)
+  npc.msg(g.removeMsg(npc), {garment:g, actor:npc})
+  g.worn = false
+  g.loc = npc.loc
+  return npc.getWearing().length === parseInt(arr[0])
+}
+
 // Wear one item.
 // It does not check what else is worn
 agenda.wearGarment = function(npc, arr) {

@@ -33,7 +33,7 @@ erotica.createGarment = function(proto, loc, color, otherOptions) {
       o[key] = otherOptions[key]
     }
   }
-  if (w[loc].npc || w[loc].player) {
+  if (loc && (w[loc].npc || w[loc].player)) {
     o.worn = true;
     o.owner = loc;
     o.onMove = function(toLoc, fromLoc) {
@@ -46,6 +46,15 @@ erotica.createGarment = function(proto, loc, color, otherOptions) {
   }
   return o;
 }
+
+
+erotica.createOutfit = function(npc, data) {
+  for (let el of data) {
+    el.splice(1, 0, npc);
+    erotica.createGarment(...el)
+  }
+}
+
 
 
 
@@ -345,6 +354,16 @@ createItem("panties_black", PANTIES(),
   }
 );
 
+createItem("briefs_black", PANTIES(),
+  {
+    alias:"black briefs",
+    exam:"The briefs are black, and rather small.",
+    colors:erotica.colorListUnderwear,
+    image:"thong_black",
+    underwear:true,
+  }
+);
+
 createItem("boxers_black", BOXERS(),
   {
     alias:"plain black boxers",
@@ -443,7 +462,16 @@ createItem("teeshirt_ripped", TEE_SHIRT(),
 createItem("croptop_black", VEST_TOP(true),
   {
     alias:"black vest-top",
-    exam:"A rather short, black vest-top.",
+    exam:"A rather short, black vest-top that leaves most of the midriff bare.",
+    image:"vest_pink",
+    colors:erotica.colorList,
+  }
+);
+
+createItem("vesttop_black", VEST_TOP(false),
+  {
+    alias:"black vest-top",
+    exam:"A black vest-top that just about reaches the waist.",
     image:"vest_pink",
     colors:erotica.colorList,
   }
@@ -538,6 +566,14 @@ createItem("leggings_black", PANTS("leggings"),
   }
 );
 
+createItem("pants_black", PANTS("pants"),
+  {
+    alias:"pants",
+    exam:"A pair of black pants.",
+    garmentType:"smart",
+  }
+);
+
 
 
 
@@ -589,7 +625,16 @@ createItem("dress_side", DRESS(["chest", "nipple", "upperback", "lowerback", "mi
 createItem("dress_split", DRESS(["chest", "cleavage", "nipple", "lowerback", "midriff", "hip", "groin", "buttock", "thigh", "calf"]),
   {
     alias:"long black dress",
-    exam:"This silky black dress had a low neckline, and a long skirt split all the way ip the left side.",
+    exam:"This silky black dress had a low neckline, and a long skirt split all the way up the left side.",
+    image:"dress_split_black",
+    colors:erotica.colorListSwimwearF,
+  }
+);
+
+createItem("dress_long", DRESS(["chest", "cleavage", "nipple", "lowerback", "midriff", "hip", "groin", "buttock", "thigh", "calf"]),
+  {
+    alias:"long black dress",
+    exam:"This elegant black dress had an intricate neckline that hides most of the cleavage, and a long skirt.",
     image:"dress_split_black",
     colors:erotica.colorListSwimwearF,
   }
@@ -752,7 +797,7 @@ createItem("bandeau_black", HALTER(),
   }
 );
 
-createItem("briefs_black", BRIEFS(),
+createItem("briefs_black_sw", BRIEFS(),
   {
     alias:"black bikini briefs",
     regex:/bikini bottoms?$/,
@@ -940,5 +985,21 @@ createItem("leather_collar", COLLAR(), MADE_OF(materials.leather),
   {
     alias:"leather collar",
     exam:"A studded leather collar.",
+  }
+);
+
+createItem("bowtie_black", WEARABLE_X(5, ['neck']),
+  {
+    alias:"black bowtie",
+    exam:"A black bowtie.",
+    garmentType:"smart",
+  }
+);
+
+createItem("tie_black", WEARABLE_X(5, ['neck']),
+  {
+    alias:"black tie",
+    exam:"A black tie.",
+    garmentType:"smart",
   }
 );

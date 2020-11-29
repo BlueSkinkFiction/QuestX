@@ -7,7 +7,7 @@ tp.addDirective("description", function(arr, params) {
 
 tp.addDirective("attire", function(arr, params) {
   const l = params.item.getWearingVisible()
-  return formatList(l, {article:INDEFINITE, lastJoiner:" and ", nothing:"nothing", npc:true, modified:true});
+  return formatList(l, {article:INDEFINITE, lastJoiner:" and ", nothing:"nothing", npc:true, modified:false});
 });
 
 tp.addDirective("posture", function(arr, params) {
@@ -24,7 +24,7 @@ tp.addDirective("restraint", function(arr, params) {
   return params.item.restraint.situation;
 });
 
-tp.addDirective("ifrestraint", function(arr, params) {
+tp.addDirective("ifRestraint", function(arr, params) {
   return params.item.restraint ? arr.join(":") : "";
 });
 

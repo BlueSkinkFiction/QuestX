@@ -15,14 +15,6 @@ erotica.pullOffTexts = {
 const WEARABLE_X = function (layer, slots) {
   const res = Object.assign(WEARABLE(layer, slots), MADE_OF(materials.cloth))
   
-  if (res.getVerbs === undefined) console.log(res)
-  
-  res.getBaseVerbs = res.getVerbs
-  
-  res.getVerbs = function() {
-    return this.getBaseVerbs()
-  }
-  
   res.examine = function() {
     if (!this.exam) {
       debugmsg("No description set for " + this.name)
@@ -84,39 +76,26 @@ const WEARABLE_THAT_PULLS_DOWN = function (layer, slots) {
 
   res.pulledDown = false
   res.getSlots = function() { return this.pulledDown ? [] : this.slots; };
-  res.breakEnsemble = function() { return this.pulledDown };
-  res.getBaseVerbs = function() {
-    if (!this.isAtLoc(game.player.name)) {
-      return [lang.verbs.examine, lang.verbs.take];
-    }
-    else if (this.getWorn()) {
-      if (this.getWearRemoveBlocker(game.player, false)) {
-        return [lang.verbs.examine];
+  res.breakEnsemble = function() { return this.pulledDown }
+  res.onCreation = function(o) {
+    o.verbFunctions.push(function(o, list) {
+      if (!o.isAtLoc(game.player.name)) {
+        list.push("Take")
       }
-      else if (this.pulledDown) {
-        return [lang.verbs.examine, lang.verbs.remove, "Pull up"];
-      }
-      else {
-        return [lang.verbs.examine, lang.verbs.remove, "Pull down"];
-      }
-    }
-    else {
-      if (this.getWearRemoveBlocker(game.player, true)) {
-        return [lang.verbs.examine, lang.verbs.drop];
+      else if (o.getWorn()) {
+        if (!o.getWearRemoveBlocker(game.player, false)) {
+          list.push("Remove")
+          list.push(o.pulledDown ? "Pull up" : "Pull down")
+        }
       }
       else {
-        return [lang.verbs.examine, lang.verbs.drop, lang.verbs.wear];
+        list.push("Drop")
+        if (!o.getWearRemoveBlocker(game.player, true)) list.push("Wear")
       }
-    }
-  };
-  res.getNameModifier = function(options) {
-    if (!this.worn) return ''
-    if (options.npc) {
-      return this.pulledDown ? " around " + w[this.loc].pronouns.poss_adj + " ankles" : ""; 
-    }
-    else {
-      return this.pulledDown ? " (around " + game.player.pronouns.poss_adj + " ankles)" : " (worn)"; 
-    }
+    })
+    o.nameModifierFunctions.push(function(o, list) {
+      if (o.worn) list.push(o.pulledDown ? "around " + w[o.loc].pronouns.poss_adj + " ankles" : "worn")
+    })
   }
   res.pullDown = function(char) {
     if (this.pulledDown) {
@@ -150,39 +129,28 @@ const WEARABLE_THAT_PULLS_UP = function (layer, slots, toDest) {
   res.getSlots = function() { return this.pulledUp ? [] : this.slots; };
   res.breakEnsemble = function() { return this.pulledUp };
   res.toDest = toDest
-  res.getBaseVerbs = function() {
-    if (!this.isAtLoc(game.player.name)) {
-      return [lang.verbs.examine, lang.verbs.take];
-    }
-    else if (this.getWorn()) {
-      if (this.getWearRemoveBlocker(game.player, false)) {
-        return [lang.verbs.examine];
+
+  res.onCreation = function(o) {
+    o.verbFunctions.push(function(o, list) {
+      if (!o.isAtLoc(game.player.name)) {
+        list.push("Take")
       }
-      else if (this.pulledUp) {
-        return [lang.verbs.examine, lang.verbs.remove, "Pull down"];
-      }
-      else {
-        return [lang.verbs.examine, lang.verbs.remove, "Pull up"];
-      }
-    }
-    else {
-      if (this.getWearRemoveBlocker(game.player, true)) {
-        return [lang.verbs.examine, lang.verbs.drop];
+      else if (o.getWorn()) {
+        if (!o.getWearRemoveBlocker(game.player, false)) {
+          list.push("Remove")
+          list.push(o.pulledUp ? "Pull down" : "Pull up")
+        }
       }
       else {
-        return [lang.verbs.examine, lang.verbs.drop, lang.verbs.wear];
+        list.push("Drop")
+        if (!o.getWearRemoveBlocker(game.player, true)) list.push("Wear")
       }
-    }
-  };
-  res.getNameModifier = function(options) {
-    if (!this.worn) return ''
-    if (options.npc) {
-      return this.pulledUp ? " pulled up around " + w[this.loc].pronouns.poss_adj + " " + this.toDest : ""
-    }
-    else {
-      return this.pulledUp ? " (around " + game.player.pronouns.poss_adj + " " + this.toDest + ")" : " (worn)"
-    }
+    })
+    o.nameModifierFunctions.push(function(o, list) {
+      if (o.worn) list.push(o.pulledDown ? "around " + w[o.loc].pronouns.poss_adj + " " + this.toDest : "worn")
+    })
   }
+
   res.pullUp = function(char) {
     if (this.pulledUp) {
       failedmsg(lang.pronounVerb(this, "be", true) + " already.")
@@ -217,40 +185,28 @@ const WEARABLE_THAT_UNFASTENS = function (layer, slots, slots2) {
   res.breakEnsemble = function() { return this.unfastened };
   res.ripOff = erotica.ripOffButtoned
   res.pullsoff = "jacket"
-  res.getBaseVerbs = function() {
-    if (!this.isAtLoc(game.player.name)) {
-      return [lang.verbs.examine, lang.verbs.take];
-    }
-    else if (this.getWorn()) {
-      if (this.getWearRemoveBlocker(game.player, false)) {
-        return [lang.verbs.examine];
+  
+  res.onCreation = function(o) {
+    o.verbFunctions.push(function(o, list) {
+      if (!o.isAtLoc(game.player.name)) {
+        list.push("Take")
       }
-      else if (this.unfastened) {
-        return [lang.verbs.examine, lang.verbs.remove, "Fasten"];
-      }
-      else {
-        return [lang.verbs.examine, lang.verbs.remove, "Unfasten"];
-      }
-    }
-    else {
-      if (this.getWearRemoveBlocker(game.player, true)) {
-        return [lang.verbs.examine, lang.verbs.drop];
+      else if (o.getWorn()) {
+        if (!o.getWearRemoveBlocker(game.player, false)) {
+          list.push("Remove")
+          list.push(o.unfastened ? "Fasten" : "Unfasten")
+        }
       }
       else {
-        return [lang.verbs.examine, lang.verbs.drop, lang.verbs.wear];
+        list.push("Drop")
+        if (!o.getWearRemoveBlocker(game.player, true)) list.push("Wear")
       }
-    }
-  };
-  res.getNameModifier = function(options) {
-    if (!this.worn) return ''
-    if (options.npc) {
-      return this.unfastened ? " that is unfastened" : ""
-    }
-    else {
-      return this.unfastened ? " (worn unfastened)" : " (worn)"
-    }
-    return ''
+    })
+    o.nameModifierFunctions.push(function(o, list) {
+      if (o.worn) list.push(o.unfastened ? (o === game.player ? "worn unfastened" : "unfastened") : "worn")
+    })
   }
+
   res.unfasten = function(char) {
     if (this.unfastened) {
       failedmsg(lang.pronounVerb(this, "be", true) + " already.")

@@ -49,8 +49,13 @@ const MADE_OF = function(material) {
       if (report) msg(s);
       return true;
     },
-  };
-  return res;
+    onCreation:function(o) {
+      o.verbFunctions.push(function(o, list) {
+        if (o.material.smash) list.push("Smash")
+      })
+    },
+  }
+  return res
 };
 
 
