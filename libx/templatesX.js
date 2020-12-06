@@ -96,49 +96,24 @@ const AGREGATE_BODY_PART = function(intimateRating, paired, regex) {
 
 const EROTIC_FURNITURE = function(options) {
   const res = FURNITURE(options);
-  res.assumePosture = function(isMultiple, char, posture, success_msg, adverb) {
-    const tpParams = {char:char, item:this}
-    if (char.posture === posture && char.postureFurniture === this.name) {
-      char.msg(already(char));
-      return false;
-    }
-    if (!this.testForPosture(char, posture)) {
-      return false;
-    }
-    if (char.posture && char.postureFurniture !== this.name) {
-      char.msg(stop_posture(char))
-      char.msg(success_msg, tpParams);
-    }
-    else if (char.posture && this[char.posture + "_to_" + posture]) {
-      char.msg(this[char.posture + "_to_" + posture], {actor:char, item:this})
-    }
-    else {
-      char.msg(success_msg, tpParams);
-    }
-    
-    char.posture = posture;
-    char.postureFurniture = this.name;
-    char.postureAdverb = adverb === undefined ? 'on' : adverb;
-    
-    if (typeof this["on" + posture] === "function") this["on" + posture](char);
-    return true;
-  };
+  res.postureChangesImplemented = true
 
   if (options.bendover) {
     res.bendover = function(isMultiple, char) {
-      return this.assumePosture(isMultiple, char, "bending", lang.bendover_successful, "over");
-    };
+      return this.assumePosture(isMultiple, char, "bending", "bendover", "over");
+    }
   }
   if (options.straddle) {
     res.straddle = function(isMultiple, char) {
-      return this.assumePosture(isMultiple, char, "straddling", lang.straddle_successful, "");
-    };
+      return this.assumePosture(isMultiple, char, "straddling", "straddle", "");
+    }
   }
   if (options.recline) {
     res.facedown = function(isMultiple, char) {
-      return this.assumePosture(isMultiple, char, "facedown", lang.facedown_successful, "");
-    };
+      return this.assumePosture(isMultiple, char, "facedown", "facedown", "");
+    }
   }
+  
   res.hidesWhen_sitting = ["buttock", "lowerback", "upperback"]
   res.hidesWhen_reclining = ["buttock", "lowerback", "upperback"]
   res.hidesWhen_facedown = ["groin", "midriff", "chest", "tit", "nipple"]
@@ -156,6 +131,10 @@ const EROTIC_FURNITURE = function(options) {
   return res;
 }
 
+
+lang.bendover_on_successful = "{nv:char:bend:true} over {nm:item:the}."
+lang.straddle_on_successful = "{nv:char:straddle:true} {nm:item:the}."
+lang.facedown_on_successful = "{nv:char:lie:true} facedown on {nm:item:the}."
 
 
 

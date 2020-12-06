@@ -8,7 +8,7 @@
 
 erotica.createGarment = function(proto, loc, color, otherOptions) {
   if (typeof proto === "string") {
-    if (w[proto] === undefined) console.log("Failed to find a garment called " + proto + " for createGarment.")
+    if (w[proto] === undefined) return errormsg("Failed to find a garment called " + proto + " for createGarment.")
     proto = w[proto]
   }
   const o = cloneObject(proto, loc)
@@ -20,7 +20,7 @@ erotica.createGarment = function(proto, loc, color, otherOptions) {
   else if (color) {
     o.alias = o.alias.replace("black", color.toLowerCase());
     if (o.image) o.image = o.image.replace("black", color.toLowerCase());
-    o.listalias = o.alias.replace("Black", sentenceCase(color));
+    o.listalias = sentenceCase(o.alias.replace("Black", sentenceCase(color)))
     if (o.exam) {
       o.exam = o.exam.replace("black", color.toLowerCase());
     }
@@ -48,9 +48,18 @@ erotica.createGarment = function(proto, loc, color, otherOptions) {
 }
 
 
-erotica.createOutfit = function(npc, data) {
+erotica.stripNaked = function(npcName) {
+  for (let key in w) {
+    if (w[key].loc === npcName) {
+      w[key].worn = false
+      delete w[key].loc
+    }
+  }
+}
+
+erotica.createOutfit = function(npcName, data) {
   for (let el of data) {
-    el.splice(1, 0, npc);
+    el.splice(1, 0, npcName)
     erotica.createGarment(...el)
   }
 }
@@ -305,6 +314,20 @@ createItem("trainers", SHOES('trainer'), MADE_OF(materials.plastic),
     alias:"trainers",
     exam:"A pair of black trainers.",
     garmentType:"casual",
+  }
+);
+
+createItem("shoes", SHOES('shoe'), MADE_OF(materials.leather),
+  {
+    alias:"shoes",
+    exam:"A pair of black shoes.",
+  }
+);
+
+createItem("pumps", SHOES('pump'), MADE_OF(materials.plastic),
+  {
+    alias:"pumps",
+    exam:"A pair of black pumps.",
   }
 );
 
@@ -616,7 +639,7 @@ createItem("dress_short", DRESS(["chest", "nipple", "lowerback", "midriff", "hip
 createItem("dress_side", DRESS(["chest", "nipple", "upperback", "lowerback", "midriff", "hip", "groin", "buttock", "thigh", "calf"]),
   {
     alias:"black, side-open dress",
-    exam:"This long black dress is open all down the left, with just a series of short chains pulling the two halves together; it had a single strap over the left shoulder.",
+    exam:"This long black dress is open all down the left, with just a series of short chains pulling the two halves together; it has a single strap over the left shoulder.",
     image:"dress_side_blue",
     colors:erotica.colorListSwimwearF,
   }
@@ -988,7 +1011,7 @@ createItem("leather_collar", COLLAR(), MADE_OF(materials.leather),
   }
 );
 
-createItem("bowtie_black", WEARABLE_X(5, ['neck']),
+createItem("bowtie_black", TIE(),
   {
     alias:"black bowtie",
     exam:"A black bowtie.",
@@ -996,7 +1019,7 @@ createItem("bowtie_black", WEARABLE_X(5, ['neck']),
   }
 );
 
-createItem("tie_black", WEARABLE_X(5, ['neck']),
+createItem("tie_black", TIE(),
   {
     alias:"black tie",
     exam:"A black tie.",

@@ -24,7 +24,7 @@ const WEARABLE_X = function (layer, slots) {
     
     const list = erotica.findSubstances(this)
     if (list.length > 0) {
-      s += " " + lang.pronounVerb(this, "be", true) + " covered in " + formatList(list, {lastJoiner:", and "}) + "."
+      s += " " + lang.pronounVerb(this, "be", true) + " covered in " + formatList(list, {lastJoiner:lang.list_and}) + "."
     }
     
     msg(s)
@@ -43,7 +43,7 @@ const WEARABLE_X = function (layer, slots) {
     msg(prefix(this, isMultiple) + this.removeMsg(char, this), {garment:this, actor:char});
     const startExposure = char.getExposure()
     this.worn = false;
-    if (this.afterRemove) this.afterRemove(char)
+    if (this.onRemove) this.onRemove(char)
     char.arousalBomb(char.getExposure() / 3)
     for (let npc of scopeNpcHere()) {
       npc.stripReaction(char, this, startExposure, char.getExposure())
@@ -1115,10 +1115,28 @@ const COLLAR = function() {
   const res = WEARABLE_X(2, "neck");
   res.garmentType = "erotica"
   res.wearMsg = function(char) {
-    return "{nv:actor:put:true} the collar round {pa:actor} neck, and fasten it.";
+    return "{nv:actor:put:true} the collar round {pa:actor} neck, and {cj:actor:fasten} it.";
   };
   res.removeMsg = function(char) {
     return "{nv:actor:unfasten:true} the collar, and take it off.";
+  };
+  res.ripOff = function(p) {
+    this.loc = p.actor.loc
+    this.worn = false
+    p.actor.msg("{nv:actor:untie:true} {nms:target:the} {nm:garment}" + s + ", and {cj:actor:pull} it off.", p)
+    return true
+  }
+  return res;
+};
+
+const TIE = function() {
+  const res = WEARABLE_X(5, "neck");
+  res.garmentType = "smart"
+  res.wearMsg = function(char) {
+    return "{nv:actor:put:true} {nm:garment:the} round {pa:actor} neck, and {cj:actor:fasten} it.";
+  };
+  res.removeMsg = function(char) {
+    return "{nv:actor:unfasten:true} {nm:garment:the}, and take it off.";
   };
   res.ripOff = function(p) {
     this.loc = p.actor.loc
