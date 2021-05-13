@@ -56,7 +56,7 @@ createItem("Joanna", ACTOR(true), {
   bodyPartAdjectives:{upperback:"tattooed"},
   willingToExpose:5,
   eyeColor:'blue',
-  getDescription:'Joanna has a warm smile, and long blonde hair.',
+  description:'Joanna has a warm smile, and long blonde hair.',
   size:3,
   appearance:9,
   skinTone:'tanned',
@@ -252,6 +252,7 @@ createItem("swimshortsblue", SHORTS(true),
 createItem("daisydukes", DAISY_DUKES(),
   {
     alias:"Daisy Dukes",
+    properName:false,
     loc:"lounge",
     pronouns:lang.pronouns.plural,
   }
@@ -349,6 +350,7 @@ createItem("a_frame", MADE_OF(materials.metal), BONDAGE_DEVICE(false),
     loc:"lounge",
     alias:"A-frame",
     situation:"manacled to the A-frame",
+    properName:false,
     legsOpen:true,
     armsOpen:false,
     points:["wrists", "ankles"],
@@ -530,7 +532,7 @@ createItem("butler_maid_question", QUESTION(), {
       response:function() {
         msg("'Can I have a maid?' you say to the receptionist.");
         msg("'Sure. There will be someone in your room for you.'");
-        const maid = createWoman("your_room")
+        const maid = erotica.createWoman("your_room")
         maid.dressUp("thongblackf", "maidoutfit", "heels2");
       }
     },
@@ -539,7 +541,7 @@ createItem("butler_maid_question", QUESTION(), {
       response:function() {
         msg("'Can I have a butler?' you say to the receptionist.");
         msg("'Sure. There will be someone in your room for you.'");
-        const butler = createWoman("your_room")
+        const butler = erotica.createMan("your_room")
         butler.dressUp("thongblackm", "bowtie");
       }
     },
