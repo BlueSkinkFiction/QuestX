@@ -359,9 +359,6 @@ erotica.defaultResponses = [
     ],
   },
 
-
-
-
   // KISS
   // Requires some work
   {
@@ -445,8 +442,6 @@ erotica.defaultResponses = [
       },
     ],
   },
-
-
 
   // TICKLE
   // Requires some work
@@ -557,8 +552,6 @@ erotica.defaultResponses = [
       },
     ],
   },
-
-
 
   // LICK
   {
@@ -760,7 +753,6 @@ erotica.defaultResponses = [
     ],
   },
 
-
   // WANK
   // Already checked target has a cock and has nothing over his crotch
   {
@@ -862,8 +854,6 @@ erotica.defaultResponses = [
     ],
   },
 
-
-
   // GIRL ON TOP
   // Already checked target has a cock and actor has pussy and both exposed
   {
@@ -895,7 +885,6 @@ erotica.defaultResponses = [
       },
     ],
   },
-
 
   // FUCK WITH DILDO
   // TODO !!!
@@ -1070,9 +1059,6 @@ erotica.defaultResponses = [
     ],
   },
 
-
-
-
   // POUR ON
   {
     name:"pour on",
@@ -1176,7 +1162,6 @@ erotica.defaultResponses = [
     ],
   },
 
-
   // POUR DOWN
   {
     name:"pour down",
@@ -1196,10 +1181,6 @@ erotica.defaultResponses = [
       },
     ],
   },
-
-
-
-
 
   // REMOVE
   {
@@ -1264,6 +1245,7 @@ erotica.defaultResponses = [
       },
     ],
   },
+  
   {
     name:"default",
     msg:"THIS SHOULD NEVER HAPPEN: {param:action}",

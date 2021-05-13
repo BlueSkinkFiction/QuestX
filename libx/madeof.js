@@ -20,6 +20,7 @@ materials = {
 
 
 const MADE_OF = function(material) {
+  if (!material) log("no material")
   res = {
     material:material,
     strength:material.strength,
@@ -51,7 +52,7 @@ const MADE_OF = function(material) {
     },
     onCreation:function(o) {
       o.verbFunctions.push(function(o, list) {
-        if (o.material.smash) list.push("Smash")
+        if (o.material && o.material.smash) list.push("Smash")
       })
     },
   }
@@ -76,7 +77,7 @@ commands.unshift(new Cmd('Burn', {
   rules:[cmdRules.isHere],
   regex:/^(burn) (.+)$/,
   objects:[
-    {ignore:true},
+    {special:'ignore'},
     {scope:parser.isPresent}
   ],
   useThisScriptForNpcs:true,
@@ -96,7 +97,7 @@ commands.unshift(new Cmd('Smash', {
   rules:[cmdRules.isHere],
   regex:/^(smash) (.+)$/,
   objects:[
-    {ignore:true},
+    {special:'ignore'},
     {scope:parser.isPresent}
   ],
   useThisScriptForNpcs:true,
@@ -112,7 +113,7 @@ commands.unshift(new Cmd('Shred', {
   rules:[cmdRules.isHere],
   regex:/^(shred|rip up|rip) (.+)$/,
   objects:[
-    {ignore:true},
+    {special:'ignore'},
     {scope:parser.isPresent}
   ],
   useThisScriptForNpcs:true,

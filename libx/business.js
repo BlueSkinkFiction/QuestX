@@ -38,7 +38,7 @@ function createBar(name, data) {
   waitress.loc = name
   waitress.scenery = true
   waitress.alias = "waitress"
-  waitress.listalias = "Waitress"
+  waitress.listAlias = "Waitress"
   waitress.examine = data.waitress
   delete data.waitress
   waitress.talkto = data.waitressSpeak

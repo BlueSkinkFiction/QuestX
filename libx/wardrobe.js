@@ -8,7 +8,7 @@
 
 erotica.createGarment = function(proto, loc, color, otherOptions) {
   if (typeof proto === "string") {
-    if (w[proto] === undefined) return errormsg("Failed to find a garment called " + proto + " for createGarment.")
+    if (w[proto] === undefined) return errormsg("Failed to find a garment called " + proto + " for createGarment.", true)
     proto = w[proto]
   }
   const o = cloneObject(proto, loc)
@@ -20,7 +20,7 @@ erotica.createGarment = function(proto, loc, color, otherOptions) {
   else if (color) {
     o.alias = o.alias.replace("black", color.toLowerCase());
     if (o.image) o.image = o.image.replace("black", color.toLowerCase());
-    o.listalias = sentenceCase(o.alias.replace("Black", sentenceCase(color)))
+    o.listAlias = sentenceCase(o.alias.replace("Black", sentenceCase(color)))
     if (o.exam) {
       o.exam = o.exam.replace("black", color.toLowerCase());
     }
@@ -50,7 +50,7 @@ erotica.createGarment = function(proto, loc, color, otherOptions) {
 
 erotica.stripNaked = function(npcName) {
   for (let key in w) {
-    if (w[key].loc === npcName) {
+    if (w[key].loc === npcName && w[key].worn) {
       w[key].worn = false
       delete w[key].loc
     }
@@ -106,18 +106,16 @@ erotica.createBikiniEnsemble = function(ensembleName, halter, briefs, ensembleAl
     exam:desc,
     alias:ensembleAlias,
     examine:function(isMultiple) {
-      const cumlist1 = erotica.findCum(this.members[0])
-      const cumlist2 = erotica.findCum(this.members[1])
       let s = this.exam
-      if (cumlist1.length > 0) {
-        if (cumlist2.length > 0) {
+      if (this.ensembleMembers[0].cumMess && this.ensembleMembers[0].cumMess.length > 0) {
+        if (this.ensembleMembers[1].cumMess && this.ensembleMembers[1].cumMess.length > 0) {
           s += " There is cum on both the halter and the briefs."
         }
         else {
           s += " There is cum on the halter."
         }
       }
-      else if (cumlist2.length > 0) {
+      else if (this.ensembleMembers[1].cumMess && this.ensembleMembers[1].cumMess.length > 0) {
         s += " There is cum on the briefs."
       }
       msg(prefix(this, isMultiple) + s)
@@ -455,7 +453,7 @@ createItem("teeshirt_black_with_logo", TEE_SHIRT(),
       const logo = random.fromArray(this.logos)
       this.alias = this.alias.replace("black", color.toLowerCase());
       if (this.image) this.image = this.image.replace("black", color);
-      this.listalias = this.alias.replace("Black", sentenceCase(color));
+      this.listAlias = this.alias.replace("Black", sentenceCase(color));
       this.exam = this.exam.replace("black", color);
       this.exam = this.exam.replace("logo", logo);
     },
@@ -604,7 +602,6 @@ createItem("pants_black", PANTS("pants"),
 
 
 
-
 //---- DRESSES ----
 
 
@@ -615,6 +612,7 @@ createItem("dress_strapless", DRESS(["chest", "cleavage", "nipple", "upperback",
     exam:"A short, strapless dress, in black.",
     image:"dress_strapless_black",
     strapless:true,
+    quick:'Short strapless',
   }
 );
 
@@ -624,6 +622,7 @@ createItem("dress_micro", DRESS(["chest", "nipple", "lowerback", "midriff", "hip
     exam:"The black dress is so short it is barely decent. Spaghetti straps held it up.",
     image:"dress_micro_black",
     colors:erotica.colorListSwimwearF,
+    quick:'Very short',
   }
 );
 
@@ -633,6 +632,7 @@ createItem("dress_short", DRESS(["chest", "nipple", "lowerback", "midriff", "hip
     exam:"The black dress is laced up across the neck line, which went down to the naval.",
     image:"dress_short_black",
     colors:erotica.colorListSwimwearF,
+    quick:'Short, laced-up',
   }
 );
 
@@ -642,6 +642,7 @@ createItem("dress_side", DRESS(["chest", "nipple", "upperback", "lowerback", "mi
     exam:"This long black dress is open all down the left, with just a series of short chains pulling the two halves together; it has a single strap over the left shoulder.",
     image:"dress_side_blue",
     colors:erotica.colorListSwimwearF,
+    quick:'Side-open',
   }
 );
 
@@ -651,6 +652,7 @@ createItem("dress_split", DRESS(["chest", "cleavage", "nipple", "lowerback", "mi
     exam:"This silky black dress had a low neckline, and a long skirt split all the way up the left side.",
     image:"dress_split_black",
     colors:erotica.colorListSwimwearF,
+    quick:'Long, left split',
   }
 );
 
@@ -660,10 +662,9 @@ createItem("dress_long", DRESS(["chest", "cleavage", "nipple", "lowerback", "mid
     exam:"This elegant black dress had an intricate neckline that hides most of the cleavage, and a long skirt.",
     image:"dress_split_black",
     colors:erotica.colorListSwimwearF,
+    quick:'Long, elegant',
   }
 );
-
-
 
 createItem("dress_goth", DRESS(["chest", "nipple", "upperback", "lowerback", "midriff", "hip", "groin", "buttock", "thigh"]),
   {
@@ -671,6 +672,7 @@ createItem("dress_goth", DRESS(["chest", "nipple", "upperback", "lowerback", "mi
     exam:"A strapless, black dress, the body ribbed like a corset, while the skirt is slightly flared, and trimmed with lace.",
     image:"dress_goth",
     strapless:true,
+    quick:'Goth-style',
   }
 );
 
@@ -682,10 +684,12 @@ createItem("dress_pvc_red", DRESS(["chest", "nipple", "upperback", "lowerback", 
         msg(prefix(this, isMultiple) + "The red PVC dress is very short; it is laced all the way up the back, leaving a strip of bare skin about an inch side that included her ass crack.");
       }
       else {
-        msg(prefix(this, isMultiple) + "The red PVC dress is very short; it is fastens by lacing all the way up the back.");
+        msg(prefix(this, isMultiple) + this.exam);
       }
     },
+    exam:"The red PVC dress is very short; it is fastens by lacing all the way up the back.",
     image:"dress_pvc_red",
+    quick:'Short PVC',
   }
 );
 
@@ -701,8 +705,9 @@ createItem("dress_mesh", DRESS(["chest", "cleavage", "nipple", "upperback", "low
       }
     },
     image:"dress_mesh",
-    pullsoff:true,
+    pullsoff:'dress',
     getRevealing:function() { return 4; },
+    quick:'Short mesh',
   }
 );
 
@@ -711,6 +716,7 @@ createItem("dress_gauze", DRESS(["chest", "nipple", "lowerback", "midriff", "hip
     alias:"very short gauze dress",
     exam:"The gauzy black dress is so short it is barely decent, but it is almost see-through too. Spaghetti straps held it up.",
     image:"dress_micro_black",
+    quick:'Short gauze',
   }
 );
 
@@ -754,7 +760,7 @@ createItem("briefs_black_m", BRIEFS(),
     colors:erotica.colorListSwimwearM,
     exam:"A pair of black swim briefs.",
     image:"briefs_black",
-    pullsoff:true,
+    pullsoff:'down',
   }
 );
 
@@ -795,7 +801,7 @@ createItem("swimsuit_yellow_panel", SWIMSUIT(0),
       }
       this.alias = this.alias.replace("yellow", color.toLowerCase());
       if (this.image) this.image = this.image.replace("yellow", color.toLowerCase());
-      this.listalias = this.alias.replace("Yellow", sentenceCase(color));
+      this.listAlias = this.alias.replace("Yellow", sentenceCase(color));
       this.exam = this.exam.replace("yellow", color.toLowerCase());
     },
   }
@@ -827,7 +833,7 @@ createItem("briefs_black_sw", BRIEFS(),
     colors:erotica.colorListSwimwearF,
     exam:"A pair of black bikini briefs that tie up at the side.",
     image:"briefs_black",
-    pullsoff:true,
+    pullsoff:'down',
   }
 );
 
@@ -868,7 +874,7 @@ createItem("briefs_us", BRIEFS(),
     alias:"USA bikini briefs",
     exam:"The bikini briefs are striped red and white, like the lower half of the US flag.",
     image:"briefs_black",
-    pullsoff:true,
+    pullsoff:'down',
   }
 );
 
@@ -908,7 +914,7 @@ createItem("leather_corset", CORSET(), MADE_OF(materials.leather),
     //wearmsg:lang.nounVerb(char, "pull", true) + " on the corset, fastening it at the back before getting her breasts comfortable in the tight garment.",
     //removemsg:lang.nounVerb(char, "unfasten", true) + " her corset, and takes it off",
     image:"corset",
-    pullsoff:true,
+    pullsoff:'jacket',
     stripper:function(char) {
       msg("Slowly she unfastens the corset. She pulls it off, her breasts bare; the men cheer and whistle.");
     },
@@ -970,6 +976,7 @@ createItem("leather_dress", DRESS(["chest", "nipple", "upperback", "lowerback", 
       }
     },
     image:"dress_leather",
+    quick:'Short leather',
   }
 );
 

@@ -1,5 +1,7 @@
 "use strict";
 
+settings.saveLoadExcludedAtts.push("bodyPartAdjectives")
+
 
 const ACTOR = function(isFemale, isPlayer) {
   let res
@@ -34,19 +36,24 @@ const ACTOR = function(isFemale, isPlayer) {
   
   res.doEvent = function() {
     if (this.npc) {
+      this.sayTakeTurn()
       this.doReactions();
-      if (!this.paused && !this.suspended && this.agenda.length > 0) this.doAgenda();
+      if (!this.paused && !this.suspended && this.agenda && this.agenda.length > 0) this.doAgenda();
     }
-    this.updateArousal();
+    if (this.isHere()) this.updateArousal();
   }
   
   
+  // This does take time. If you have a handful of NPCs it should not be bad. 
+  // I tried with 200, so all 200 had to be checked against the other 199
+  // It took 70 seconds. Therefore eac h NPC is limited to just three.
+  // No guarantee about what 3
   res.updateArousal = function() {
     const l = this.othersHere()
     let total = 0
     if (this.report) console.log("Arousal for " + this.name)
     if (this.report) console.log("Was: " + this.arousal)
-    for (let i = 0; i < l.length; i++) {
+    for (let i = 0; i < l.length && i < 3; i++) {
       const inc = this.getInstantAttraction(l[i])
       if (this.report) console.log("Add " + inc + " for " + l[i].name)
       total += inc
@@ -156,15 +163,33 @@ const ACTOR = function(isFemale, isPlayer) {
   
   // --------------  DESCRIBING ---------------------------
   
+  
+// Use for NPCs to get a dictionary of arrays, the key is the substance, the array the bodypart
+  
+  res.findGroupedSubstances = function() {
+    if (!this.substanceMess) return {}
+    const list = {}
+    for (const el of this.substanceMess) {
+      const ary = el.split('_')
+      if (!list[ary[0]]) list[ary[0]] = []        
+      list[ary[0]].push(ary[1])
+    }
+    return list
+  }
+  res.erectionShortDescs = ['flacid', 'semi-erect', 'erect', 'hard', 'very hard', 'dripping pre-cum']
   res.examine = function(isMultiple, char) {
-    let s = "{description} " + lang.pronounVerb(this, "be", true) + " wearing {attire}."
+    let s = "{description} " + lang.pronounVerb(this, "be", true) + " wearing {attire:mod}."
     if (this.posture && this.posture !== "standing") s += " " + lang.pronounVerb(this, "be", true) + " {posture}."
-    const dict = erotica.findGroupedSubstances(this)
+    const dict = this.findGroupedSubstances()
     const sl = []
     for (let key in dict) {
-      sl.push(key + " on " + this.pronouns.poss_adj + " " + formatList(dict[key], {lastJoiner:" and "}))
+      sl.push(key + " on " + this.pronouns.poss_adj + " " + formatList(dict[key], {lastJoiner:lang.list_and}))
     }
-    if (sl.length > 0) s +=  " " + lang.pronounVerb(this, "have", true) + " " + formatList(sl, {sep:"; ", lastJoiner:"; and "}) + "."
+    if (sl.length > 0) s +=  " " + lang.pronounVerb(this, "have", true) + " " + formatList(sl, {sep:";", lastJoiner:lang.list_and}) + "."
+    if (this.examineAddendum) s += ' ' + this.examineAddendum
+    if (this.hasCock) {
+      if (!this.getOuterWearable('groin')) s += ' His cock is ' + this.erectionShortDescs[this.erection] + '.'
+    }
     msg(s, {item:this})
   }
   
@@ -282,23 +307,83 @@ const ACTOR = function(isFemale, isPlayer) {
   
   // --------------  CLOTHING ---------------------------
   
+  // ignore footwear
+  
+  res.typeData = [
+    { name:'dress', pos:'both', },
+    { name:'shirt',  pos:'top', },
+    { name:'teeshirt', pos:'top', },
+    { name:'vesttop', pos:'top', },
+    { name:'halter', pos:'top', },
+    { name:'jacket', pos:'top', },
+    { name:'underwear', pos:'bottom', },
+    { name:'pants', pos:'bottom', },
+    { name:'shorts', pos:'bottom', },
+    { name:'skirt', pos:'bottom', },
+  ]
+  
+  // gives a quick one ort two word description of the character's attire (igores footwear)
+  // naked
+  //
+  // Swimwear only:
+  // swimsuit
+  // sling bikini
+  // swimwear topless
+  // bikini
+  // 
+  // Others are determined by what is on the top and bottom, with the bottom first
+  // (note no bottomless)
+  // bottom: dress underwear pants shorts skirt
+  // top: dress jacket teeshirt shirt vesttop halter topless
+  //
+  // Defaults to unclassified
+  //
+  res.getAttireDescriptor = function() {
+    const visible = this.getWearingVisible().filter(el => !el.footwear)
+    if (visible.length === 0) return 'naked'
+    if (visible.length === 1 && visible[0].subtype === 'swimsuit') return 'swimsuit'
+    if (visible.length === 1 && visible[0].subtype === 'slingbikini') return 'sling bikini'
+    if (visible.length === 1 && visible[0].garmentType === 'swimwear' && visible[0].subtype === 'underwear') return 'swimwear topless'
+    if (visible.length === 2 && visible[0].garmentType === 'swimwear' && visible[1].garmentType === 'swimwear') return 'bikini'
+    
+    const flags = {}
+    for (let el of this.typeData) flags[el.name] = false
+    for (let el of visible) flags[el.subtype] = true
+    
+    if (flags.jacket && flags.dress) return 'jacket dress'
+    if (flags.dress && flags.pants) return 'dress pants'
+    if (flags.dress) return 'dress'
+    
+    let top = 'topless'
+    let bottom = ''
+    for (let el of this.typeData) {
+      if (el.pos === 'top' && flags[el.name]) top = el.name
+      if (el.pos === 'bottom' && flags[el.name]) bottom = el.name
+    }
+    if (bottom) return bottom + ' ' + top
+
+    return 'unclassified'   
+  }
   
   
+  
+  res.getWearableOn = function(slot) {
+    const clothing = this.getWearing().filter(function(el) {
+      if (typeof el.getSlots !== "function") {
+        console.log("Item with worn set to true, but no getSlots function")
+        console.log(el)
+      }
+      return el.getSlots().includes(slot)
+    })
+    return clothing
+  }
   
   res.getOuterWearable = function(slot, considerBondage) {
-   
     if (considerBondage && this.restraint) {
       const slots = w[this.restraint].getHides(this)
       if (slots.includes(slot)) return w[this.restraint]
     }
-
-    const clothing = this.getWearing().filter(function(el) {
-      if (typeof el.getSlots !== "function") {
-        console.log("Item with worn set to true, but no getSlots function");
-        console.log(el);
-      }
-      return el.getSlots().includes(slot);
-    });
+    const clothing = this.getWearableOn(slot)
 
     if (clothing.length === 0) { return false; }
     let outer = clothing[0];
@@ -308,6 +393,10 @@ const ACTOR = function(isFemale, isPlayer) {
       }
     }
     return outer;
+  }
+  res.isBare = function(slot, considerBondage) {
+    const clothing = this.getWearableOn(slot)
+    return clothing.length === 0
   }
   
   res.getWearingVisible = function() {
@@ -427,8 +516,12 @@ const ACTOR = function(isFemale, isPlayer) {
 
 
   // Get a rating of how much the character is will to show, given how public the room is.
+  // result varies from 0 to 25 I think
+  // public rating should be from 0 (private) to 10 (very public)
+  // willingToExpose is from 0 to 10, defaults to 5
+  
   // If the public is:
-  // 0 should be 10 for anyone
+  // 0 this will give 25 for anyone
   // 5, maybe 6
   // 10, should be maybe 3, from 0
   
@@ -556,14 +649,14 @@ const ACTOR = function(isFemale, isPlayer) {
   }
   
   res.baseAttraction = function(target) {
-    this["attraction_" + target.name] = 0;
+    this["attraction_" + target.name] = this.getInstantAttraction(target);
   }
   
   // how attracted is the character to the appearance of the target?
   // Ranges from 10 to 0 (indifference) to -5 (horrified)
   res.getInstantAttraction = function(target) {
     const attact = target.isFemale ? this.attactedToWomen : this.attactedToMen
-    return Math.floor(Math.log((target.getExposure() + 15) * (attact - 0) * target.appearance / 1 + 1) * 2 - 5);  // 0 - 24
+    return Math.floor(Math.log((target.getExposure() + 15) * (attact - 0) * target.appearance / 1 + 1) * 2 - 5);  // -5 - 10
   }
   
   res.modifyAttraction = function(target, amount) {

@@ -1,37 +1,48 @@
 "use strict";
 
 
+settings.fluids = ['cum', 'water', 'honey', 'yoghurt']
+
+
 tp.addDirective("description", function(arr, params) {
-  return typeof params.item.getDescription === "function" ? params.item.getDescription() : params.item.getDescription;
+  return typeof params.item.getDescription === "function" ? params.item.getDescription() : params.item.description;
 });
 
 tp.addDirective("attire", function(arr, params) {
   const l = params.item.getWearingVisible()
-  return formatList(l, {article:INDEFINITE, lastJoiner:" and ", nothing:"nothing", npc:true, modified:false});
+  return formatList(l, {article:INDEFINITE, lastJoiner:lang.list_and, nothing:"nothing", npc:true, noWorn:true, modified:arr[0] === 'mod', enhanced:true, noBrackets:true});
 });
 
 tp.addDirective("posture", function(arr, params) {
-  if (!params.item.posture) return '';
-  return params.item.getPostureDescription();
-});
+  if (!params.item.posture) return ''
+  return params.item.getPostureDescription()
+})
 
 tp.addDirective("ifPosture", function(arr, params) {
   return params.item.posture && params.item.posture !== "standing" ? arr.join(":") : "";
 });
 
+tp.addDirective("bpAdjective", function(arr, params) {
+  let name = arr.shift()
+  const obj = tp._findObject(name, params, arr)
+  if (!obj) return errormsg("Failed to find object '" + name + "' in text processor 'bpAdjective' (" + params.tpOriginalString + ")")
+  name = arr.shift()
+  return obj.getBodyPartAdjective(name)
+})
+
 tp.addDirective("restraint", function(arr, params) {
-  if (!params.item.restraint) return '';
-  return params.item.restraint.situation;
-});
+  if (!params.item.restraint) return ''
+  return params.item.restraint.situation
+})
 
 tp.addDirective("ifRestraint", function(arr, params) {
-  return params.item.restraint ? arr.join(":") : "";
-});
+  return params.item.restraint ? arr.join(":") : ""
+})
 
 tp.addDirective("ifBare", function(arr, params) {
-  const bodyPart = w[arr.shift()];
+  const bodyPart = w[arr.shift()]
   return params.item.isBodyPartBare(bodyPart) ? arr.join(":") : "";
-});
+})
 
 // {arouse:chr:amt}
 tp.addDirective("arouse", function(arr, params) {

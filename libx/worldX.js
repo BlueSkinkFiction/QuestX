@@ -106,60 +106,26 @@ for (let key in w) {
 
 
 
-createItem("substance_prototype", {
-});
 
 
 erotica.ejaculate = function(actor, dest, extra) {
-  const cum = cloneObject(w.substance_prototype)
-  cum.owner = actor.name
-  cum.substance = "cum"
-  cum.loc = dest.name ? dest.name : dest
-  cum.subloc = extra
-  return cum
+  if (typeof dest === 'string') dest = w[dest]
+  if (!dest.cumMess) dest.cumMess = []
+  dest.cumMess.push(actor.name + (extra ? "_" + extra : ''))
 }
 
 erotica.pourOn = function(dest, substance, extra) {
-  const subst = cloneObject(w.substance_prototype)
-  subst.substance = substance
-  subst.loc = dest.name ? dest.name : dest
-  subst.subloc = extra
-  return subst
+  if (typeof dest === 'string') dest = w[dest]
+  if (!dest.substanceMess) dest.substanceMess = []
+  dest.substanceMess.push(substance + (extra ? "_" + extra : ''))
 }
 
 
-erotica.findCum = function(obj) {
-  const cumlist = []
-  for (let key in w) {
-    if (w[key].substance === "cum" && w[key].loc === obj.name) cumlist.push(w[key])
-  }
-  return cumlist
-}
-
-// Use for objects to get a list of substance objects
-erotica.findSubstances = function(obj) {
-  const list = []
-  for (let key in w) {
-    if (w[key].substance && w[key].loc === obj.name && !list.includes(w[key].substance)) {
-      list.push(w[key].substance)
-    }
-  }
-  return list
-}
 
 
-// Use for NPCs to get a dictionary of arrays, the key is the substance, the array the bodypart
-erotica.findGroupedSubstances = function(obj) {
-  const list = {}
-  for (let key in w) {
-    if (w[key].substance && w[key].loc === obj.name) {
-      const subst = w[key].substance
-      if (!list[subst]) list[subst] = []        
-      list[subst].push(w[key].subloc)
-    }
-  }
-  return list
-}
+
+
+
 
 erotica.findSource = function(actor, substance) {
   const l = scopeHeldBy(actor);

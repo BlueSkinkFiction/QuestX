@@ -10,31 +10,39 @@
 erotica.titsSynonyms = ['tits', 'boobs', 'breasts']
 erotica.bigTitsSynonyms = ['tits', 'cans', 'hooters', 'gazongas', 'melons']
 
+// These are lists (hashes) of lists that are useful when creating the NPC
+erotica.maleLists = {}
+erotica.femaleLists = {}
+
+// These are master lists (hashes) of all features that can be accessed during play
+// to quickly retrieve the features of an NPC
+erotica.maleLists.features = {}
+erotica.femaleLists.features = {}
 
 
-erotica.smallBustFeature = { type:'bust', form:'has', s:'{random:modest tits:slight breasts:little in the way of tits:small tits:hardly any boobs}'},
-erotica.bigBustFeature = { type:'bust', form:'has', s:'{random:impressive:good-sized:great} {random:tits:boobs}'},
-erotica.hugeBustFeature = { type:'bust', form:'has', s:'{random:large:huge} {random:tits:gazongas:jugs}'},
-
-erotica.smallCockFeature = { type:'cock', form:'has', bp:'cock', s:'a {random:small:less than impressive:disappointing} {random:willy:todger}'},
-erotica.bigCockFeature = { type:'cock', form:'has', bp:'cock', s:'a {random:impressive:good-sized:great} {random:cock:dick}'},
-erotica.hugeCockFeature = { type:'cock', form:'has', bp:'cock', s:'a {random:large:huge} {random:cock:dick}'},
 
 
-erotica.maleFeatures = []
-erotica.femaleFeatures = []
+erotica.femaleLists.features.smallBustFeature = { type:'bust', form:'has', s:'{random:modest tits:slight breasts:little in the way of tits:small tits:hardly any boobs}'},
+erotica.femaleLists.features.bigBustFeature = { type:'bust', form:'has', s:'{random:impressive:good-sized:great} {random:tits:boobs}'},
+erotica.femaleLists.features.hugeBustFeature = { type:'bust', form:'has', s:'{random:large:huge} {random:tits:gazongas:jugs}'},
+
+erotica.maleLists.features.smallCockFeature = { type:'cock', form:'has', bp:'cock', s:'a {random:small:less than impressive:disappointing} {random:willy:todger}'},
+erotica.maleLists.features.bigCockFeature = { type:'cock', form:'has', bp:'cock', s:'a {random:impressive:good-sized:great} {random:cock:dick}'},
+erotica.maleLists.features.hugeCockFeature = { type:'cock', form:'has', bp:'cock', s:'a {random:large:huge} {random:cock:dick}'},
 
 
-erotica.femaleFeatures.small = { type:'size', form:'is', s:'{random:a small woman:small:petite:a petite woman}'},
-erotica.femaleFeatures.big = { type:'size', form:'is', s:'{random:a tall woman:tall:Amazonian in stature}'},
-erotica.maleFeatures.small = { type:'size', form:'is', s:'{random:not so tall:on the short side:below average height}'},
-erotica.maleFeatures.big = { type:'size', form:'is', s:'{random:a tall guy:tall:statuesque}'},
 
-erotica.femaleFeatures.hot = { type:'attraction', form:'is', s:'{random:attractive:good-looking:sexy:alluring:beautiful:very good-looking}'},
-erotica.femaleFeatures.superHot = { type:'attraction', form:'is', s:'{random:super hot::stunning:amazingly attractive:so beautiful:drop-dead gorgeous}'},
 
-erotica.maleFeatures.hot = { type:'attraction', form:'is', s:'{random:handsome:good-looking:an attractive guy}'},
-erotica.maleFeatures.superHot = { type:'attraction', form:'is', s:'{random:super hot:very handsome:very good-looking:stunning:drop-dead gorgeous}'},
+erotica.femaleLists.features.small = { type:'size', form:'is', s:'{random:a small woman:small:petite:a petite woman}'},
+erotica.femaleLists.features.big = { type:'size', form:'is', s:'{random:a tall woman:tall:Amazonian in stature}'},
+erotica.maleLists.features.small = { type:'size', form:'is', s:'{random:not so tall:on the short side:below average height}'},
+erotica.maleLists.features.big = { type:'size', form:'is', s:'{random:a tall guy:tall:statuesque}'},
+
+erotica.femaleLists.features.hot = { type:'attraction', form:'is', s:'{random:attractive:good-looking:sexy:alluring:beautiful:very good-looking}'},
+erotica.femaleLists.features.superHot = { type:'attraction', form:'is', s:'{random:super hot::stunning:amazingly attractive:so beautiful:drop-dead gorgeous}'},
+
+erotica.maleLists.features.hot = { type:'attraction', form:'is', s:'{random:handsome:good-looking:an attractive guy}'},
+erotica.maleLists.features.superHot = { type:'attraction', form:'is', s:'{random:super hot:very handsome:very good-looking:stunning:drop-dead gorgeous}'},
 
 
 
@@ -83,7 +91,7 @@ erotica.features = [
   { type:'nose', form:'has', bp:'face', s:'a soft, petite nose'},
   { type:'nose', form:'has', bp:'face', s:'a bony nose'},
   { type:'nose', form:'has', bp:'face', s:'an aquiline nose'},
-  { type:'nose', form:'has', bp:'face', s:function(char) { return "a slight indentation in the tip of " + char.pronouns.poss_adj + " nose"}},
+  { type:'nose', form:'has', bp:'face', s:"a slight indentation in the tip of {pa:char} nose"},
 
   { type:'body', form:'has', s:'a muscled body'},
   { type:'body', form:'has', ifHas:'cock', s:'a muscled body'},
@@ -98,10 +106,13 @@ erotica.features = [
 
 ]
 
-erotica.maleFeatures.features = erotica.features
-erotica.femaleFeatures.features = erotica.features
+erotica.maleLists.extraFeatures = erotica.features
+erotica.femaleLists.extraFeatures = erotica.features
 
-
+for (let [i, el] of erotica.features.entries()) {
+  erotica.femaleLists.features['bonus_' + i] = el
+  erotica.maleLists.features['bonus_' + i] = el
+}
 
 
 
@@ -111,7 +122,7 @@ erotica.femaleFeatures.features = erotica.features
 erotica.eyeColors = [
   "amber",
   "blue",
-  "deeo blue",
+  "deep blue",
   "pale blue",
   "aquamarine",
   "brown",
@@ -124,28 +135,31 @@ erotica.eyeColors = [
   "hazel",
 ]
 
-erotica.eyeFeatureGeneric = { type:'eyes', form:'has', bp:'face', s:function(char) { return char.eyeColor + ' eyes'}},
-erotica.maleFeatures.eyeGeneric = erotica.eyeFeatureGeneric
-erotica.femaleFeatures.eyeGeneric = erotica.eyeFeatureGeneric
+erotica.eyeFeatureGeneric = { type:'eyes', form:'has', bp:'face', s:"{param:char:eyeColor} eyes"},
+erotica.maleLists.features.eyeGeneric = erotica.eyeFeatureGeneric
+erotica.femaleLists.features.eyeGeneric = erotica.eyeFeatureGeneric
+
 
 erotica.eyeFeatures = [
-  { type:'eyes', form:'has', bp:'face', s:function(char) { return 'upturned ' + char.eyeColor + ' eyes'}},
-  { type:'eyes', form:'has', bp:'face', s:function(char) { return 'downturned ' + char.eyeColor + ' eyes'}},
-  { type:'eyes', form:'has', bp:'face', s:function(char) { return 'warm ' + char.eyeColor + ' eyes'}},
-  { type:'eyes', form:'has', bp:'face', s:function(char) { return 'friendly ' + char.eyeColor + ' eyes'}},
-  { type:'eyes', form:'has', bp:'face', s:function(char) { return 'doleful ' + char.eyeColor + ' eyes'}},
-  { type:'eyes', form:'has', bp:'face', s:function(char) { return 'doe-like ' + char.eyeColor + ' eyes'}},
-  { type:'eyes', form:'has', bp:'face', s:function(char) { return 'soulful ' + char.eyeColor + ' eyes'}},
-  { type:'eyes', form:'has', bp:'face', s:function(char) { return 'almond-shaped ' + char.eyeColor + ' eyes'}},
-  { type:'eyes', form:'has', bp:'face', s:function(char) { return 'moon-shaped ' + char.eyeColor + ' eyes'}},
-  { type:'eyes', form:'has', bp:'face', s:function(char) { return 'sparkling ' + char.eyeColor + ' eyes'}},
-  { type:'eyes', form:'has', bp:'face', s:function(char) { return 'staring ' + char.eyeColor + ' eyes'}},
-  { type:'eyes', form:'has', bp:'face', s:function(char) { return 'scary ' + char.eyeColor + ' eyes'}},
+  { type:'eyes', form:'has', bp:'face', s:'upturned {param:char:eyeColor} eyes'},
+  { type:'eyes', form:'has', bp:'face', s:'downturned {param:char:eyeColor} eyes'},
+  { type:'eyes', form:'has', bp:'face', s:'warm {param:char:eyeColor} eyes'},
+  { type:'eyes', form:'has', bp:'face', s:'friendly {param:char:eyeColor} eyes'},
+  { type:'eyes', form:'has', bp:'face', s:'doleful {param:char:eyeColor} eyes'},
+  { type:'eyes', form:'has', bp:'face', s:'doe-like {param:char:eyeColor} eyes'},
+  { type:'eyes', form:'has', bp:'face', s:'soulful {param:char:eyeColor} eyes'},
+  { type:'eyes', form:'has', bp:'face', s:'almond-shaped {param:char:eyeColor} eyes'},
+  { type:'eyes', form:'has', bp:'face', s:'moon-shaped {param:char:eyeColor} eyes'},
+  { type:'eyes', form:'has', bp:'face', s:'sparkling {param:char:eyeColor} eyes'},
+  { type:'eyes', form:'has', bp:'face', s:'staring {param:char:eyeColor} eyes'},
+  { type:'eyes', form:'has', bp:'face', s:'scary {param:char:eyeColor} eyes'},
 ]
   
-erotica.maleFeatures.eye = erotica.eyeFeatures
-erotica.femaleFeatures.eye = erotica.eyeFeatures
+erotica.maleLists.eyes = erotica.eyeFeatures
+erotica.femaleLists.eyes = erotica.eyeFeatures
 
+for (let [i, el] of erotica.femaleLists.eyes.entries()) erotica.femaleLists.features['eyes_' + i] = el
+for (let [i, el] of erotica.maleLists.eyes.entries()) erotica.maleLists.features['eyes_' + i] = el
 
 
 
@@ -153,10 +167,15 @@ erotica.femaleFeatures.eye = erotica.eyeFeatures
 // ---- SKIN TONE ---
 
 erotica.skinToneFeatures = [
-  { type:'skintone', form:'has', s:function(char) { return char.skinTone + " skin"}},
-  { type:'skintone', form:'has', s:function(char) { return "a " + char.skinTone + " skin tone"}},
-  { type:'skintone', form:'iso', s:function(char) { return sentenceCase(char.pronouns.poss_adj) + " skin is " + char.skinTone}},
+  { type:'skintone', form:'has', s:"{param:char:skinTone} skin"},
+  { type:'skintone', form:'has', s:"a {param:char:skinTone} skin tone"},
+  { type:'skintone', form:'iso', s:"{pa:char} skin is {param:char:skinTone}"},
 ]
+
+for (let [i, el] of erotica.skinToneFeatures.entries()) {
+  erotica.femaleLists.features['skin_' + i] = el
+  erotica.maleLists.features['skin_' + i] = el
+}
 
 erotica.erectionStates = [
   "shrivelled little",
@@ -267,6 +286,7 @@ erotica.altHairColors = [
   "bright yellow",
   "bright green",
 ]
+
   // Hair length
   // 0 Shaved
   // 1 buzzcut
@@ -279,170 +299,128 @@ erotica.altHairColors = [
   // 8 naval
   // 9 waist
   // 10 crotch
-erotica.femaleFeatures.hairStyles = [
-  
+erotica.femaleLists.hairStyles = [
+
   // long hair (6-10)
-  { type:'hair', hairLength:8, form:'has', bp:'head', s:function(char) { return "long " + char.hairColor + " hair cascading down " + char.pronouns.poss_adj + " back"}},
-  { type:'hair', hairLength:7, form:'has', bp:'head', s:function(char) { return "wavy long " + char.hairColor + " hair"}},
-  { type:'hair', hairLength:6, form:'has', bp:'head', s:function(char) { return "long, wild " + char.hairColor + " hair"}},
-  { type:'hair', hairLength:7, form:'has', bp:'head', s:function(char) { return "long, tousled " + char.hairColor + " hair"}},
-  { type:'hair', hairLength:8, form:'has', bp:'head', s:function(char) { return "long " + char.hairColor + " hair"}},
-  { type:'hair', hairLength:7, form:'has', bp:'head', s:function(char) { return "long " + char.hairColor + " hair in cornrow braids"}},
-  { type:'hair', hairLength:6, form:'has', bp:'head', s:function(char) { return "long " + char.hairColor + " hair swept to the left"}},
-  { type:'hair', hairLength:6, form:'has', bp:'head', s:function(char) { return "right-swept " + char.hairColor + " hair"}},
-  { type:'hair', hairLength:9, form:'has', bp:'head', s:function(char) { return "long, layered " + char.hairColor + " hair falling down her back"}},
-  { type:'hair', hairLength:7, form:'has', bp:'head', s:function(char) { return "sleek, straight and long " + char.hairColor + " hair"}},
-  { type:'hair', hairLength:6, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in long glamorous waves"}},
-  { type:'hair', hairLength:9, form:'has', bp:'head', s:function(char) { return "long " + char.hairColor + " hair tumbling down " + char.pronouns.poss_adj + " back"}},
-  { type:'hair', hairLength:7, form:'has', bp:'head', s:function(char) { return "wavy long " + char.hairColor + " hair"}},
-  { type:'hair', hairLength:7, form:'has', bp:'head', s:function(char) { return "long, wild " + char.hairColor + " hair"}},
-  { type:'hair', hairLength:7, form:'has', bp:'head', s:function(char) { return "long, tousled " + char.hairColor + " hair"}},
-  { type:'hair', hairLength:8, form:'has', bp:'head', s:function(char) { return "long " + char.hairColor + " hair"}},
-  { type:'hair', hairLength:7, form:'has', bp:'head', s:function(char) { return "long cornrow-braided " + char.hairColor + " hair"}},
-  { type:'hair', hairLength:7, form:'has', bp:'head', s:function(char) { return "long " + char.hairColor + " hair swept to the left"}},
-  { type:'hair', hairLength:6, form:'has', bp:'head', s:function(char) { return "right-swept " + char.hairColor + " hair"}},
-  { type:'hair', hairLength:7, form:'has', bp:'head', s:function(char) { return "long, layered " + char.hairColor + " hair falling to " + char.pronouns.poss_adj + " waist"}},
-  { type:'hair', hairLength:10, form:'has', bp:'head', s:function(char) { return "long, wild " + char.hairColor + " hair falling to well below " + char.pronouns.poss_adj + " waist"}},
-  { type:'hair', hairLength:8, form:'has', bp:'head', s:function(char) { return "long, sleek and straight " + char.hairColor + " hair"}},
-  { type:'hair', hairLength:6, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in long glamorous waves"}},
+  { type:'hair', hairLength:8, form:'has', bp:'head', s:"long {param:char:hairColor} hair cascading down {pa:char} back"},
+  { type:'hair', hairLength:7, form:'has', bp:'head', s:"wavy long {param:char:hairColor} hair"},
+  { type:'hair', hairLength:6, form:'has', bp:'head', s:"long, wild {param:char:hairColor} hair"},
+  { type:'hair', hairLength:7, form:'has', bp:'head', s:"long, tousled {param:char:hairColor} hair"},
+  { type:'hair', hairLength:8, form:'has', bp:'head', s:"long {param:char:hairColor} hair"},
+  { type:'hair', hairLength:7, form:'has', bp:'head', s:"long {param:char:hairColor} hair in cornrow braids"},
+  { type:'hair', hairLength:6, form:'has', bp:'head', s:"long {param:char:hairColor} hair swept to the left"},
+  { type:'hair', hairLength:6, form:'has', bp:'head', s:"right-swept {param:char:hairColor} hair"},
+  { type:'hair', hairLength:9, form:'has', bp:'head', s:"long, layered {param:char:hairColor} hair falling down her back"},
+  { type:'hair', hairLength:7, form:'has', bp:'head', s:"sleek, straight and long {param:char:hairColor} hair"},
+  
+  { type:'hair', hairLength:6, form:'has', bp:'head', s:"{param:char:hairColor} hair in long glamorous waves"},
+  { type:'hair', hairLength:9, form:'has', bp:'head', s:"long {param:char:hairColor} hair tumbling down {pa:char} back"},
+  { type:'hair', hairLength:7, form:'has', bp:'head', s:"long wavy {param:char:hairColor} hair"},
+  { type:'hair', hairLength:7, form:'has', bp:'head', s:"long, wild {param:char:hairColor} hair"},
+  { type:'hair', hairLength:7, form:'has', bp:'head', s:"long, tousled {param:char:hairColor} hair"},
+  { type:'hair', hairLength:8, form:'has', bp:'head', s:"long {param:char:hairColor} hair"},
+  { type:'hair', hairLength:7, form:'has', bp:'head', s:"long cornrow-braided {param:char:hairColor} hair"},
+  { type:'hair', hairLength:7, form:'has', bp:'head', s:"long {param:char:hairColor} hair swept to the left"},
+  { type:'hair', hairLength:6, form:'has', bp:'head', s:"right-swept {param:char:hairColor} hair"},
+  { type:'hair', hairLength:7, form:'has', bp:'head', s:"long, layered {param:char:hairColor} hair falling to {pa:char} waist"},
+  
+  { type:'hair', hairLength:10, form:'has', bp:'head', s:"long, wild {param:char:hairColor} hair falling to well below {pa:char} waist"},
+  { type:'hair', hairLength:8, form:'has', bp:'head', s:"long, sleek and straight {param:char:hairColor} hair"},
+  { type:'hair', hairLength:6, form:'has', bp:'head', s:"{param:char:hairColor} hair in long glamorous waves"},
 
   // ponytail, etc. (5-8)
-  { type:'hair', hairLength:7, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in braids"}},
-  { type:'hair', hairLength:8, form:'has', bp:'head', s:function(char) { return "long " + char.hairColor + " hair in braids"}},
-  { type:'hair', hairLength:5, form:'has', bp:'head', s:function(char) { return char.pronouns.poss_adj + "long " + char.hairColor + " hair in a high ponytail"}},
-  { type:'hair', hairLength:8, form:'has', bp:'head', s:function(char) { return char.pronouns.poss_adj + "long " + char.hairColor + " hair in a high ponytail that falls halfway down " + char.pronouns.poss_adj + " back"}},
-  { type:'hair', hairLength:5, form:'has', bp:'head', s:function(char) { return "long " + char.hairColor + " hair held in a tight ponytail"}},
-  { type:'hair', hairLength:6, form:'has', bp:'head', s:function(char) { return "long " + char.hairColor + " hair held in a ponytail"}},
-  { type:'hair', hairLength:6, form:'has', bp:'head', s:function(char) { return "long " + char.hairColor + " hair in a neat ponytail"}},
-  { type:'hair', hairLength:5, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in a half-ponytail"}},
-  { type:'hair', hairLength:6, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in a side-ponytail"}},
-  { type:'hair', hairLength:5, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in two pigtails"}},
-  { type:'hair', hairLength:7, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in long pigtails"}},
+  { type:'hair', hairLength:7, form:'has', bp:'head', s:"{param:char:hairColor} hair in braids"},
+  { type:'hair', hairLength:8, form:'has', bp:'head', s:"long {param:char:hairColor} hair in braids"},
+  { type:'hair', hairLength:5, form:'has', bp:'head', s:"{pa:char} long {param:char:hairColor} hair in a high ponytail"},
+  { type:'hair', hairLength:8, form:'has', bp:'head', s:"{pa:char} long {param:char:hairColor} hair in a high ponytail that falls halfway down {pa:char} back"},
+  { type:'hair', hairLength:5, form:'has', bp:'head', s:"long {param:char:hairColor} hair held in a tight ponytail"},
+  { type:'hair', hairLength:6, form:'has', bp:'head', s:"long {param:char:hairColor} hair held in a ponytail"},
+  { type:'hair', hairLength:6, form:'has', bp:'head', s:"long {param:char:hairColor} hair in a neat ponytail"},
+  
+  { type:'hair', hairLength:5, form:'has', bp:'head', s:"{param:char:hairColor} hair in a half-ponytail"},
+  { type:'hair', hairLength:6, form:'has', bp:'head', s:"{param:char:hairColor} hair in a side-ponytail"},
+  { type:'hair', hairLength:5, form:'has', bp:'head', s:"{param:char:hairColor} hair in two pigtails"},
+  { type:'hair', hairLength:7, form:'has', bp:'head', s:"{param:char:hairColor} hair in long pigtails"},
   
   // short hair (1-5)
-  { type:'hair', hairLength:5, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair that brushes " + char.pronouns.poss_adj + " shoulders"}},
-  { type:'hair', hairLength:3, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in a short fro"}},
-  { type:'hair', hairLength:4, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in a short bob"}},
-  { type:'hair', hairLength:4, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in a bob"}},
-  { type:'hair', hairLength:5, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in a bob with outward curls"}},
-  { type:'hair', hairLength:5, form:'has', bp:'head', s:function(char) { return "slicked-back, shoulder-length " + char.hairColor + " hair"}},
-  { type:'hair', hairLength:5, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in a shoulder-grazing bob"}},
-  { type:'hair', hairLength:5, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in a curly bob"}},
-  { type:'hair', hairLength:2, form:'has', bp:'head', s:function(char) { return "pixie-cut " + char.hairColor + " hair"}},
-  { type:'hair', hairLength:1, form:'has', bp:'head', s:function(char) { return "buzz-cut " + char.hairColor + " hair"}},
-  { type:'hair', hairLength:2, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in a crew-cut"}},
-  { type:'hair', hairLength:2, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in a short, Mohawk-style"}},
-  { type:'hair', hairLength:5, form:'has', bp:'head', s:function(char) { return char.pronouns.poss_adj + " " + char.hairColor + " hair in a halo of curls"}},
-]
-
-erotica.maleFeatures.hairStyles = [
+  { type:'hair', hairLength:5, form:'has', bp:'head', s:"{param:char:hairColor} hair that brushes {pa:char} shoulders"},
+  { type:'hair', hairLength:3, form:'has', bp:'head', s:"{param:char:hairColor} hair in a short fro"},
+  { type:'hair', hairLength:4, form:'has', bp:'head', s:"{param:char:hairColor} hair in a short bob"},
+  { type:'hair', hairLength:4, form:'has', bp:'head', s:"{param:char:hairColor} hair in a bob"},
+  { type:'hair', hairLength:5, form:'has', bp:'head', s:"{param:char:hairColor} hair in a bob with outward curls"},
+  { type:'hair', hairLength:5, form:'has', bp:'head', s:"slicked-back, shoulder-length {param:char:hairColor} hair"},
   
-  // long hair (6-10)
-  { type:'hair', hairLength:8, form:'has', bp:'head', s:function(char) { return "long " + char.hairColor + " hair cascading down " + char.pronouns.poss_adj + " back"}},
-  { type:'hair', hairLength:7, form:'has', bp:'head', s:function(char) { return "wavy long " + char.hairColor + " hair"}},
-  { type:'hair', hairLength:6, form:'has', bp:'head', s:function(char) { return "long, wild " + char.hairColor + " hair"}},
-
-  // ponytail, etc. (5-8)
-  { type:'hair', hairLength:6, form:'has', bp:'head', s:function(char) { return "long " + char.hairColor + " hair held in a ponytail"}},
-  { type:'hair', hairLength:6, form:'has', bp:'head', s:function(char) { return "long " + char.hairColor + " hair in a neat ponytail"}},
-  
-  // short hair (1-5)
-  { type:'hair', hairLength:5, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair that brushes " + char.pronouns.poss_adj + " shoulders"}},
-  { type:'hair', hairLength:3, form:'has', bp:'head', s:function(char) { return "slicked-back " + char.hairColor + " hair"}},
-  { type:'hair', hairLength:1, form:'has', bp:'head', s:function(char) { return "buzz-cut " + char.hairColor + " hair"}},
-  { type:'hair', hairLength:1, form:'has', bp:'head', s:function(char) { return "buzz-cut " + char.hairColor + " hair"}},
-  { type:'hair', hairLength:1, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in a buzz-cut"}},
-  { type:'hair', hairLength:2, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in a crew-cut"}},
-  { type:'hair', hairLength:2, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in a flat-top"}},
-  { type:'hair', hairLength:2, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in a short, Mohawk-style"}},
-  { type:'hair', hairLength:4, form:'has', bp:'head', s:function(char) { return char.hairColor + " hair in a high Mohawk-style"}},
-  { type:'hair', hairLength:2, form:'has', bp:'head', s:function(char) { return "spiky " + char.hairColor + " hair"}},
-
-  { type:'hair', hairLength:0, form:'has', bp:'head', s:function(char) { return "a shaven head"}},
-  { type:'hair', hairLength:0, form:'has', bp:'head', s:function(char) { return "a shaven head"}},
-  { type:'hair', hairLength:0, form:'has', bp:'head', s:function(char) { return "a shaven head"}},
-
+  { type:'hair', hairLength:5, form:'has', bp:'head', s:"{param:char:hairColor} hair in a shoulder-grazing bob"},
+  { type:'hair', hairLength:5, form:'has', bp:'head', s:"{param:char:hairColor} hair in a curly bob"},
+  { type:'hair', hairLength:2, form:'has', bp:'head', s:"pixie-cut {param:char:hairColor} hair"},
+  { type:'hair', hairLength:1, form:'has', bp:'head', s:"buzz-cut {param:char:hairColor} hair"},
+  { type:'hair', hairLength:2, form:'has', bp:'head', s:"{param:char:hairColor} hair in a crew-cut"},
+  { type:'hair', hairLength:2, form:'has', bp:'head', s:"{param:char:hairColor} hair in a short, Mohawk-style"},
+  { type:'hair', hairLength:5, form:'has', bp:'head', s:"{pa:char}  {param:char:hairColor} hair in a halo of curls"},
 ]
 
 
+
+erotica.maleLists.hairStyles = [
+  
+  // long hair (6-10)
+  { type:'hair', hairLength:8, form:'has', bp:'head', s:"long {param:char:hairColor} hair cascading down {pa:char} back"},
+  { type:'hair', hairLength:7, form:'has', bp:'head', s:"wavy long {param:char:hairColor} hair"},
+  { type:'hair', hairLength:6, form:'has', bp:'head', s:"long, wild {param:char:hairColor} hair"},
+
+  // ponytail, etc. (5-8)
+  { type:'hair', hairLength:6, form:'has', bp:'head', s:"long {param:char:hairColor} hair held in a ponytail"},
+  { type:'hair', hairLength:6, form:'has', bp:'head', s:"long {param:char:hairColor} hair in a neat ponytail"},
+  
+  // short hair (1-5)
+  { type:'hair', hairLength:5, form:'has', bp:'head', s:"{param:char:hairColor} hair that brushes {pa:char} shoulders"},
+  { type:'hair', hairLength:3, form:'has', bp:'head', s:"slicked-back {param:char:hairColor} hair"},
+  { type:'hair', hairLength:1, form:'has', bp:'head', s:"buzz-cut {param:char:hairColor} hair"},
+  { type:'hair', hairLength:1, form:'has', bp:'head', s:"buzz-cut {param:char:hairColor} hair"},
+  { type:'hair', hairLength:1, form:'has', bp:'head', s:"{param:char:hairColor} hair in a buzz-cut"},
+  { type:'hair', hairLength:2, form:'has', bp:'head', s:"{param:char:hairColor} hair in a crew-cut"},
+  { type:'hair', hairLength:2, form:'has', bp:'head', s:"{param:char:hairColor} hair in a flat-top"},
+  { type:'hair', hairLength:2, form:'has', bp:'head', s:"{param:char:hairColor} hair in a short, Mohawk-style"},
+  { type:'hair', hairLength:4, form:'has', bp:'head', s:"{param:char:hairColor} hair in a high Mohawk-style"},
+  { type:'hair', hairLength:2, form:'has', bp:'head', s:"spiky {param:char:hairColor} hair"},
+
+  { type:'hair', hairLength:0, form:'has', bp:'head', s:"a shaven head"},
+  { type:'hair', hairLength:0, form:'has', bp:'head', s:"a shaven head"},
+  { type:'hair', hairLength:0, form:'has', bp:'head', s:"a shaven head"},
+
+]
+
+
+for (let [i, el] of erotica.femaleLists.hairStyles.entries()) erotica.femaleLists.features['hairStyle_' + i] = el
+for (let [i, el] of erotica.maleLists.hairStyles.entries()) erotica.maleLists.features['hairStyle_' + i] = el
 
 
 
 
 // ---- TATTOOS ---
 
-erotica.femaleFeatures.tattoos = [
-  
-  { type:'tattoo', form:'has', s:function(char) { return "tattoos all over " + char.pronouns.poss_adj + " body"}},
-
-  { type:'tattoo', form:'has', bp:'upperback', script:erotica.setTattooImage, s:function(char) {
-    return char.tattooImage + " tattooed on " + char.pronouns.poss_adj + " left shoulder blade"
-  }},
-
-  { type:'tattoo', form:'has', bp:'lowerback', script:erotica.setTattooImage, s:function(char) {
-    return char.tattooImage + " tattooed on " + char.pronouns.poss_adj + " lower back"
-  }},
-
-  { type:'tattoo', form:'has', bp:'midriff', script:erotica.setTattooImage, s:function(char) {
-    return char.tattooImage + " tattooed on " + char.pronouns.poss_adj + " her midriff"
-  }},
-
-  { type:'tattoo', form:'has', bp:'tit', script:erotica.setTattooImage, s:function(char) {
-    return char.tattooImage + " tattooed on " + char.pronouns.poss_adj + " left breast"
-  }},
-
-  { type:'tattoo', form:'has', bp:'buttock', script:erotica.setTattooImage, s:function(char) {
-    return char.tattooImage + " tattooed on " + char.pronouns.poss_adj + " left buttock"
-  }},
-
-
-  { type:'tattoo', form:'has', bp:'thigh', script:erotica.setTattooQuote, s:function(char) {
-    return "the words \"" + char.tattooQuote + "\" tattooed on " + char.pronouns.poss_adj + " left thigh"
-  }},
-
-  { type:'tattoo', form:'has', bp:'arm', script:erotica.setTattooQuote, s:function(char) {
-    return "the words \"" + char.tattooQuote + "\" tattooed on " + char.pronouns.poss_adj + " left arm"
-  }},
-
-  { type:'tattoo', form:'has', bp:'midriff', script:erotica.setTattooQuote, s:function(char) {
-    return "the words \"" + char.tattooQuote + "\" tattooed just above " + char.pronouns.poss_adj + " waist"
-  }},
+erotica.femaleLists.tattoos = [
+  { type:'tattoo', form:'has', s:"tattoos all over {pa:char} body" },
+  { type:'tattoo', form:'has', bp:'upperback', script:erotica.setTattooImage, s: "{param:char:tattooImage} tattooed on {pa:char} left shoulder blade" },
+  { type:'tattoo', form:'has', bp:'lowerback', script:erotica.setTattooImage, s: "{param:char:tattooImage} tattooed on {pa:char} lower back" },
+  { type:'tattoo', form:'has', bp:'midriff', script:erotica.setTattooImage, s: "{param:char:tattooImage} tattooed on {pa:char} her midriff" },
+  { type:'tattoo', form:'has', bp:'tit', script:erotica.setTattooImage, s: "{param:char:tattooImage} tattooed on {pa:char} left breast" },
+  { type:'tattoo', form:'has', bp:'buttock', script:erotica.setTattooImage, s: "{param:char:tattooImage} tattooed on {pa:char} left buttock" },
+  { type:'tattoo', form:'has', bp:'thigh', script:erotica.setTattooQuote, s: "the words \"{param:char:tattooQuote}\" tattooed on {pa:char} left thigh" },
+  { type:'tattoo', form:'has', bp:'arm', script:erotica.setTattooQuote, s: "the words \"{param:char:tattooQuote}\" tattooed on {pa:char} left arm" },
+  { type:'tattoo', form:'has', bp:'midriff', script:erotica.setTattooQuote, s: "the words \"{param:char:tattooQuote}\" tattooed just above {pa:char} waist" },
 ]
 
-erotica.maleFeatures.tattoos = [
-  
-  { type:'tattoo', form:'has', bp:'arm', s:function(char) { return "large tribal tattoos covering both " + char.pronouns.poss_adj + " arms"}},
-  { type:'tattoo', form:'has', s:function(char) { return "tattoos all over " + char.pronouns.poss_adj + " body"}},
-
-  { type:'tattoo', form:'has', bp:'upperback', script:erotica.setTattooImage, s:function(char) {
-    return char.tattooImage + " tattooed on " + char.pronouns.poss_adj + " back"
-  }},
-
-  { type:'tattoo', form:'has', bp:'chest', script:erotica.setTattooImage, s:function(char) {
-    return char.tattooImage + " tattooed on " + char.pronouns.poss_adj + " chest"
-  }},
-
-  { type:'tattoo', form:'has', bp:'midriff', script:erotica.setTattooImage, s:function(char) {
-    return char.tattooImage + " tattooed on " + char.pronouns.poss_adj + " stomach"
-  }},
-
-  { type:'tattoo', form:'has', bp:'arm', script:erotica.setTattooImage, s:function(char) {
-    return char.tattooImage + " tattooed on " + char.pronouns.poss_adj + " upper left arm"
-  }},
-
-  { type:'tattoo', form:'has', bp:'arm', script:erotica.setTattooImage, s:function(char) {
-    return char.tattooImage + " tattooed on " + char.pronouns.poss_adj + " upper right arm"
-  }},
-
-  { type:'tattoo', form:'has', bp:'buttock', script:erotica.setTattooImage, s:function(char) {
-    return char.tattooImage + " tattooed on " + char.pronouns.poss_adj + " left buttock"
-  }},
-
-
-  { type:'tattoo', form:'has', bp:'thigh', script:erotica.setTattooQuote, s:function(char) {
-    return "the words \"" + char.tattooQuote + "\" tattooed on " + char.pronouns.poss_adj + " right arm"
-  }},
-
+erotica.maleLists.tattoos = [
+  { type:'tattoo', form:'has', bp:'arm', s:"large tribal tattoos covering both {pa:char} arms" },
+  { type:'tattoo', form:'has', s:"tattoos all over {pa:char} body" },
+  { type:'tattoo', form:'has', bp:'upperback', script:erotica.setTattooImage, s: "{param:char:tattooImage} tattooed on {pa:char} back" },
+  { type:'tattoo', form:'has', bp:'chest', script:erotica.setTattooImage, s: "{param:char:tattooImage} tattooed on {pa:char} chest" },
+  { type:'tattoo', form:'has', bp:'midriff', script:erotica.setTattooImage, s: "{param:char:tattooImage} tattooed on {pa:char} stomach" },
+  { type:'tattoo', form:'has', bp:'arm', script:erotica.setTattooImage, s: "{param:char:tattooImage} tattooed on {pa:char} upper left arm" },
+  { type:'tattoo', form:'has', bp:'arm', script:erotica.setTattooImage, s: "{param:char:tattooImage} tattooed on {pa:char} upper right arm" },
+  { type:'tattoo', form:'has', bp:'buttock', script:erotica.setTattooImage, s: "{param:char:tattooImage} tattooed on {pa:char} left buttock" },
+  { type:'tattoo', form:'has', bp:'thigh', script:erotica.setTattooQuote, s: "the words \"{param:char:tattooQuote}\" tattooed on {pa:char} right arm" },
 ]
 
 erotica.tattooImages = [
@@ -596,6 +574,10 @@ erotica.tattooQuotes = [
   "One Life One Love",
 ]
 
+
+
+for (let [i, el] of erotica.femaleLists.tattoos.entries()) erotica.femaleLists.features['tattoo_' + i] = el
+for (let [i, el] of erotica.maleLists.tattoos.entries()) erotica.maleLists.features['tattoo_' + i] = el
 
 
 
