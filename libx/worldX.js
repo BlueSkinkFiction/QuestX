@@ -72,10 +72,10 @@ createItem("bollock", GENITALS(9, true, /bollocks?|balls?|testicles?|nadgers?|nu
 createItem("cock", GENITALS(10, false, /cock|dick|phallus|penis|willy|manhood|organ|tool|pecker|schlong|prick|member|wang|knob|dong/), {
   modestyBoost:true,
   response_suck:function(char, object) {
-    msg(lang.nounVerb(char, "suck", true) + " " + lang.getName(object, {article:DEFINITE}) + " {cock:target}.", {target:object});
+    msg("{nv:char:suck:true} {pa:char} {nms:npc:true} {cock:npc}.", {npc:object, char:char});
   },
   response_lick:function(char, object) {
-    msg(lang.nounVerb(char, "run", true) + " " + char.pronouns.posessive + " tongue along the length of " + lang.getName(object, {article:DEFINITE}) + " hard cock.");
+    msg("{nv:char:run:true} {pa:char} tongue along the length of {nms:npc:true} hard cock.", {npc:object, char:char});
   },
   getSlot:function() { return "groin" },
 });
@@ -108,10 +108,10 @@ for (let key in w) {
 
 
 
-erotica.ejaculate = function(actor, dest, extra) {
+erotica.ejaculate = function(char, dest, extra) {
   if (typeof dest === 'string') dest = w[dest]
   if (!dest.cumMess) dest.cumMess = []
-  dest.cumMess.push(actor.name + (extra ? "_" + extra : ''))
+  dest.cumMess.push(char.name + (extra ? "_" + extra : ''))
 }
 
 erotica.pourOn = function(dest, substance, extra) {
@@ -127,23 +127,10 @@ erotica.pourOn = function(dest, substance, extra) {
 
 
 
-erotica.findSource = function(actor, substance) {
-  const l = scopeHeldBy(actor);
-  for (let i = 0; i < l.length; i++) {
-    if (l[i].isSource && l[i].isSource(substance)) {
-      return l[i];
-    }
-  }
-  return false;
-}
-
-
 
 
 
 erotica.verify = function() {
-  const checkFunctions = ["wearMsg", "removeMsg", "ripOff", "getSlots"]
-  const checkInts = ["strength"]
   for (let key in w) {
     if (w[key].wearable) {
       const slots = w[key].getSlots();
@@ -157,12 +144,11 @@ erotica.verify = function() {
           }
         }
       }
-      for (let i = 0; i < checkFunctions.length; i++) {
-        if (typeof w[key][checkFunctions[i]] !== "function") errormsg("No function'" + checkFunctions[i] + "' for garment " + w[key].name);
-      }
-      for (let i = 0; i < checkInts.length; i++) {
-        if (typeof w[key][checkInts[i]] !== "number") errormsg("No number'" + checkInts[i] + "' for garment " + w[key].name);
-      }
+      if (typeof w[key].ripOff !== "function") errormsg("No function 'ripOff' for garment " + w[key].name)
+      if (typeof w[key].getSlots !== "function") errormsg("No function 'getSlots' for garment " + w[key].name)
+      if (typeof w[key].specialWearMsg !== "function" && typeof w[key].wearMsg !== "string") errormsg("No 'wearMsg' for garment " + w[key].name)
+      if (typeof w[key].specialRemoveMsg !== "function" && typeof w[key].removeMsg !== "string") errormsg("No 'wearMsg' for garment " + w[key].name)
+      if (typeof w[key].strength !== "number") errormsg("No number'strength' for garment " + w[key].name);
     }
   }
   util.verifyResponses(erotica.defaultResponses)

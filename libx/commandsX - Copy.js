@@ -372,51 +372,32 @@ commands.unshift(new Cmd('Teabag', {
 
 
 
-/*function handleEmptyInto(char, vessel, sink) {
-  const options = {char:char, container:vessel, fluid:vessel.containedFluidName, sink:sink}
-  if (!vessel.vessel) return failedmsg(lang.not_vessel, options);
-  if (vessel.closed) return  failedmsg(lang.container_closed, options);
-  if (!char.canManipulate(vessel, "fill")) return world.FAILED;
-  if (!char.getAgreement("Fill", vessel)) return world.FAILED;
-  if (!vessel.isAtLoc(char.name)) return failedmsg(lang.not_carrying, {char:char, item:sink});
-  return vessel.doEmpty(options) ? world.SUCCESS: world.FAILED;
-}
-*/
-
-function cmdPourFluidOn(char, target, fluid, bodypart) {
-  for (const key in w) {
-    const o = w[key]
-    if (o.vessel && o.containedFluidName === fluid && o.loc === char.name) {
-      return cmdPourVesselOn(char, target, o, bodypart, undefined, "pour on")
-    }
-  }
-  return failedmsg(lang.not_carrying_fluid, {char:char, fluid:fluid});
-}
-
-function cmdPourFluidDown(char, target, fluid, bodypart) {
-  for (const key in w) {
-    const o = w[key]
-    if (o.vessel && o.containedFluidName === fluid && o.loc === char.name) {
-      return cmdPourVesselOn(char, target, o, undefined, garment, "pour down")
-    }
-  }
-  return failedmsg(lang.not_carrying_fluid, {char:char, fluid:fluid});
-}
 
 
-function cmdPourVesselOn(char, target, vessel, bodypart, garment, action) {
+
+
+function cmdPourOn(char, target, substance, bodypart) {
   //console.log(char)
   //console.log(target)
   //console.log(substance)
   //console.log(bodypart)
   
+  const source = util.findSource({char:char, fluid:substance})
+  if (!source) {
+    return failedmsg("No " + substance + " here to do that with.")
+  }
+  
   const params = {
     boss:player,
     char:char,
-    item:target,
-    action:action,
-    source:vessel,
-    substance:vessel.containedFluidName,
+    target:target,
+    action:"pour on",
+    source:source,
+    
+    //rating:rating,
+    //first:!object[firstName],
+    //firstFail:!object[firstName + "_failed"],
+    substance:substance,
   }
 
   if (bodypart !== undefined && bodypart.name !== 'torso') {
@@ -432,7 +413,39 @@ function cmdPourVesselOn(char, target, vessel, bodypart, garment, action) {
   return world.SUCCESS;
 }
 
+function cmdPourDown(char, target, substance, garment) {
+  console.log(char)
+  console.log(target)
+  console.log(substance)
+  console.log(garment)
+  
+  if (!garment.wearable || !garment.worn) {
+    return failedmsg("You can only pour stuff down clothing that is worn.")
+  }
+  
+  const source = util.findSource({char:char, fluid:substance})
+  if (!source) {
+    return failedmsg("No " + substance + " here to do that with.")
+  }
 
+  const params = {
+    boss:player,
+    char:char,
+    target:target,
+    action:"pour down",
+    garment:garment,
+    
+    //rating:rating,
+    //first:!object[firstName],
+    //firstFail:!object[firstName + "_failed"],
+    substance:substance,
+  }
+  
+  if (target.restraint) params.restraint = w[target.restraint]
+
+  respond(params, erotica.defaultResponses, respondCompleted);
+  return world.SUCCESS;
+}
 
 
 
@@ -448,9 +461,9 @@ commands.unshift(new Cmd("PourOn", {
   script:function(objects) {
     const char = extractChar(this, objects)
     if (!char) return world.FAILED
-    return cmdPourFluidOn(char, objects[1][0], objects[0])
+    return cmdPourOn(char, objects[1][0], objects[0])
   },
-}))
+}));
 
 commands.unshift(new Cmd("PourOnBP", {
   npcCmd:true,
@@ -465,9 +478,9 @@ commands.unshift(new Cmd("PourOnBP", {
   script:function(objects) {
     const char = extractChar(this, objects)
     if (!char) return world.FAILED
-    return cmdPourFluidOn(char, objects[1][0], objects[0], objects[2][0])
+    return cmdPourOn(char, objects[1][0], objects[0], objects[2][0])
   },
-}))
+}));
 
 commands.unshift(new Cmd("PourDown", {
   npcCmd:true,
@@ -482,63 +495,10 @@ commands.unshift(new Cmd("PourDown", {
   script:function(objects) {
     const char = extractChar(this, objects)
     if (!char) return world.FAILED
-    return cmdPourFluidDown(char, objects[1][0], objects[0], objects[2][0])
+    return cmdPourDown(char, objects[1][0], objects[0], objects[2][0])
   },
-}))
+}));
 
-
-
-
-
-commands.unshift(new Cmd("EmptyOn", {
-  npcCmd:true,
-  cmdCategory:'PourOn',
-  regex:/^(?:empty|pour out|pour|discharge|decant) (.+) (?:on to|on|down|over) (.+)$/,
-  objects:[
-    {scope:parser.isHeld},
-    {scope:parser.isNpcAndHere},
-  ],
-  useThisScriptForNpcs:true,
-  script:function(objects) {
-    const char = extractChar(this, objects)
-    if (!char) return world.FAILED
-    return cmdPourVesselOn(char, objects[1][0], objects[0][0], undefined, undefined, "pour on")
-  },
-}))
-
-commands.unshift(new Cmd("EmptyOnBP", {
-  npcCmd:true,
-  cmdCategory:'PourOn',
-  regex:/^(?:empty|pour out|pour|discharge|decant) (.+) (?:on to|on|over) (.+)'s (.+)$/,
-  objects:[
-    {scope:parser.isHeld},
-    {scope:parser.isNpcAndHere},
-    {scope:parser.isBodyPart}
-  ],
-  useThisScriptForNpcs:true,
-  script:function(objects) {
-    const char = extractChar(this, objects)
-    if (!char) return world.FAILED
-    return cmdPourVesselOn(char, objects[1][0], objects[0][0], objects[2][0], undefined, "pour on")
-  },
-}))
-
-commands.unshift(new Cmd("EmptyDown", {
-  npcCmd:true,
-  cmdCategory:'PourOn',
-  regex:/^(?:empty|pour out|pour|discharge|decant) (.+) down (.+)'s (.+)$/,
-  objects:[
-    {scope:parser.isHeld},
-    {scope:parser.isNpcAndHere},
-    {scope:parser.isHeldByNpc, attName:'garment'}
-  ],
-  useThisScriptForNpcs:true,
-  script:function(objects) {
-    const char = extractChar(this, objects)
-    if (!char) return world.FAILED
-    return cmdPourVesselOn(char, objects[1][0], objects[0][0], undefined, objects[2][0], "pour down")
-  },
-}))
 
 
 
@@ -621,6 +581,7 @@ erotica.ACTIONS = [
     intimateRating:10,
     getDefaultBodyPart:function(char, target) { return target.hasBodyPart("pussy") ? "pussy" : "ass" },
     extraTests:function(options) {
+      log(options)
       if (!options.bodypart.canBePenetrated) return falsemsg("{nv:char:cannot:true} put anything in {nm:bodypart:a}.", options)
       options.garment = options.item.getOuterWearable("crotch")
       if (options.garment) {
@@ -997,24 +958,6 @@ commands.unshift(new Cmd("LookAtBP", {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //--------------------------------------------------------
 //--  POSTURES --
 
@@ -1243,24 +1186,6 @@ for (let posture of erotica.POSTURES_LIST) {
 
 findCmd('Stand').score = -10
 findCmd('NpcStand').score = -10
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 //--------------------------------------------------------
 //--  CLOTHING RELATED  --

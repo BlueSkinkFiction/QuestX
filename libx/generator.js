@@ -59,7 +59,7 @@ erotica.createPerson = function(loc, female) {
 erotica.generate = function(char, list, averageSize) {
   char.eyeColor = random.fromArray(erotica.eyeColors)
   char.getDescription = erotica.getDescription
-  char.properName = true
+  char.properNoun = true
   char.size = random.int(1,3) + random.int(1,3) + averageSize - 4
   char.appearance = random.int(1,3) + random.int(1,3) + 4
   //log(random.buffer)

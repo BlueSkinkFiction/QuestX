@@ -99,18 +99,18 @@ const EROTIC_FURNITURE = function(options) {
   res.postureChangesImplemented = true
 
   if (options.bendover) {
-    res.bendover = function(isMultiple, char) {
-      return this.assumePosture(isMultiple, char, "bending", "bendover", "over");
+    res.bendover = function(options) {
+      return this.assumePosture(options, "bending", "bendover", "over");
     }
   }
   if (options.straddle) {
-    res.straddle = function(isMultiple, char) {
-      return this.assumePosture(isMultiple, char, "straddling", "straddle", "");
+    res.straddle = function(options) {
+      return this.assumePosture(options, "straddling", "straddle", "");
     }
   }
   if (options.recline) {
-    res.facedown = function(isMultiple, char) {
-      return this.assumePosture(isMultiple, char, "facedown", "facedown", "");
+    res.facedown = function(options) {
+      return this.assumePosture(options, "facedown", "facedown", "");
     }
   }
   
@@ -122,12 +122,12 @@ const EROTIC_FURNITURE = function(options) {
   res.hidesWhen_crawling = []
   res.hidesWhen_straddling = ["crotch"]
   res.hidesWhenBendover = ["chest", "tit", "nipple", "midriff", "groin"]
-  res.reclining_to_facedown = "{nv:actor:roll:true} on to {pa:actor} front."
-  res.facedown_to_reclining = "{nv:actor:roll:true} on to {pa:actor} back."
-  res.straddling_to_sitting = "{nv:actor:swing:true} around to sit properly on {nm:item:the}."
-  res.sitting_to_straddling = "{nv:actor:swing:true} around to straddle {nm:item:the}."
-  res.sitting_to_reclining = "{nv:actor:lie:true} back on {nm:item:the}."
-  res.reclining_to_sitting = "{nv:actor:sit:true} up on {nm:item:the}."
+  res.reclining_to_facedown = "{nv:char:roll:true} on to {pa:char} front."
+  res.facedown_to_reclining = "{nv:char:roll:true} on to {pa:char} back."
+  res.straddling_to_sitting = "{nv:char:swing:true} around to sit properly on {nm:item:the}."
+  res.sitting_to_straddling = "{nv:char:swing:true} around to straddle {nm:item:the}."
+  res.sitting_to_reclining = "{nv:char:lie:true} back on {nm:item:the}."
+  res.reclining_to_sitting = "{nv:char:sit:true} up on {nm:item:the}."
   return res;
 }
 
@@ -140,9 +140,9 @@ lang.facedown_on_successful = "{nv:char:lie:true} facedown on {nm:item:the}."
 
 // Sex toys
 
-const PHALLUS = function(canMove) {
+const PHALLUS = function(testMove) {
   const res = {
-    canMove:canMove,
+    testMove:testMove,
     dildo:true,
   };
   return res;
@@ -154,33 +154,38 @@ const GAG = function() {
   return res;
 }
 
-const BONDAGE_DEVICE = function(canMove) {
+const BONDAGE_DEVICE = function(testMove) {
   const res = {
     bondage:true,
-    canMove:canMove,
+    testMove:testMove,
     canManipulate:false,
     points:[],
     posture:'standing',
-    getHides:function(actor) { return [] },
-    cannotManipulateMsg:function(char, obj, verb) {
+    getHides:function(char) { return [] },
+    cannotManipulateObjMsg:function(char, verb) {
       if (verb === undefined) verb = "do anything with"
-      const objName = obj ? lang.getName(obj, {article:DEFINITE}) : "anything"
-      return lang.nounVerb(char, "can", true) + "not " + verb.toLowerCase() + " " + objName + " whilst " + lang.pronounVerb(char, "be") + " " + this.situation + "."
+      return "{pv:char:cannot:true} " + verb.toLowerCase() + " {nm:item:the} whilst {pv:char:be} " + this.situation + "."
     },
-    cannotMoveMsg:function(char, obj, verb) {
-      return lang.nounVerb(char, "can", true) + "not go anywhere whilst " + lang.pronounVerb(char, "be") + " " + this.situation + "."
+    cannotManipulateMsg:function(char, verb) {
+      if (verb === undefined) verb = "do anything"
+      return "{pv:char:cannot:true} not " + verb.toLowerCase() + " whilst {pv:char:be} " + this.situation + "."
+    },
+    cannotMoveMsg:function(char) {
+      return "{pv:char:be:true} not going anywhere whilst {pv:char:be} " + this.situation + "."
     },
     restrain:function(char, target) {
-      msg(this.restrainMsg(char, target))
+      msg(this.restrainMsg, {char:char, item:target})
       target.posture = this.posture
       delete target.postureFurniture
       target.restraint = this.name
       this.victim = target.name
     },
-    release:function(char, target) {
-      msg(this.releaseMsg(char, target))
+    release:function(char) {
+      const target = w[this.victim]
+      msg(this.releaseMsg, {char:char, item:target})
       delete target.restraint
       delete this.victim
+      target.posture = "standing"
     },
   };
   return res;

@@ -19,8 +19,8 @@ const ACTOR = function(isFemale, isPlayer) {
   res.hasPussy = isFemale
   res.hasTits = isFemale
   res.posture = "standing"
-  res.actor = true
-  res.properName = true
+  res.char = true
+  res.properNoun = true
   res.enjoysAnal = false
   res.slutty = 2
   res.exhibitionist = 2
@@ -33,6 +33,7 @@ const ACTOR = function(isFemale, isPlayer) {
   //res.responses = erotica.defaultResponses
   res.responseNotWhileTiedUp = "'Not while I'm tied up.'"
   res.insult = function(target) { return target.hasBodyPart("cock") ? "jerk" : "bitch" }
+  res.restraintSituation = function()  { return this.restraint.situation }
   
   res.doEvent = function() {
     if (this.npc) {
@@ -104,7 +105,7 @@ const ACTOR = function(isFemale, isPlayer) {
     const l = []
     for (let key in w) {
       const o = w[key]
-      if (o.actor && o !== this && o.loc === this.loc) l.push(o)
+      if (o.char && o !== this && o.loc === this.loc) l.push(o)
     }
     return l
   }
@@ -131,9 +132,9 @@ const ACTOR = function(isFemale, isPlayer) {
     if (!this.canPosture()) return world.FAILED;
     if (!forced && !this.getAgreement("Posture", posture.cmd)) return world.FAILED;
     if (this.postureFurniture) {
-      this.msg(stop_posture(this));  // stop_posture handles details
+      this.msg(stop_posture(this), {char:this});  // stop_posture handles details
     }  
-    this.msg(posture.getAssumePostureDescription(this, this.posture));
+    this.msg(posture.getAssumePostureDescription(this, this.posture), {char:this});
     this.posture = posture.desc;
     this.postureAddFloor = posture.addFloor;
     return world.SUCCESS;
@@ -167,48 +168,58 @@ const ACTOR = function(isFemale, isPlayer) {
 // Use for NPCs to get a dictionary of arrays, the key is the substance, the array the bodypart
   
   res.findGroupedSubstances = function() {
-    if (!this.substanceMess) return {}
+    if (!this.substanceMess) this.substanceMess = []
+    if (!this.cumMess) this.cumMess = []
     const list = {}
     for (const el of this.substanceMess) {
       const ary = el.split('_')
       if (!list[ary[0]]) list[ary[0]] = []        
       list[ary[0]].push(ary[1])
     }
+    for (const el of this.cumMess) {
+      const ary = el.split('_')
+      const char = w[ary[0]]
+      const subst = lang.getName(char, {article:DEFINITE, possessive:true}) + " cum"
+      if (!list[subst]) list[subst] = []
+      list[subst].push(ary[1])
+    }
     return list
   }
   res.erectionShortDescs = ['flacid', 'semi-erect', 'erect', 'hard', 'very hard', 'dripping pre-cum']
-  res.examine = function(isMultiple, char) {
-    let s = "{description} " + lang.pronounVerb(this, "be", true) + " wearing {attire:mod}."
-    if (this.posture && this.posture !== "standing") s += " " + lang.pronounVerb(this, "be", true) + " {posture}."
+  res.examine = function(objects) {
+    let s = "{description} {pv:item:be:true} wearing {attire:mod}"
+    s += this.getPostureDescription(true) + '.'
     const dict = this.findGroupedSubstances()
     const sl = []
     for (let key in dict) {
-      sl.push(key + " on " + this.pronouns.poss_adj + " " + formatList(dict[key], {lastJoiner:lang.list_and}))
+      sl.push(key + " on {pa:item} " + formatList(dict[key], {lastJoiner:lang.list_and}))
     }
-    if (sl.length > 0) s +=  " " + lang.pronounVerb(this, "have", true) + " " + formatList(sl, {sep:";", lastJoiner:lang.list_and}) + "."
-    if (this.examineAddendum) s += ' ' + this.examineAddendum
+    if (sl.length > 0) s +=  " {pv:item:have:true} " + formatList(sl, {sep:";", lastJoiner:lang.list_and}) + "."
+    if (this.examineAddendum) s += this.examineAddendum + ' '
     if (this.hasCock) {
-      if (!this.getOuterWearable('groin')) s += ' His cock is ' + this.erectionShortDescs[this.erection] + '.'
+      if (!this.getOuterWearable('groin')) s += ' {pa:item:true} cock is ' + this.erectionShortDescs[this.erection] + '.'
     }
-    msg(s, {item:this})
+    msg(s, objects)
   }
   
-  res.getPostureDescription = function(capitalise) {
-    if (!this.posture || this.posture === "standing") return false;
+  res.getPostureDescription = function(includePreamble) {
+    if (!this.posture || (this.posture === "standing" && !this.restraint)) return ''
 
-    const pos = this.posture.replace("#", this.pronouns.poss_adj);
+    const pos = this.posture.replace("#", this.pronouns.poss_adj)
+    let s
     if (this.restraint) {
-      return w[this.restraint].situation;  // ??? does this need personalising?
+      s = w[this.restraint].situation
     }
     else if (this.postureFurniture) {
-      return pos + " " + this.postureAdverb + " " + lang.getName(w[this.postureFurniture], {article:DEFINITE});
+      s = pos + " " + this.postureAdverb + " " + lang.getName(w[this.postureFurniture], {article:DEFINITE})
     }
     else if (this.postureAddFloor) {
-      return pos + " on the " + (w[this.loc].postureSurface || "floor");
+      s = pos + " on the " + (w[this.loc].postureSurface || "floor")
     }
     else {
-      return pos;
+      s = pos
     }
+    return includePreamble ? ', and {cj:item:be} '  + s : s
     
   }
 
@@ -226,7 +237,7 @@ const ACTOR = function(isFemale, isPlayer) {
   
   // --------------  BODY PARTS ---------------------------
   
-  // You can override this to have an erotic actor have, for example, both a cock and tits
+  // You can override this to have an erotic char have, for example, both a cock and tits
   // or to have novel body parts, such as a tail
   // Unit tested
   res.hasBodyPart = function(bp) {
@@ -258,8 +269,8 @@ const ACTOR = function(isFemale, isPlayer) {
       return this.bodyPartDescs[bp_name](this)
     }
 
-    if (w[bp_name].paired) return lang.pronounVerb(this, "have", true) + " " + this.getBodyPartAdjective(bp_name) + " " + w[bp_name].pluralAlias + "."
-    return lang.pronounVerb(this, "have", true) + " a " + this.getBodyPartAdjective(bp_name) + " " + bp_name + "."
+    if (w[bp_name].paired) return "{pv:item:have:true} " + this.getBodyPartAdjective(bp_name) + " " + w[bp_name].pluralAlias + "."
+    return "{pv:item:have:true} a " + this.getBodyPartAdjective(bp_name) + " " + bp_name + "."
   }
   
   // You can override this to give a specific body part an adjective
@@ -294,7 +305,7 @@ const ACTOR = function(isFemale, isPlayer) {
   res.getDefaultBodyPartAdjective = function() {
     return this.hasCock ? "muscled" : "smooth";
   }
-  // You can override this to have an erotic actor have a fetish for a body part
+  // You can override this to have an erotic char have a fetish for a body part
   // Have it return a number for a recognised body part, or false for anything else
   res.getIntimateRating = function(bp_name) {
     return false;
@@ -476,6 +487,7 @@ const ACTOR = function(isFemale, isPlayer) {
     return res;
   }
 
+  res.getFootwear = function() { return this.getWearing().filter(el => el.footwear) }
 
 
   // returns true if every visible garment is of one of the types specified
@@ -689,7 +701,7 @@ const ACTOR = function(isFemale, isPlayer) {
   // Unit tested
   res.getWillingToGo = function(dir) {
     const willingHere = this.getWillingToExposeHere() - this.getExposure();
-    const willingThere = this.getWillingToExpose(w[game.room[dir].name]) - this.getExposure();
+    const willingThere = this.getWillingToExpose(w[currentLocation[dir].name]) - this.getExposure();
 
     if (willingThere >= 3) return erotica.HAPPY;
     if (willingThere > willingHere) return erotica.HAPPY;
@@ -744,7 +756,7 @@ const ACTOR = function(isFemale, isPlayer) {
   // Should also bail if the character is not happy about taking orders too.
   // Whether erotica.RELUCTANT returns true or false is up to you.
   res.getAgreementRemove = function(obj) {
-    if (this === game.player) return true;
+    if (this === player) return true;
     
     if (this.restraint && w[this.restraint].canManipulate) return failedmsg(this.responseNotWhileTiedUp)
    
@@ -791,53 +803,30 @@ const ACTOR = function(isFemale, isPlayer) {
   
   // --------------  CAN? ---------------------------
   
-  res.canMove = function(ex, dir) {
-    if (this.restraint && !w[this.restraint].canMove) {
-      if (dir !== undefined) {
-        if (this === game.player) {
-          failedmsg(w[this.restraint].cannotMoveMsg(this, dir));
-        }
-        else {
-          msg(this.responseNotWhileTiedUp)
-        }
-        return false;
-      }
+  res.testMove = function(ex) {
+    if (this.restraint && !w[this.restraint].testMove) {
+      if (this === player) return falsemsg(w[this.restraint].cannotMoveMsg(this), {char:this})
+      return falsemsg(this.responseNotWhileTiedUp)
     }
-    else {
-      return true;
-    }
+    return true
   }
+  res.canUseHands = function() { return !this.restraint || w[this.restraint].canManipulate }
   res.canManipulate = function(obj, verb) {
-    if (this.restraint && !w[this.restraint].canManipulate) {
-      if (obj !== undefined) {
-        if (this === game.player) {
-          failedmsg(w[this.restraint].cannotManipulateMsg(this, obj, verb));
-        }
-        else {
-          msg(this.responseNotWhileTiedUp)
-        }
-      }
-      return false;
+    if (!this.canUseHands()) {
+      if (this !== player) return falsemsg(this.responseNotWhileTiedUp, {char:this})
+      if (obj === undefined) return falsemsg(w[this.restraint].cannotManipulateMsg(this, verb), {char:this})
+      return falsemsg(w[this.restraint].cannotManipulateObjMsg(this, verb), {char:this, item:obj})
     }
-    else {
-      return true;
-    }
+    return true;
   }
   res.canPosture = function(verb) {
-    if (this.restraint && !w[this.restraint].canMove) {
+    if (this.restraint && !w[this.restraint].testMove) {
       if (verb  !== undefined) {
-        if (this === game.player) {
-          failedmsg(w[this.restraint].cannotPostureMsg(this, verb));
-        }
-        else {
-          msg(this.responseNotWhileTiedUp)
-        }
-        return false;
+        if (this === player) return falsemsg(w[this.restraint].cannotPostureMsg(this, verb))
+        return falsemsg(this.responseNotWhileTiedUp)
       }
     }
-    else {
-      return true;
-    }
+    return true;
   }
   res.canTalk = function() {
     return this.gag ? false : true
@@ -860,7 +849,7 @@ const ACTOR = function(isFemale, isPlayer) {
 agenda.removeGarment = function(npc, arr) {
   const g = (arr.length === 0 ? npc.firstToRemove() : w[arr[0]])
   if (!g.wearable || g.loc !== npc.name) console.log(arr)
-  npc.msg(g.removeMsg(npc), {garment:g, actor:npc});
+  npc.msg(g.removeMsg(npc), {item:g, char:npc});
   g.worn = false
   g.loc = npc.loc
   return true;
@@ -870,7 +859,7 @@ agenda.removeGarment = function(npc, arr) {
 agenda.strip = function(npc, arr) {
   const g = npc.firstToRemove()
   if (!g.wearable || g.loc !== npc.name) console.log(arr)
-  npc.msg(g.removeMsg(npc), {garment:g, actor:npc});
+  npc.msg(g.removeMsg(npc), {item:g, char:npc});
   g.worn = false
   g.loc = npc.loc
   return npc.isNaked();
@@ -880,7 +869,7 @@ agenda.strip = function(npc, arr) {
 agenda.stripTo = function(npc, arr) {
   const g = npc.firstToRemove()
   if (!g.wearable || g.loc !== npc.name) console.log(arr)
-  npc.msg(g.removeMsg(npc), {garment:g, actor:npc});
+  npc.msg(g.removeMsg(npc), {item:g, char:npc});
   g.worn = false
   g.loc = npc.loc
   return npc.firstToRemove().name === arr[0];
@@ -890,7 +879,7 @@ agenda.stripTo = function(npc, arr) {
 agenda.stripToN = function(npc, arr) {
   const g = npc.firstToRemove()
   if (!g.wearable || g.loc !== npc.name) console.log(arr)
-  npc.msg(g.removeMsg(npc), {garment:g, actor:npc})
+  npc.msg(g.removeMsg(npc), {item:g, char:npc})
   g.worn = false
   g.loc = npc.loc
   return npc.getWearing().length === parseInt(arr[0])
@@ -901,7 +890,7 @@ agenda.stripToN = function(npc, arr) {
 agenda.wearGarment = function(npc, arr) {
   const g = w[arr[0]]
   if (!g.wearable) console.log(arr)
-  npc.msg(g.wearMsg(npc), {garment:g, actor:npc});
+  npc.msg(g.wearMsg(npc), {item:g, char:npc});
   g.worn = true
   g.loc = npc.name
   return true;
@@ -921,7 +910,7 @@ agenda.wearCostume = function(npc, arr) {
   }
   if (count === 0) return true;  // should not happen!
   if (!g.wearable) console.log(arr)
-  npc.msg(g.wearMsg(npc), {garment:g, actor:npc});
+  npc.msg(g.wearMsg(npc), {item:g, char:npc});
   g.worn = true
   g.loc = npc.name
   return count === 1;

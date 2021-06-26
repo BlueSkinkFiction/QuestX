@@ -1,7 +1,6 @@
 "use strict";
 
 
-settings.fluids = ['cum', 'water', 'honey', 'yoghurt']
 
 
 tp.addDirective("description", function(arr, params) {
@@ -36,13 +35,41 @@ tp.addDirective("restraint", function(arr, params) {
 })
 
 tp.addDirective("ifRestraint", function(arr, params) {
-  return params.item.restraint ? arr.join(":") : ""
+  return params.item.restraint ? arr[0] : arr[1]
 })
 
 tp.addDirective("ifBare", function(arr, params) {
   const bodyPart = w[arr.shift()]
-  return params.item.isBodyPartBare(bodyPart) ? arr.join(":") : "";
+  return params.item.isBodyPartBare(bodyPart) ? arr[0] : arr[1]
 })
+
+tp.addDirective("ifBP", function(arr, params) {
+  let name = arr.shift()
+  const obj = tp._findObject(name, params, arr)
+  if (!obj) return errormsg("Failed to find object '" + name + "' in text processor 'ifBP' (" + params.tpOriginalString + ")")
+  const bodyPart = w[arr.shift()]
+  return obj.hasBodyPart(arr[0]) ? arr[1] : arr[2]
+})
+
+tp.addDirective("covering", function(arr, params) {
+  let name = arr.shift()
+  const obj = tp._findObject(name, params, arr)
+  const slot = arr[0]
+  const subject = obj.getOuterWearable(slot)
+  const options = {}
+  if (arr[1] === 'the') options.article = DEFINITE
+  if (arr[1] === 'a') options.article = INDEFINITE
+  return arr[2] === 'true' ? sentenceCase(lang.getName(subject, options)) : lang.getName(subject, options)
+})
+
+tp.addDirective("insult", function(arr, params) {
+  let name = arr.shift()
+  const obj = tp._findObject(name, params, arr)
+  if (!obj) return errormsg("Failed to find object '" + name + "' in text processor 'ifBP' (" + params.tpOriginalString + ")")
+  const target = tp._findObject(arr[0], params, arr)
+  return obj.insult(target)
+})
+
 
 // {arouse:chr:amt}
 tp.addDirective("arouse", function(arr, params) {
@@ -95,31 +122,28 @@ parser.isBodyPart = function(item) {
   return item.isBodyPart;
 }
 parser.isBodyPartOrHere = function(item) {
-  return item.isBodyPart || parser.isHeldByNpc(item) || parser.isHeld(item) || item.isAtLoc(game.player.loc);
+  return item.isBodyPart || parser.isHeldByNpc(item) || parser.isHeld(item) || item.isAtLoc(player.loc);
 }
 parser.isWornByChar = function(item) {
   return (parser.isHeldByNpc(item) || parser.isHeld(item)) && item.getWorn();
 }
 
 parser.isBondageDeviceHere = function(item) {
-  return item.isAtLoc(game.player.loc) && item.bondage;
+  return item.isAtLoc(player.loc) && item.bondage;
 }
+
+
 
 
 
 
 function stop_posture(char) {
   if (!char.posture) char.posture = "standing"
-  if (char.posture === "standing") return "";
-  let s;
-  // You could split up sitting, standing and lying
-  if (char.postureFurniture) {
-    s = lang.nounVerb(char, "get", true) + " off " + lang.getName(w[char.postureFurniture], {article:DEFINITE}) + ".";
-  }
-  else {
-    s = lang.nounVerb(char, "stand", true) + " up.";
-  }
-  char.posture = "standing"
-  delete char.postureFurniture
-  return s;
+  if (!char.posture) return ""
+  if (!char.postureFurniture && char.posture === "standing") return ""
+  const options = {char:char}
+  if (w[char.postureFurniture]) options.item = w[char.postureFurniture]
+  char.posture = false
+  char.postureFurniture = false
+  return processText(options.item ? "{nv:char:get:true} off {nm:item:the}." : "{nv:char:stand:true} up.", options)
 }

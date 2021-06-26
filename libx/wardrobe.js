@@ -6,7 +6,7 @@
 // May need to consider how player will refer to tee-shirts
 
 
-erotica.createGarment = function(proto, loc, color, otherOptions) {
+erotica.createGarment = function(proto, loc, color, options) {
   if (typeof proto === "string") {
     if (w[proto] === undefined) return errormsg("Failed to find a garment called " + proto + " for createGarment.", true)
     proto = w[proto]
@@ -28,17 +28,20 @@ erotica.createGarment = function(proto, loc, color, otherOptions) {
       console.log("No exam for " + proto.name)
     }
   }
-  if (otherOptions) {
-    for (let key in otherOptions) {
-      o[key] = otherOptions[key]
+  if (options) {
+    for (let key in options) {
+      log(key)
+      log(options[key])
+      o[key] = options[key]
     }
+    log(o)
   }
   if (loc && (w[loc].npc || w[loc].player)) {
     o.worn = true;
     o.owner = loc;
-    o.onMove = function(toLoc, fromLoc) {
+    o.afterMove = function(options) {
       // garment picked up from room by player, whilst owner present
-      if (w[fromLoc].room && toLoc === game.player.name && w[this.owner].isHere()) {
+      if (w[options.fromLoc].room && options.toLoc === player.name && w[this.owner].isHere()) {
         w[this.owner].pause()
         msg(this.pickupMsg, {char:this.owner, garment:this})
       }
@@ -93,7 +96,7 @@ erotica.createBikini = function(loc) {
   }
   let ensembleAlias = halter.bikiniAlias ? halter.bikiniAlias : halter.alias.replace(/ (bikini )?halter/, " bikini");
   ensembleAlias = ensembleAlias.replace("black", color);
-  const ensembleName = world.findUniqueName(halter.name.replace("_halter", "_ensemble"))
+  const ensembleName = util.findUniqueName(halter.name.replace("_halter", "_ensemble"))
   
   const ensemble = erotica.createBikiniEnsemble(ensembleName, halter, briefs, ensembleAlias, desc);
   return [halter, briefs, color, ensemble]
@@ -105,7 +108,7 @@ erotica.createBikiniEnsemble = function(ensembleName, halter, briefs, ensembleAl
   const ensemble = createEnsemble(ensembleName, [halter, briefs], {
     exam:desc,
     alias:ensembleAlias,
-    examine:function(isMultiple) {
+    examine:function(multiple) {
       let s = this.exam
       if (this.ensembleMembers[0].cumMess && this.ensembleMembers[0].cumMess.length > 0) {
         if (this.ensembleMembers[1].cumMess && this.ensembleMembers[1].cumMess.length > 0) {
@@ -118,7 +121,7 @@ erotica.createBikiniEnsemble = function(ensembleName, halter, briefs, ensembleAl
       else if (this.ensembleMembers[1].cumMess && this.ensembleMembers[1].cumMess.length > 0) {
         s += " There is cum on the briefs."
       }
-      msg(prefix(this, isMultiple) + s)
+      msg(prefix(this, multiple) + s)
       return true
     },
   });
@@ -432,6 +435,14 @@ createItem("thick_tights_black", TIGHTS(),
 //---- CASUAL WEAR ----
 
 
+createItem("jacket_black", JACKET(),
+  {
+    alias:"black jacket",
+    exam:"A long-sleeved jacket, with buttons.",
+    colors:erotica.colorList,
+  }
+);
+
 createItem("teeshirt_black", TEE_SHIRT(),
   {
     alias:"black tee-shirt",
@@ -528,7 +539,6 @@ createItem("skirt_black", SKIRT(1),
     alias:"black skirt",
     exam:"A black, wrap-around skirt that covers most of the thigh.",
     colors:erotica.colorList,
-    wrapSkirt:true,
   }
 );
 
@@ -679,12 +689,12 @@ createItem("dress_goth", DRESS(["chest", "nipple", "upperback", "lowerback", "mi
 createItem("dress_pvc_red", DRESS(["chest", "nipple", "upperback", "lowerback", "midriff", "hip", "groin", "buttock", "thigh"]),
   {
     alias:"red PVC dress",
-    examine:function(isMultiple) {
+    examine:function(multiple) {
       if (this.worn) {
-        msg(prefix(this, isMultiple) + "The red PVC dress is very short; it is laced all the way up the back, leaving a strip of bare skin about an inch side that included her ass crack.");
+        msg(prefix(this, multiple) + "The red PVC dress is very short; it is laced all the way up the back, leaving a strip of bare skin about an inch side that included her ass crack.");
       }
       else {
-        msg(prefix(this, isMultiple) + this.exam);
+        msg(prefix(this, multiple) + this.exam);
       }
     },
     exam:"The red PVC dress is very short; it is fastens by lacing all the way up the back.",
@@ -696,12 +706,12 @@ createItem("dress_pvc_red", DRESS(["chest", "nipple", "upperback", "lowerback", 
 createItem("dress_mesh", DRESS(["chest", "cleavage", "nipple", "upperback", "lowerback", "midriff", "hip", "groin", "buttock", "thigh"]),
   {
     alias:"black mesh dress",
-    examine:function(isMultiple) {
+    examine:function(multiple) {
       if (this.worn) {
-        msg(prefix(this, isMultiple) + "The dress is very short, but more of an issue is it is made of a course mesh, so does not really hide much at all.");
+        msg(prefix(this, multiple) + "The dress is very short, but more of an issue is it is made of a course mesh, so does not really hide much at all.");
       }
       else {
-        msg(prefix(this, isMultiple) + "The dress is very short, and made of a mesh material that is more hole than fabric.");
+        msg(prefix(this, multiple) + "The dress is very short, and made of a mesh material that is more hole than fabric.");
       }
     },
     image:"dress_mesh",
@@ -910,13 +920,13 @@ createItem("leather_corset", CORSET(), MADE_OF(materials.leather),
   {
     alias:"leather crset",
     garmentType:'leatherwear',
-    exam:"The corset is made of soft black leather, and is fastens at the back with a series of loops and hooks. While it offered good support for her bust, it is barely high enough to cover her nipples.",
-    //wearmsg:lang.nounVerb(char, "pull", true) + " on the corset, fastening it at the back before getting her breasts comfortable in the tight garment.",
-    //removemsg:lang.nounVerb(char, "unfasten", true) + " her corset, and takes it off",
+    exam:"The corset is made of soft black leather, and is fastens at the back with a series of loops and hooks. While it offered good support for her bust, it is barely high enough to cover {pa:char} nipples.",
+    wearMsg:"{nv:char:pull:true} on the corset, fastening it at the back before getting {pa:char} breasts comfortable in the tight garment.",
+    removeMsg:"{nv:char:unfasten:true} {pa:char} corset, and takes it off",
     image:"corset",
     pullsoff:'jacket',
-    stripper:function(char) {
-      msg("Slowly she unfastens the corset. She pulls it off, her breasts bare; the men cheer and whistle.");
+    stripper:function() {
+      return "Slowly she unfastens the corset. She pulls it off, {pa:char} breasts bare; the men cheer and whistle."
     },
   }
 );
@@ -927,13 +937,12 @@ createItem("leather_belt_skirt", SKIRT(0), MADE_OF(materials.leather),
     garmentType:'leatherwear',
     slots:["groin", "buttock", "hip"],
     exam:"A wide leather belt that is just about thick enough to wear as a belt.",
-    stripper:function(char) {
-      const groin = game.player.getInnerWearable("groin");
-      if (groin === this) {
-        msg("Slowly " + lang.nounVerb(char, "unfasten") + " the belt, conscious she had no panties on. She pulls it off, her sex exposed; the men cheer and whistle.");
+    stripper:function(options) {
+      if (!options.groin) {
+        return "Slowly {nv:char:unfasten} the belt, conscious {nv:char:have} no panties on. {nv:char:pull:true} it off, {pa:char} sex exposed; the men cheer and whistle."
       }
       else {
-        msg(lang.nounVerb(char, "unfasten", true) + " the belt, glad she is wearing underwear. She pulls it off, exposing her " + lang.getName(groin, ) + ".");
+        return "{nv:char:unfasten:true} the belt, glad she is wearing underwear. She pulls it off, exposing {pa:char} {nm:groin}."
       }
     },
   }
@@ -944,7 +953,7 @@ createItem("leather_thong", THONG(), MADE_OF(materials.leather),
   {
     alias:"leather thong",
     garmentType:'leatherwear',
-    exam:"The thong is made of soft black black, and where one might have expected a triangle of leather to preserve her modesty at least a little there is merely two straps, with studs at each end.",
+    exam:"The thong is made of soft black black, and where one might have expected a triangle of leather to preserve {pa:char} modesty at least a little there is merely two straps, with studs at each end.",
     image:"thong_leather",
     garmentType:'leatherwear',
     getRevealing:function() { return 3; },
@@ -956,9 +965,7 @@ createItem("leather_halter", BRA(), MADE_OF(materials.leather),
     alias:"leather halter",
     garmentType:'leatherwear',
     exam:"The halter is made of soft black leather; three thin bands crossed each breast, offering minimal coverage.",
-    wearMsg:function(char) {
-      return lang.nounVerb(char, "pull", true) + " on the halter, fastening it at the back, then adjusting the bands to cover " + char.pronouns.poss_adj + " nipples.";
-    },
+    wearMsg: "{nv:char:pull:true} on the halter, fastening it at the back, then adjusting the bands to cover {pa:char} nipples.",
     image:"halter_leather",
   }
 );
@@ -967,12 +974,12 @@ createItem("leather_dress", DRESS(["chest", "nipple", "upperback", "lowerback", 
   {
     alias:"black leather dress",
     garmentType:'leatherwear',
-    examine:function(isMultiple) {
+    examine:function(multiple) {
       if (this.worn) {
-        msg(prefix(this, isMultiple) + "Now she has it on, Lucy realises the black leather dress is even shorter at the back, and does not actually reach her crotch. The six inch hole over her cleavage also makes her feel rather exposed.");
+        msg(prefix(this, multiple) + "Now she has it on, Lucy realises the black leather dress is even shorter at the back, and does not actually reach her crotch. The six inch hole over her cleavage also makes her feel rather exposed.");
       }
       else {
-        msg(prefix(this, isMultiple) + "The black leather dress is so short it would barely be decent. It has a high neckline, but a gaping hole, six inches across, over the cleavage.");
+        msg(prefix(this, multiple) + "The black leather dress is so short it would barely be decent. It has a high neckline, but a gaping hole, six inches across, over the cleavage.");
       }
     },
     image:"dress_leather",
@@ -1000,6 +1007,7 @@ createItem("catsuit", JUMPSUIT("zip", false), MADE_OF(materials.pvc),
 createItem("loin_cloth", LOIN_CLOTH(),
   {
     alias:"loin cloth",
+    image:'loincloth',
   }
 );
 

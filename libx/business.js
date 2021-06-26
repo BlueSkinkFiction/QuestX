@@ -1,7 +1,7 @@
 
 function createShop(shopName, salesmanName, isFemale, data) {
   const salesman = createItem(salesmanName, ACTOR(isFemale))
-  salesman.properName = true
+  salesman.properNoun = true
   salesman.loc = shopName
   salesman.examine = data.examine
   salesman.isAtLoc = function(loc, situ) { return loc === this.loc && situ !== world.LOOK }
@@ -34,7 +34,7 @@ function createShop(shopName, salesmanName, isFemale, data) {
 
 function createBar(name, data) {
   const waitress = createItem(name + "_waitress", ACTOR(true))
-  waitress.properName = false
+  waitress.properNoun = false
   waitress.loc = name
   waitress.scenery = true
   waitress.alias = "waitress"

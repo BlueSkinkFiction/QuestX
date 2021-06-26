@@ -50,7 +50,7 @@ const MADE_OF = function(material) {
       if (report) msg(s);
       return true;
     },
-    onCreation:function(o) {
+    afterCreation:function(o) {
       o.verbFunctions.push(function(o, list) {
         if (o.material && o.material.smash) list.push("Smash")
       })
@@ -85,7 +85,7 @@ commands.unshift(new Cmd('Burn', {
     const char = extractChar(this, objects)
     if (!char) return world.FAILED;
     if (!haveFireSource(char)) {
-      failedmsg(lang.nounVerb(char, "need", true) + " a source of fire to burn something.");
+      failedmsg("{nv:char:need:true} a source of fire to burn something.", objects);
       return world.FAILED;
     }
     return cmdDamage("fire", char, objects[0], "#### will not burn.");
