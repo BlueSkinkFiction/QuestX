@@ -4,8 +4,8 @@ createItem("me",
   ACTOR(false, true), {
     loc:"lounge", 
     regex:/^(me|myself|player)$/, 
-    examine:function(isMultiple) {
-      msg(prefix(this, isMultiple) + "You are wearing {attire}. {ifPosture:You are {posture}.}", {item:this});
+    examine:function(multiple) {
+      msg(prefix(this, multiple) + "You are wearing {attire}. {ifPosture:You are {posture}.}", {item:this});
       if (!this.hasCock && !this.hasPussy) msg("You have no genitals...");
       if (this.hasCock && this.hasPussy) msg("You have both male and female genitals...");
       if (this.hasCock && this.hasTits) msg("Your plump breasts contrast with the cock hanging between your legs.");
@@ -52,7 +52,7 @@ createRoom("balcony", {
 
 createItem("Joanna", ACTOR(true), {
   loc:"lounge", 
-  properName:true,
+  properNoun:true,
   bodyPartAdjectives:{upperback:"tattooed"},
   willingToExpose:5,
   eyeColor:'blue',
@@ -115,22 +115,22 @@ createItem("joanna_hello", TOPIC(true), {
 
 
 util.addResponse(["suck", "target not tied up", "happy", "cock"], {
-    test:function(p) { return p.actor.name === "Joanna" && p.target.arousal > 90 },
-    msg:"Joanna giggles as {nv:target:come} in her mouth, letting some cum dribble down her chin.",
-    script:function(p) { p.target.modifyAttraction(p.actor, 5); p.target.arousal = 10, p.actor.arousal += 12 },
+    test:function(p) { return p.char.name === "Joanna" && p.item.arousal > 90 },
+    msg:"Joanna giggles as {nv:item:come} in her mouth, letting some cum dribble down her chin.",
+    script:function(p) { p.item.modifyAttraction(p.char, 5); p.item.arousal = 10, p.char.arousal += 12 },
 }, erotica.defaultResponses)
 
 util.addResponse(["lick", "happy"], {
-    test:function(p) { return p.bodypart.name === "pussy" && p.target.name === "Joanna" && p.target.arousal > 90},
-    msg:"{nv:actor:lick} Joanna's throbbing clit; she squeals as she comes.",
-    script:function(p) { p.target.modifyAttraction(p.actor, 5); p.target.arousal += 10, p.actor.arousal += 12 },
+    test:function(p) { return p.bodypart.name === "pussy" && p.item.name === "Joanna" && p.item.arousal > 90},
+    msg:"{nv:char:lick} Joanna's throbbing clit; she squeals as she comes.",
+    script:function(p) { p.item.modifyAttraction(p.char, 5); p.item.arousal += 10, p.char.arousal += 12 },
 }, erotica.defaultResponses)
 
 
 createItem("maid",
   ACTOR(true), {
     loc:"lounge",
-    properName:false,
+    properNoun:false,
     examine: "A helpful brunette, with a big smile. She is wearing {attire}. {ifPosture:She is {posture}.}",
     willingToExpose:10,
     getDefaultBodyPartAdjective:function() {
@@ -143,7 +143,7 @@ createItem("maid",
 createItem("Clive",
   ACTOR(false), {
     loc:"lounge", 
-    properName:true,
+    properNoun:true,
     examine: "A cool dude. He is wearing {attire}. {ifPosture:He is {posture}.}", 
   }
 );
@@ -252,7 +252,7 @@ createItem("swimshortsblue", SHORTS(true),
 createItem("daisydukes", DAISY_DUKES(),
   {
     alias:"Daisy Dukes",
-    properName:false,
+    properNoun:false,
     loc:"lounge",
     pronouns:lang.pronouns.plural,
   }
@@ -310,18 +310,18 @@ createItem("whip", MADE_OF(materials.leather), TAKEABLE(),
   }
 );
 
-createItem("jug", MADE_OF(materials.ceramic), TAKEABLE(),
-  {
-    loc:"table",
-    examine:function(isMultiple) { msg(prefix(this, isMultiple) + "The jug contains " + this.contains + ", and is " + Math.floor(this.volume / this.capacity * 100) + "% full."); },
-    capacity:10,
-    isSource:function(subst) {
-      return (subst === this.contains && this.volume > 0)
-    },
-    volume:10,
-    contains:'custard',
-  }
-);
+createItem("jug", MADE_OF(materials.ceramic), TAKEABLE(), VESSEL(), {
+  loc:"table",
+  examine:function() {
+    if (this.containedFluidName) {
+      msg("A big jug containing " + this.containedFluidName + ".")
+    }
+    else {
+      msg("A big, empty jug.")
+    }
+  },
+  containedFluidName:'custard',
+})
 
 
 createItem("knife", MADE_OF(materials.metal), TAKEABLE(),
@@ -350,16 +350,12 @@ createItem("a_frame", MADE_OF(materials.metal), BONDAGE_DEVICE(false),
     loc:"lounge",
     alias:"A-frame",
     situation:"manacled to the A-frame",
-    properName:false,
+    properNoun:false,
     legsOpen:true,
     armsOpen:false,
     points:["wrists", "ankles"],
-    restrainMsg:function(char, victim) { 
-      return lang.nounVerb(char, "manacle", true) + " " + lang.getName(victim, {article:DEFINITE, possessive:true}) + " wrists to the top of the A-frame, then " + lang.conjugate (char, "make") + " " + victim.pronouns.objective + " open " + victim.pronouns.poss_adj + " legs wide, before manacling them too."
-    },
-    releaseMsg:function(char, victim) {
-      return lang.nounVerb(char, "release", true) + " the manacles on " + lang.getName(victim, {article:DEFINITE, possessive:true}) + " ankles, then " + lang.conjugate (char, "reach") + " up and " + lang.conjugate (char, "release") + " " + victim.pronouns.poss_adj + " wrists."
-    },
+    restrainMsg:"{nv:char:manacle:true} {nms:item:the} wrists to the top of the A-frame, then {cj:char:make} {ob:item} open {pa:item} legs wide, before manacling them too.",
+    releaseMsg:"{nv:char:unlock:true} the manacles on {nms:item:the} ankles, then {cj:char:reach} up and {cj:char:release} {pa:item} wrists.",
   }
 );
 
@@ -379,14 +375,10 @@ createItem("bondage_table", MADE_OF(materials.metal), BONDAGE_DEVICE(false), OPE
         return actor.posture === "reclining" ? ["lowerback", "upperback"] : ["midriff", "chest", "tit", "nipple"] 
       }
     },
-    restrainMsg:function(char, victim) { 
-      return lang.nounVerb(victim, "lie", true) + " back on the metal table and " + lang.nounVerb(char, "secure") + " " + victim.pronouns.poss_adj + " wrists in the manacles above " + victim.pronouns.poss_adj + " head, then " + lang.conjugate (char, "make") + " " + victim.pronouns.objective + " open " + victim.pronouns.poss_adj + " legs wide, so " + lang.pronounVerb(char, "can") + " secure " + victim.pronouns.poss_adj + " ankles too."
-    },
-    releaseMsg:function(char, victim) {
-      return lang.nounVerb(char, "unfasten", true) + " the manacles on " + lang.getName(victim, {article:DEFINITE, possessive:true}) + " ankles, then the ones on " + victim.pronouns.poss_adj + " wrists. " + lang.nounVerb(victim, "get", true) + " off the table."
-    },
-    openMsg:function(isMultiple, tpParams) {
-      tpParams.victim = this.victim
+    restrainMsg:"{nv:item:lie:true} back on the metal table and {nv:char:secure} {pa:item} wrists in the manacles above {pa:item} head, then {cj:char:make} {ob:item} open {pa:item} legs wide, so {pv:char:can} secure {pa:item} ankles too.",
+    releaseMsg:"{nv:char:unfasten:true} the manacles on {nms:item:the} ankles, then the ones on {pa:item} wrists. {nv:item:get:true} off the table.",
+    openMsg:function(options) {
+      options.victim = this.victim
       let s = "{nv:char:slide:true} open the panel in the centre of the metal table, "
       if (this.victim) {
         s += "right under {nms:victim:the} buttocks, leaving {pa:victim} ass exposed."
@@ -394,17 +386,13 @@ createItem("bondage_table", MADE_OF(materials.metal), BONDAGE_DEVICE(false), OPE
       else {
         s += "right about where the victim's ass would be."
       }
-      msg(prefix(this, isMultiple) + s, tpParams);
+      msg(s, options)
     },
-    closeMsg:function(isMultiple, char) {
-      let s = lang.nounVerb(char, "slide", true) + " the panel in the centre of the metal table closed"
-      if (this.victim) {
-        s += "; " + lang.getName(w[this.victim], {article:DEFINITE, possessive:true}) + " buttocks rest on the cool metal."
-      }
-      else {
-        s += "."
-      }
-      msg(prefix(this, isMultiple) + s);
+    closeMsg:function(options) {
+      let s = "{nv:char:slide:true} the panel in the centre of the metal table closed"
+      if (this.victim) s += "; " + lang.getName(w[this.victim], {article:DEFINITE, possessive:true}) + " buttocks rest on the cool metal"
+      s += "."
+      msg(s, options)
     },
   }
 );
@@ -423,16 +411,16 @@ createItem("thin_shirt", BUTTONED_SHIRT(), {
 createItem("dress_cursed", DRESS([]),
   {
     alias:"short, black, strapless dress",
-    examine:function(isMultiple) {
+    examine:function(multiple) {
       const n = Math.floor(this.count / this.countRate)
       if (n < this.states.length - 1) {
-        msg(prefix(this, isMultiple) + this.states[n].desc);
+        msg(prefix(this, multiple) + this.states[n].desc);
       }
       else if (this.getWorn()) {
-        msg(prefix(this, isMultiple) + "A red strap that goes round " + lang.getName(w[this.loc], {article:DEFINITE,possessive:true}) + " bust, without covering the nipples, held up by thin straps over " + w[this.loc].pronouns.poss_adj + " shoulders.");
+        msg(prefix(this, multiple) + "A red strap that goes round " + lang.getName(w[this.loc], {article:DEFINITE,possessive:true}) + " bust, without covering the nipples, held up by thin straps over " + w[this.loc].pronouns.poss_adj + " shoulders.");
       }
       else {
-        msg(prefix(this, isMultiple) + "A red strap that would go round the bust, without covering much at all, held up by thin straps.");
+        msg(prefix(this, multiple) + "A red strap that would go round the bust, without covering much at all, held up by thin straps.");
       }
     },
     getSlots:function() {

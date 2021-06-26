@@ -24,11 +24,10 @@ settings.roomTemplate = [
 settings.status = [
   "hitpoints",
   function() { return "<td>Spell points:</td><td>3</td>"; },
-  function() { return "<td>Health points:</td><td>" + game.player.hitpoints + "</td>"; },
-  function() { return '<td colspan="2">' + game.player.status + "</td>"; },
+  function() { return '<td colspan="2">' + player.status + "</td>"; },
 ];
 
-
+settings.fluids = ['cum', 'water', 'honey', 'yoghurt', 'custard']
 
 
 
@@ -61,7 +60,7 @@ settings.startingDialogHtml += '</div></div>'
 
 
 settings.startingDialogOnClick = function() {
-  const p = game.player
+  const p = player
   p.alias = $("#namefield").val()
   p.magic = $('#magic-slider').slider('value')
   p.job = settings.sliders.job.values[$('#job-slider').slider('value')]
@@ -77,14 +76,14 @@ settings.startingDialogOnClick = function() {
 }
 settings.startingDialogInit = function() {
   io.addSlider('magic', 100, function(value) {
-    game.player.magic = value
-    const wealth = 200 - game.player.magic - game.player.combat
+    player.magic = value
+    const wealth = 200 - player.magic - player.combat
     $('#magic-text').html('Magic: ' + value)
     $('#wealth-text').html('Wealth: ' + wealth)
   })
   io.addSlider('combat', 100, function(value) {
-    game.player.combat = value
-    const wealth = 200 - game.player.magic - game.player.combat
+    player.combat = value
+    const wealth = 200 - player.magic - player.combat
     $('#combat-text').html('Combat: ' + value)
     $('#wealth-text').html('Wealth: ' + wealth)
   })

@@ -39,9 +39,9 @@ test.tests = function() {
   erotica.verify();
 
   w.Joanna.loc = "lounge"
-  w.me.moveChar("lounge")
-  game.player.hasTits = false
-  game.player.hasCock = true
+  w.me.loc = "lounge"
+  player.hasTits = false
+  player.hasCock = true
 
   // General stuff used by other parts
 
@@ -53,14 +53,14 @@ test.tests = function() {
   
   test.title("responses");
   const sublist = util.getResponseSubList(["suck", "target not tied up", "happy", "cock"], erotica.defaultResponses)
-  test.assertEqual("Joanna giggles as {nv:target:come} in her mouth, letting some cum dribble down her chin.", sublist[0].msg)
-  
+  test.assertEqual("Joanna giggles as {nv:item:come} in her mouth, letting some cum dribble down her chin.", sublist[0].msg)
+
   commands.unshift(new Cmd("test response", {
     regexes:[/^response$/],
     objects:[
     ],
     script:function(objects) {
-      respond({action:'nonsense', actor:w.Joanna, target:w.me}, erotica.defaultResponses)
+      respond({action:'nonsense', char:w.Joanna, target:w.me}, erotica.defaultResponses)
       return world.SUCCESS;
     },
   }));  
@@ -74,7 +74,7 @@ test.tests = function() {
   w.briefsblack.worn = false
   w.briefsblack.loc = "lounge"
   w.halterblack.loc = "lounge"
-  game.update();
+  world.update();
   test.assertCmd("look", ["The lounge", "The lounge is lavishly appointed.", "You can see an A-frame, a black bikini, Clive (wearing some blue swim shorts), some Daisy Dukes, some jeans, Joanna, a maid (wearing a maid outfit), a settee, a red swimsuit, a table (with a dildo, a jug and a whip on it), a mesh teeshirt, a white teeshirt and a red thong here."]);
   
   
@@ -94,7 +94,7 @@ test.tests = function() {
   world.scopeSnapshot();
   test.assertCmd("look", ["The lounge", "The lounge is lavishly appointed.", "You can see an A-frame, Clive (wearing some blue swim shorts), some Daisy Dukes, a black bikini halter, some jeans, Joanna, a maid (wearing a maid outfit), a settee, a red swimsuit, a table (with a dildo, a jug and a whip on it), a mesh teeshirt, a white teeshirt and a red thong here."]);
   test.assertCmd("x halter", "A bikini halter that is black.")
-  test.assertCmd("x briefs", "You can't see anything you might call 'briefs' here.")
+  test.assertCmd("x briefs", "There doesn't seem to be anything you might call 'briefs' here.")
   test.assertCmd("x bikini", "A bikini halter that is black.")
   w.briefsblack.loc = "lounge"
   w.halterblack.loc = "balcony"
@@ -155,7 +155,7 @@ test.tests = function() {
   w.Joanna.attactedToWomen = 4
   test.assertEqual(7, w.Joanna.getInstantAttraction(w.maid));
   
-  
+
   test.title("firstToRemove");
   w.Joanna.dressUp("jeans2", "teeshirtwhite", "halterblack", "briefsblack", "heels");
   test.assertEqual("pants teeshirt", w.Joanna.getAttireDescriptor())
@@ -281,35 +281,11 @@ test.tests = function() {
   w.Joanna.willingToExpose = 5;
   w.Joanna.dressUp("halterblack", "briefsblack");
 
-/* 
-// changed and tested in ycruise
-  test.title("create description")
-  let dict = []
-  erotica.appendToDescription(w.Joanna, dict, "is", "tall")
-  erotica.appendToDescription(w.Joanna, dict, "is", "blue")
-  erotica.appendToDescription(w.Joanna, dict, "has", "teeth")
-  erotica.appendToDescription(w.Joanna, dict, "iso", "She looks sad")
-  erotica.appendToDescription(w.Joanna, dict)
-  test.assertEqual("Joanna is tall and blue. She has teeth. She looks sad.", dict.s)
-  dict = []
-  erotica.appendToDescription(w.Joanna, dict, "is", "tall")
-  erotica.appendToDescription(w.Joanna, dict, "is", "blue")
-  erotica.appendToDescription(w.Joanna, dict, "has", "teeth")
-  erotica.appendToDescription(w.Joanna, dict, "iso", "She looks sad")
-  erotica.appendToDescription(w.Joanna, dict)
-  test.assertEqual("Joanna is tall and blue. She has teeth. She looks sad.", dict.s)
-  w.Joanna.features = [
-    {form:'is', s:"small"},
-    {form:'has', s:"feet"},
-    {form:'has', s:"hands"},
-    {form:'has', s:"a boob tattoo", bp:'tit'},
-  ]
-  w.Joanna.getDescription = erotica.getDescription
-  test.assertEqual("Joanna is small. She has feet and hands.", w.Joanna.getDescription(), true)
-  w.halterblack.worn = false
-  test.assertEqual("Joanna is small. She has feet, hands and a boob tattoo.", w.Joanna.getDescription(), true)
-  w.halterblack.worn = true
-*/
+
+  
+  
+  
+
 
   test.title("getWearingVisible");
   test.assertEqual("black bikini", formatList(w.Joanna.getWearingVisible()))
@@ -338,16 +314,17 @@ test.tests = function() {
   
   test.title("Grope");
   w.Joanna.arousal = -20
-  test.assertCmd("grope joanna's thigh", "'Hey!' exclaims Joanna as you try to grope her thighs. 'Keep your filthy hands to yourself, jerk!'");
-  
+  test.assertCmd("grope joanna's thigh", "'Hey!' exclaims Joanna as you try to grope her thighs. 'Keep your filthy hands to yourself, jerk!'")
   w.Joanna.attraction_me = 25
   test.assertCmd("grope joanna's thigh", "'Hey!' exclaims Joanna as you try to grope her thighs. 'Keep your hands to yourself!'");
-  w.Joanna.oldCanManipulate = w.Joanna.canManipulate
-  w.Joanna.canManipulate = function() { return false }
+  w.Joanna.oldCanManipulate = w.Joanna.canUseHands
+  w.Joanna.canUseHands = function() { return false }
   test.assertCmd("grope joanna's thigh", "'Please no!' exclaims Joanna as you run your hands over her thighs.");
+  
+  
   test.assertCmd("grope joanna's tit", "'Please no!' exclaims Joanna as you squeeze her tits.");
   test.assertCmd("maid, grope joanna's tit", "'Please no!' exclaims Joanna as the maid squeezes Joanna's tits.");
-  w.Joanna.canManipulate = w.Joanna.oldCanManipulate
+  w.Joanna.canUseHands = w.Joanna.oldCanManipulate
   w.Joanna.attraction_me = 50
   test.assertCmd("grope joanna's thigh", "'Hey!' exclaims Joanna as you try to grope her thighs. 'Hey, cheeky!'");
   w.Joanna.attraction_me = 100
@@ -373,14 +350,14 @@ test.tests = function() {
   test.assertCmd("go down on j", "'Oh God yes!' exclaims Joanna as you lick her hot pussy.");
 
   //parser.debug = true
-  test.assertCmd("blow j", "You can only suck off character's with dicks.");
+  test.assertCmd("blow j", "Joanna doesn't have a cock.");
   w.Joanna.dressUp("halterblack", "briefsblack");
 
   // COMMANDS - WANK (requires work)
   test.title("Wank");
   test.assertCmd("j, wank me", "Joanna keeps jerking off you; pre-cum starts to drip from the end of your cock.")
   test.assertCmd("j, jerk me off", "Joanna keeps jerking off you; pre-cum starts to drip from the end of your cock.");
-  test.assertCmd("jill off j", "You would have to get to Joanna's black bikini briefs off her to do that!");
+  test.assertCmd("jill off j", "You would have to get Joanna's black bikini briefs off her to do that!")
   w.briefsblack.worn = false
   test.assertCmd("jill j off", "You slip your finger into her hot pussy, making her giggle.");
   test.assertCmd("wank j", "You slip your finger into her hot pussy, making her giggle.");
@@ -402,11 +379,13 @@ test.tests = function() {
   test.title("Posture");
   test.assertCmd("x jo", "Joanna has a warm smile, and long blonde hair. She is wearing a black bikini.");
   test.assertCmd("jo, bend over table", "Joanna bends over the table.");
-  test.assertCmd("x jo", "Joanna has a warm smile, and long blonde hair. She is wearing a black bikini. She is bending over the table.");
+  test.assertCmd("x jo", "Joanna has a warm smile, and long blonde hair. She is wearing a black bikini, and is bending over the table.");
   test.assertCmd("jo, crawl", ["Joanna gets off the table.", "Joanna goes down on her hands and knees."]);
   test.assertCmd("jo, kneel", ["Joanna kneels."]);
-  test.assertCmd("jo, stand", ["Joanna stands up."]);
+  test.assertEqual("kneeling", w.Joanna.posture)
+  test.assertCmd("jo, stand", ["Joanna stands up."])
   test.assertEqual("standing", w.Joanna.posture)
+  
   test.assertCmd("jo, lie down", ["Joanna lies back on the floor."]);
   test.assertEqual("reclining", w.Joanna.posture)
   test.assertCmd("jo, lie face down", ["Joanna rolls over, to lie face down."]);
@@ -503,14 +482,22 @@ test.tests = function() {
 
   test.title("Bondage 1");
   w.Joanna.dressUp("halterblack", "briefsblack", "teeshirtwhite");  
-  test.assertCmd("tie j up", ["You take the pair of heels and the jeans from Joanna and you put them on the ground.", "You manacle Joanna's wrists to the top of the A-frame, then make her open her legs wide, before manacling them too."]);
+  test.assertCmd("tie j up", ["You take the pair of heels and the jeans from Joanna and drop them on the ground.", "You manacle Joanna's wrists to the top of the A-frame, then make her open her legs wide, before manacling them too."]) 
+  test.assertEqual('Joanna', w.a_frame.victim)
+  test.assertEqual('a_frame', w.Joanna.restraint)
   test.assertCmd("j, undress", ["'Not while I'm tied up.'"]);
-  test.assertCmd("j, e", ["'Not while I'm tied up.'"]);
+  test.assertCmd("j, e", ["'Not while I'm tied up.'"])
+
+  
   test.assertCmd("j, get whip", ["'Not while I'm tied up.'"]);
   test.assertCmd("look", ["The lounge", "The lounge is lavishly appointed.", "You can see an A-frame, Clive (wearing some blue swim shorts), a pair of heels, some jeans, Joanna (manacled to the A-frame; wearing a black bikini and a white teeshirt), a maid (wearing a maid outfit), a settee and a table (with a dildo, a jug and a whip on it) here."]);
-  test.assertCmd("remove t from j", ["You push Joanna's white teeshirt up, revealing her black bikini halter."]);
+  
+  
+  test.assertCmd("x jo", ["Joanna has a warm smile, and long blonde hair. She is wearing a black bikini and a white teeshirt, and is manacled to the A-frame."])
+  test.assertCmd("remove t from j", ["You push Joanna's white teeshirt up, revealing her black bikini halter."])
+  
   test.assertCmd("remove t from j", ["It is already pulled up; it is not going any more than that."]);
-  test.assertCmd("x jo", ["Joanna has a warm smile, and long blonde hair. She is wearing a black bikini and a white teeshirt pulled up around her neck."])
+  test.assertCmd("x jo", ["Joanna has a warm smile, and long blonde hair. She is wearing a black bikini and a white teeshirt pulled up around her neck, and is manacled to the A-frame."])
   test.assertCmd("remove h from j", [/You untie Joanna's black bikini halter at the back and pull it away, baring her firm /]);
   test.assertCmd("remove briefs from j", ["You unfasten Joanna's black bikini briefs at the left hip, baring her pussy, then on the right too before letting them drop to the ground."]);
 
@@ -519,23 +506,26 @@ test.tests = function() {
   w.Joanna.dressUp("swimsuitred");  
   test.assertCmd("remove swimsuit from j", ["You try to remove Joanna's red swimsuit, but cannot whilst she is tied up like that."]);
   test.assertCmd("rip swimsuit from j", [/You rip the shoulder straps of Joanna's red swimsuit and it falls to her waist, baring her firm [a-z]+\. Then You rip the sides and crotch o the red swimsuit, letting the shredded remains drop to the floor, baring her pussy/]);
-  test.assertCmd("free j", ["You release the manacles on Joanna's ankles, then reach up and release her wrists."]);
-  w.Joanna.dressUp("halterblack", "briefsblack");  
+  test.assertCmd("free j", ["You unlock the manacles on Joanna's ankles, then reach up and release her wrists."])
+  test.assertEqual(undefined, w.Joanna.restraint)
+  test.assertEqual(undefined, w.a_frame.victim)
+  w.Joanna.dressUp("halterblack", "briefsblack");
 
   test.title("Bondage me");
   w.leatherjacket.worn = true
   w.leatherjacket.loc = "me"
+  
   test.assertCmd("j,tie me up", ["Joanna manacles your wrists to the top of the A-frame, then makes you open your legs wide, before manacling them too."]);
   test.assertCmd("undress", ["You cannot remove the leather jacket whilst you are manacled to the A-frame."]);
-  test.assertCmd("e", ["You cannot go anywhere whilst you are manacled to the A-frame."]);
+  test.assertCmd("e", ["You are not going anywhere whilst you are manacled to the A-frame."]);
   test.assertCmd("get whip", ["You cannot take the whip whilst you are manacled to the A-frame."]);
-  test.assertCmd("j, free me", ["Joanna releases the manacles on your ankles, then reaches up and releases your wrists."]);
+  test.assertCmd("j, free me", ["Joanna unlocks the manacles on your ankles, then reaches up and releases your wrists."]);
   
   
   
   test.title("Bondage me 2");
   w.bondage_table.loc = "lounge"
-  game.update();
+  world.update();
   test.assertCmd("j, tie me to bondage table", ["You lie back on the metal table and Joanna secures your wrists in the manacles above your head, then makes you open your legs wide, so she can secure your ankles too."]);
   test.assertEqual("reclining", w.me.posture)
   test.assertEqual(w.bondage_table, w.me.getOuterWearable("buttock", true))
@@ -545,9 +535,11 @@ test.tests = function() {
   test.assertEqual(true, w.bondage_table.closed)
   
   test.assertCmd("j, fuck me with dildo", ["Joanna cannot do that while you are secured to the bondage table like that."]);
-  
+ 
   test.assertEqual(w.bondage_table, w.me.getOuterWearable("buttock", true))
   test.assertCmd("j, open bondage table", ["Joanna slides open the panel in the centre of the metal table, right under your buttocks, leaving your ass exposed."]);
+  
+
   test.assertEqual(false, w.me.getOuterWearable("buttock", true))
   test.assertCmd("j, fuck me with dildo", ["You squeal as Joanna thrusts the dildo into your ass."]);
   
@@ -555,7 +547,7 @@ test.tests = function() {
   test.assertCmd("j, fuck me", ["Not while Joanna is wearing some black bikini briefs."]);
   w.briefsblack.worn = false
   test.assertCmd("j, fuck me", ["Joanna fucks you."]);
-  
+
   
   
   w.briefsblack.worn = true
@@ -632,7 +624,7 @@ test.tests = function() {
 
   test.title("Suck tit")
   w.Joanna.arousal = 0
-  w.Joanna.modifyAttraction(game.player, 50)
+  w.Joanna.modifyAttraction(player, 50)
   w.me.arousal = 0
   test.assertCmd("suck j's tit", ["'Hmm!' Joanna sighs as you suck on her nipple."])
   test.assertCmd("suck j's tit", ["'Hmm!' Joanna sighs as you suck on her nipple."])
@@ -652,28 +644,32 @@ test.tests = function() {
   test.assertCmd("come over j's ass", ["You caress your cock, making it harder and harder, as you aim it at Joanna's ass."])
 
   test.title("Substances 1")
-  erotica.ejaculate(game.player, w.Joanna, "face")
-  erotica.ejaculate(game.player, w.jeans2)
+  erotica.ejaculate(player, w.Joanna, "face")
+  erotica.ejaculate(player, w.jeans2)
   test.assertEqual(1, w.jeans2.cumMess.length)
-  test.assertCmd("x jeans", ["A pair of grey jeans. They are covered in cum."])
-  test.assertCmd("x jo", ["Joanna has a warm smile, and long blonde hair. She is wearing nothing. She is on her hands and knees. She has cum on her face."])
-  erotica.ejaculate(game.player, w.Joanna, "ass")
-  test.assertCmd("x jo", ["Joanna has a warm smile, and long blonde hair. She is wearing nothing. She is on her hands and knees. She has cum on her ass and face."])
+  test.assertCmd("x jeans", ["A pair of grey jeans. They have your cum on them."])
+  
+  
+  test.assertCmd("x jo", ["Joanna has a warm smile, and long blonde hair. She is wearing nothing, and is on her hands and knees. She has your cum on her face."])
+  erotica.ejaculate(player, w.Joanna, "ass")
+  test.assertCmd("x jo", ["Joanna has a warm smile, and long blonde hair. She is wearing nothing, and is on her hands and knees. She has your cum on her ass and face."])
   
   erotica.pourOn(w.Joanna, "custard", "tits")
   erotica.pourOn(w.Joanna, "honey", "thighs")
   
-  test.assertCmd("x jo", ["Joanna has a warm smile, and long blonde hair. She is wearing nothing. She is on her hands and knees. She has cum on her ass and face; custard on her tits and honey on her thighs."])
+  test.assertCmd("x jo", ["Joanna has a warm smile, and long blonde hair. She is wearing nothing, and is on her hands and knees. She has custard on her tits; honey on her thighs and your cum on her ass and face."])
+
 
   test.title("Substances 2")
-  test.assertEqual(true, w.jug.isSource("custard"))
-  test.assertEqual(false, w.jug.isSource("honey"))
-  test.assertEqual(false, erotica.findSource(game.player, "custard"))
   test.assertCmd("get jug", ["You take the jug."])
-  test.assertEqual("jug", erotica.findSource(game.player, "custard").name)
   test.assertCmd("pour custard over joanna", ["You pour custard on to Joanna's chest, letting it dribble down her."])
+  w.jug.containedFluidName = 'yoghurt'
+  test.assertCmd("empty jug over joanna", ["You pour yoghurt on to Joanna's chest, letting it dribble down her."])
+  w.jug.containedFluidName = 'honey'
+  
+  test.assertCmd("pour honey over joanna's thighs", ["You pour honey on to Joanna's thighs, letting it dribble down her."])
 
-
+/*
 
   
   
@@ -707,24 +703,81 @@ test.tests = function() {
   delete w[g1.name]
   
   
-  const c = commands.find(function(el) { return el.name === "NpcPullDown1" })
+  test.title("Random - average")
+  random.prime([
+    1, 2, 2, 2, 2,
+    2, 2,  // bust
+    100, 100, 15, 5, // skin, hair color
+    100, // eyes
+    0, 4, 5, // tattoo
+    1, 4, // misc
+  ])
+  const res1 = {
+    hasBodyPart:function(s) { return s === "tit" },
+    isBodyPartBare:function() { return true },
+    pronouns:lang.pronouns.female,
+    alias:'Mary',
+    isFemale:true,
+  }
+  erotica.generate(res1, erotica.femaleLists, 4)
+
+  test.assertEqual('blue', res1.eyeColor)
+  test.assertEqual(4, res1.size)
+  test.assertEqual(8, res1.appearance)
+  test.assertEqual(3, res1.bust)
+  test.assertEqual(true, !res1.hasHugeBoobs)
+  test.assertEqual('copper', res1.hairColor)
+  test.assertEqual(undefined, res1.skinTone)
+  test.assertEqual(['hair', 'eyes', 'tattoo', 'mouth'], res1.featuresDone)
+  test.assertEqual(['hairStyle_5', 'eyeGeneric', 'tattoo_4', 'bonus_4'], res1.features)
+  test.assertEqual('Mary has long copper hair in cornrow braids, blue eyes, wolves howling at the moon tattooed on her left breast and a pouting mouth.', res1.getDescription())
+
   
-  log(lang.getName(w.Joanna, {}))
-  log(lang.getName(w.Joanna, {modified:true}))
+  test.title("Random - great")
+  random.prime([
+    0, 3, 3, 3, 3,
+    3, 3,  // bust
+    0, 0, 0, 0, 8, // skin, hair color
+    0, 0,  // eyes
+    100, // tattoo
+    2, 48, 45,  // misc
+    1, 1, 1, 1, 1, 1, 1, 1// desc
+  ])
+  const res2 = {
+    hasBodyPart:function(s) { return s === "tit" },
+    isBodyPartBare:function() { return true },
+    pronouns:lang.pronouns.female,
+    alias:'Joanna',
+    isFemale:true,
+  }
+  erotica.generate(res2, erotica.femaleLists, 4)
+
+  test.assertEqual('amber', res2.eyeColor)
+  test.assertEqual(6, res2.size)
+  test.assertEqual(10, res2.appearance)
+  test.assertEqual(5, res2.bust)
+  test.assertEqual(true, res2.hasHugeBoobs)
+  test.assertEqual('black', res2.hairColor)
+  test.assertEqual('umber', res2.skinTone)
+  test.assertEqual(['skintone', 'hair', 'eyes', 'body'], res2.featuresDone)
+  test.assertEqual(['hugeBustFeature', 'skin_0', 'hairStyle_8', 'eyes_0', 'bonus_48'], res2.features)
+  const desc = res2.getDescription()
+  test.assertEqual(true, desc.startsWith('Joanna has'))
+  test.assertEqual(true, desc.endsWith(', umber skin, long, layered black hair falling down her back, upturned amber eyes and great legs.'))
 
 
-  //for (let i = 0; i < 100; i++) {
-    //erotica.createBikini("Joanna")
-    //console.log(erotica.createBikini("Joanna")[1].alias)
-  //}
-  //console.log(erotica.createMan("lounge"));
-  //const w1 = erotica.createWoman("lounge");
-  //for (let i = 0; i < 900; i++){
-  //  msg(erotica.createWoman("lounge").getDescription());
-  //  msg(erotica.createMan("lounge").getDescription());
-  //}*/
+
+
+  test.title("Random women")
+  for (let i = 0; i < 100; i++) erotica.createWoman('castle')
+
+  test.title("Random Men")
+  for (let i = 0; i < 100; i++) erotica.createMan('castle')
   
-};
+
+  /*  */
+
+}
 
  
     
