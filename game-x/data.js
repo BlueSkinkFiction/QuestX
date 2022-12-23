@@ -4,8 +4,8 @@ createItem("me",
   ACTOR(false, true), {
     loc:"lounge", 
     regex:/^(me|myself|player)$/, 
-    examine:function(multiple) {
-      msg(prefix(this, multiple) + "You are wearing {attire}. {ifPosture:You are {posture}.}", {item:this});
+    examine:function() {
+      msg("You are wearing {attire}. {ifPosture:You are {posture}.}", {item:this});
       if (!this.hasCock && !this.hasPussy) msg("You have no genitals...");
       if (this.hasCock && this.hasPussy) msg("You have both male and female genitals...");
       if (this.hasCock && this.hasTits) msg("Your plump breasts contrast with the cock hanging between your legs.");
@@ -65,7 +65,7 @@ createItem("Joanna", ACTOR(true), {
   bust:3,
   
   features:[
-    { type:'hair', hairLength:8, form:'has', bp:'head', s:function(char) { return w.Joanna.pronouns.poss_adj + "long " + char.hairColor + " hair in a high ponytail that falls halfway down " + char.pronouns.poss_adj + " back"}},
+    { type:'hair', hairLength:8, form:'has', bp:'head', s:function(char) { return w.Joanna.pronouns.possAdj + "long " + char.hairColor + " hair in a high ponytail that falls halfway down " + char.pronouns.possAdj + " back"}},
     { type:'eyes', form:'has', bp:'face', s:function(char) { return char.eyeColor + ' eyes'}},
   ],
   insult:function(target) { return target.hasBodyPart("cock") ? "jerk" : "bitch" },
@@ -178,6 +178,7 @@ createItem("thongred", THONG(),
   {
     alias:"red thong",
     loc:"lounge",
+    exam:'A tiny red triangle and some thin cords.',
   }
 );
 
@@ -237,6 +238,7 @@ createItem("teeshirtmesh", TEE_SHIRT(true),
 createItem("swimsbriefsblack", BRIEFS(),
   {
     alias:"black Speedos",
+    exam:'Skimpy black Speedos',
   }
 );
 
@@ -245,6 +247,7 @@ createItem("swimshortsblue", SHORTS(true),
     alias:"blue swim shorts",
     loc:"Clive",
     worn:true,
+    exam:'These swim shorts are different shades of blue in a camoglage style pattern.',
     swimwear:true,
   }
 );
@@ -254,6 +257,7 @@ createItem("daisydukes", DAISY_DUKES(),
     alias:"Daisy Dukes",
     properNoun:false,
     loc:"lounge",
+    exam:'Tiny demin shorts.',
     pronouns:lang.pronouns.plural,
   }
 );
@@ -292,6 +296,7 @@ createItem("leatherjacket", MADE_OF(materials.leather), OPENABLE(false), JACKET(
 createItem("settee", MADE_OF(materials.wood), FURNITURE({sit:true, recline:true}),
   {
     loc:"lounge",
+    examine:'To fit three people.',
   }
 );
 
@@ -300,6 +305,7 @@ createItem("settee", MADE_OF(materials.wood), FURNITURE({sit:true, recline:true}
 createItem("dildo", MADE_OF(materials.rubber), TAKEABLE(), PHALLUS(true),
   {
     loc:"table",
+    examine:'Purple.',
   }
 );
 
@@ -307,6 +313,7 @@ createItem("dildo", MADE_OF(materials.rubber), TAKEABLE(), PHALLUS(true),
 createItem("whip", MADE_OF(materials.leather), TAKEABLE(),
   {
     loc:"table",
+    examine:'More of a riding crop perjaps.',
   }
 );
 
@@ -327,6 +334,7 @@ createItem("jug", MADE_OF(materials.ceramic), TAKEABLE(), VESSEL(), {
 createItem("knife", MADE_OF(materials.metal), TAKEABLE(),
   {
     cutter:true,
+    examine:'A sharp kitchen knife.',
   }
 );
 
@@ -334,14 +342,17 @@ createItem("knife", MADE_OF(materials.metal), TAKEABLE(),
 
 createItem("table", MADE_OF(materials.wood), EROTIC_FURNITURE({stand:true, bendover:true}), SURFACE(), {
   loc:"lounge",
+  examine:'Just a table.',
 });
 
 createItem("chair", MADE_OF(materials.plastic), EROTIC_FURNITURE({sit:true, straddle:true}), {
   hidesWhenSitting:["buttocks", "lowerback"],
   hidesWhenStraddling:["crotch", "groin", "midriff"],
+  examine:'Just a chair',
 });
 
 createItem("bed", MADE_OF(materials.wood), EROTIC_FURNITURE({recline:true, sit:true}), {
+    examine:'A bed.',
 });
 
 
@@ -356,6 +367,7 @@ createItem("a_frame", MADE_OF(materials.metal), BONDAGE_DEVICE(false),
     points:["wrists", "ankles"],
     restrainMsg:"{nv:char:manacle:true} {nms:item:the} wrists to the top of the A-frame, then {cj:char:make} {ob:item} open {pa:item} legs wide, before manacling them too.",
     releaseMsg:"{nv:char:unlock:true} the manacles on {nms:item:the} ankles, then {cj:char:reach} up and {cj:char:release} {pa:item} wrists.",
+    examine:'Two solid lengths of metal that meet at the top, with manacles in the corners.',
   }
 );
 
@@ -367,6 +379,7 @@ createItem("bondage_table", MADE_OF(materials.metal), BONDAGE_DEVICE(false), OPE
     closed:true,
     points:["wrists", "ankles"],
     posture:'reclining',
+    examine:'A metal table with manacles in the corners.',
     getHides:function(actor) { 
       if (this.closed) {
         return actor.posture === "reclining" ? ["buttock", "lowerback", "upperback"] : ["groin", "midriff", "chest", "tit", "nipple"] 
@@ -411,16 +424,16 @@ createItem("thin_shirt", BUTTONED_SHIRT(), {
 createItem("dress_cursed", DRESS([]),
   {
     alias:"short, black, strapless dress",
-    examine:function(multiple) {
+    examine:function() {
       const n = Math.floor(this.count / this.countRate)
       if (n < this.states.length - 1) {
-        msg(prefix(this, multiple) + this.states[n].desc);
+        msg(this.states[n].desc);
       }
       else if (this.getWorn()) {
-        msg(prefix(this, multiple) + "A red strap that goes round " + lang.getName(w[this.loc], {article:DEFINITE,possessive:true}) + " bust, without covering the nipples, held up by thin straps over " + w[this.loc].pronouns.poss_adj + " shoulders.");
+        msg("A red strap that goes round " + lang.getName(w[this.loc], {article:DEFINITE,possessive:true}) + " bust, without covering the nipples, held up by thin straps over " + w[this.loc].pronouns.possAdj + " shoulders.");
       }
       else {
-        msg(prefix(this, multiple) + "A red strap that would go round the bust, without covering much at all, held up by thin straps.");
+        msg("A red strap that would go round the bust, without covering much at all, held up by thin straps.");
       }
     },
     getSlots:function() {
@@ -513,35 +526,33 @@ createItem("dress_cursed", DRESS([]),
   }
 );
 
-createItem("butler_maid_question", QUESTION(), {
-  responses:[
-    {
-      regex:/^(maid)$/,
-      response:function() {
-        msg("'Can I have a maid?' you say to the receptionist.");
-        msg("'Sure. There will be someone in your room for you.'");
-        const maid = erotica.createWoman("your_room")
-        maid.dressUp("thongblackf", "maidoutfit", "heels2");
-      }
-    },
-    {
-      regex:/^(butler)$/,
-      response:function() {
-        msg("'Can I have a butler?' you say to the receptionist.");
-        msg("'Sure. There will be someone in your room for you.'");
-        const butler = erotica.createMan("your_room")
-        butler.dressUp("thongblackm", "bowtie");
-      }
-    },
-    {
-      regex:/^(no)$/,
-      response:function() {
-        msg("'No thanks to the maid or butler,' you say.");
-        msg("'That's fine.'");
-      }
-    },
-  ],
-});  
+util.createQuestion("butler_maid_question", [
+  {
+    regex:/^(maid)$/,
+    response:function() {
+      msg("'Can I have a maid?' you say to the receptionist.");
+      msg("'Sure. There will be someone in your room for you.'");
+      const maid = erotica.createWoman("your_room")
+      maid.dressUp("thongblackf", "maidoutfit", "heels2");
+    }
+  },
+  {
+    regex:/^(butler)$/,
+    response:function() {
+      msg("'Can I have a butler?' you say to the receptionist.");
+      msg("'Sure. There will be someone in your room for you.'");
+      const butler = erotica.createMan("your_room")
+      butler.dressUp("thongblackm", "bowtie");
+    }
+  },
+  {
+    regex:/^(no)$/,
+    response:function() {
+      msg("'No thanks to the maid or butler,' you say.");
+      msg("'That's fine.'");
+    }
+  },
+])  
 
 
 

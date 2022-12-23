@@ -3,7 +3,7 @@
 
 
 
-commands.unshift(new Cmd('DebugTestBikini', {
+new Cmd('DebugTestBikini', {
   regex:/^bikini$/,
   objects:[
   ],
@@ -27,7 +27,7 @@ commands.unshift(new Cmd('DebugTestBikini', {
     console.log(parser.isHere(w.black_bikini));
     return world.SUCCESS;
   },
-}));
+})
 
 
 

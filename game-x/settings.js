@@ -7,9 +7,10 @@ settings.version = "0.1";
 // UI options
 settings.customLibraries.push({folder:'libx', files:["setupX", "responsesX", "npcX", "templatesX", "commandsX", "worldX", "madeof", "wearableX", "wardrobe", "generator", "lists"]})
 
-settings.noAskTell = false
+//settings.noAskTell = false
 
 settings.playMode = 'dev'
+//settings.textInput = false
 settings.tests = true
 settings.givePlayerSayMsg = false
 settings.npcReactionsAlways = true
@@ -28,7 +29,6 @@ settings.status = [
 ];
 
 settings.fluids = ['cum', 'water', 'honey', 'yoghurt', 'custard']
-
 
 
 settings.startingDialogEnabled  = false
