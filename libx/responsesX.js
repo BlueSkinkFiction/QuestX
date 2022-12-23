@@ -55,7 +55,7 @@ erotica.defaultResponses = [
               { 
                 name: "tit",
                 test:function(p) { return p.bodypart.name === "tit" },
-                msg:"'Hmm!' signs {nm:item:the} as {nv:char:squeeze} {pa2:item:char} tits.",
+                msg:"'Hmm!' sighs {nm:item:the} as {nv:char:squeeze} {pa2:item:char} tits.",
                 script:function(p) { p.item.arousal += 5 },
               },
               { 
@@ -84,7 +84,7 @@ erotica.defaultResponses = [
               },
               { 
                 name: "other",
-                msg:"{nv:item:smiles:the:true} as {nv:char:run} {pa:char} hands over {pa2:item:char} {show:bpname}.",
+                msg:"{nv:item:smile:the:true} as {nv:char:run} {pa:char} hands over {pa2:item:char} {show:bpname}.",
                 script:function(p) { p.item.arousal += 2  },
               },
             ],
@@ -584,7 +584,7 @@ erotica.defaultResponses = [
         responses:[
           {
             test:function(p) { return p.bodypart.name === "tit" },
-            msg:"'Hmm!' signs {nm:item:the} as {nv:char:lick} {pa2:item:char} tits.",
+            msg:"'Hmm!' sighs {nm:item:the} as {nv:char:lick} {pa2:item:char} tits.",
             script:function(p) { p.item.modifyAttraction(p.char, 10); p.item.arousal += 5, p.char.arousal += 3 },
           },
           {
@@ -608,7 +608,7 @@ erotica.defaultResponses = [
             script:function(p) { p.item.modifyAttraction(p.char, 10); p.item.arousal += 2, p.char.arousal += 4 },
           },
           {
-            msg:"{nv:item:smiles:the:true} as {nv:char:licks} {pa2:item:char} {show:bpname}.",
+            msg:"{nv:item:smile:the:true} as {nv:char:lick} {pa2:item:char} {show:bpname}.",
             script:function(p) { p.item.modifyAttraction(p.char, 10); p.item.arousal += 3, p.char.arousal += 3 },
           },
         ],
@@ -670,11 +670,11 @@ erotica.defaultResponses = [
           },
           {
             test:function(p) { return p.rating < 25 },
-            msg:"{nv:char:slip:true} {pa:char} finger into {pa2:item:char} {pussy:item}. 'Please, no!' {pn:item:exclaim}, unable to stop {sb:char} as {pv:char:go} deeper into {pa:item} sex.",
+            msg:"{nv:char:slip:true} {pa:char} finger into {pa2:item:char} {pussy:item}. 'Please, no!' {pv:item:exclaim}, unable to stop {sb:char} as {pv:char:go} deeper into {pa:item} sex.",
             script:function(p) { p.char.arousal += 8; p.item.arousal += 2 },
           },
           {
-            msg:"{nv:char:slip:true} {pa:char} finger into {pa2:item:char} {pussy:item}. 'Oh yes' {pn:item:gasp}, unable in any case to stop {sb:char} as {pv:char:go} deeper into {pa:item} sex.",
+            msg:"{nv:char:slip:true} {pa:char} finger into {pa2:item:char} {pussy:item}. 'Oh yes' {pv:item:gasp}, unable in any case to stop {sb:char} as {pv:char:go} deeper into {pa:item} sex.",
             script:function(p) { p.char.arousal += 5; p.item.arousal += 12 },
           },
         ],
@@ -717,19 +717,19 @@ erotica.defaultResponses = [
             responses:[
               {
                 test:function(p) { return p.rating < 0 },
-                msg:"{nv:char:reach:true} {pa:char} finger to {pa2:item:char} crotch. 'Hands off!' {pn:item:exclaim}, giving {nm:char} a hard slap.",
+                msg:"{nv:char:reach:true} {pa:char} finger to {pa2:item:char} crotch. 'Hands off!' {pv:item:exclaim}, giving {nm:char} a hard slap.",
                 script:function(p) { p.char.reputation += 20 },
                 failed:true,
               },
               {
                 test:function(p) { return p.rating < 25 },
-                msg:"{nv:char:reach:true} {pa:char} finger to {pa2:item:char} crotch. 'Hands off!' {pn:item:exclaim}.",
+                msg:"{nv:char:reach:true} {pa:char} finger to {pa2:item:char} crotch. 'Hands off!' {pv:item:exclaim}.",
                 script:function(p) { p.char.reputation += 10 },
                 failed:true,
               },
               {
                 test:function(p) { return p.rating < 50 },
-                msg:"{nv:char:reach:true} {pa:char} finger to {pa2:item:char} crotch. 'Hey!' {pn:item:giggle}, 'hands to yourself, naughty.'",
+                msg:"{nv:char:reach:true} {pa:char} finger to {pa2:item:char} crotch. 'Hey!' {pv:item:giggle}, 'hands to yourself, naughty.'",
                 script:function(p) { },
               },
               {
@@ -776,7 +776,7 @@ erotica.defaultResponses = [
           },
           {
             test:function(p) { return p.rating < 25 },
-            msg:"{nv:char:put:true} a hand on {nms:item:the} cock. 'Hey, no!' {pn:item:exclaim}, unable to stop {sb:char} as {pv:char:jerk} {sb:item} off.",
+            msg:"{nv:char:put:true} a hand on {nms:item:the} cock. 'Hey, no!' {pv:item:exclaim}, unable to stop {sb:char} as {pv:char:jerk} {sb:item} off.",
             script:function(p) { p.char.arousal += 8; p.item.arousal += 2 },
           },
           {
@@ -823,19 +823,19 @@ erotica.defaultResponses = [
             responses:[
               {
                 test:function(p) { return p.rating < 0 },
-                msg:"{nv:char:put:true} a hand on {nms:item:the} cock. 'Hey, no!' {pn:item:exclaim}.",
+                msg:"{nv:char:put:true} a hand on {nms:item:the} cock. 'Hey, no!' {pv:item:exclaim}.",
                 script:function(p) { p.char.arousal += 8; p.item.arousal += 2 },
                 failed:true,
               },
               {
                 test:function(p) { return p.rating < 25 },
-                msg:"{nv:char:put:true} a hand on {nms:item:the} cock. 'Hey, no!' {pn:item:exclaim}.",
+                msg:"{nv:char:put:true} a hand on {nms:item:the} cock. 'Hey, no!' {pv:item:exclaim}.",
                 script:function(p) { p.char.reputation += 10 },
                 failed:true,
               },
               {
                 test:function(p) { return p.rating < 80 },
-                msg:"{nv:char:put:true} a hand on {nms:item:the} cock. 'Hey, yes!' {pn:item:exclaim}, as {nv:char:jerk} {sb:item} off.",
+                msg:"{nv:char:put:true} a hand on {nms:item:the} cock. 'Hey, yes!' {pv:item:exclaim}, as {nv:char:jerk} {sb:item} off.",
                 script:function(p) { p.char.arousal += 5; p.item.arousal += 10 },
               },
               {
@@ -973,19 +973,19 @@ erotica.defaultResponses = [
             responses:[
               {
                 test:function(p) { return p.rating < 0 },
-                msg:"{nv:char:put:true} a hand on {nms:item:the} cock. 'Hey, no!' {pn:item:exclaim}.",
+                msg:"{nv:char:put:true} a hand on {nms:item:the} cock. 'Hey, no!' {pv:item:exclaim}.",
                 script:function(p) { p.char.arousal += 8; p.item.arousal += 2 },
                 failed:true,
               },
               {
                 test:function(p) { return p.rating < 25 },
-                msg:"{nv:char:put:true} a hand on {nms:item:the} cock. 'Hey, no!' {pn:item:exclaim}.",
+                msg:"{nv:char:put:true} a hand on {nms:item:the} cock. 'Hey, no!' {pv:item:exclaim}.",
                 script:function(p) { p.char.reputation += 10 },
                 failed:true,
               },
               {
                 test:function(p) { return p.rating < 80 },
-                msg:"{nv:char:put:true} a hand on {nms:item:the} cock. 'Hey, yes!' {pn:item:exclaim}, as {nv:char:jerk} {sb:item} off.",
+                msg:"{nv:char:put:true} a hand on {nms:item:the} cock. 'Hey, yes!' {pv:item:exclaim}, as {nv:char:jerk} {sb:item} off.",
                 script:function(p) { p.char.arousal += 5; p.item.arousal += 10 },
               },
               {
@@ -1075,12 +1075,12 @@ erotica.defaultResponses = [
               p.char.arousal += 3
               p.item.arousal += 2
               p.source.volume -= 5
-              erotica.pourOn(w.Joanna, p.substance, "midriff")
-              erotica.pourOn(w.Joanna, p.substance, "chest")
-              erotica.pourOn(w.Joanna, p.substance, "groin")
-              if (p.item.hasBodyPart("tit")) erotica.pourOn(w.Joanna, p.substance, "tit")
-              if (p.item.hasBodyPart("cock")) erotica.pourOn(w.Joanna, p.substance, "cock")
-              if (p.item.hasBodyPart("pussy")) erotica.pourOn(w.Joanna, p.substance, "pussy")
+              erotica.pourOn(p.item, p.substance, "midriff")
+              erotica.pourOn(p.item, p.substance, "chest")
+              erotica.pourOn(p.item, p.substance, "groin")
+              if (p.item.hasBodyPart("tit")) erotica.pourOn(p.item, p.substance, "tit")
+              if (p.item.hasBodyPart("cock")) erotica.pourOn(p.item, p.substance, "cock")
+              if (p.item.hasBodyPart("pussy")) erotica.pourOn(p.item, p.substance, "pussy")
             },
           },
           {
@@ -1090,9 +1090,9 @@ erotica.defaultResponses = [
               p.char.arousal += 3
               p.item.arousal += 2
               p.source.volume -= 5
-              erotica.pourOn(w.Joanna, p.substance, "lowerback")
-              erotica.pourOn(w.Joanna, p.substance, "upperback")
-              erotica.pourOn(w.Joanna, p.substance, "buttock")
+              erotica.pourOn(p.item, p.substance, "lowerback")
+              erotica.pourOn(p.item, p.substance, "upperback")
+              erotica.pourOn(p.item, p.substance, "buttock")
             },
           },
           {
@@ -1102,10 +1102,10 @@ erotica.defaultResponses = [
               p.char.arousal += 3
               p.item.arousal += 2
               p.source.volume -= 2
-              erotica.pourOn(w.Joanna, p.substance, "thigh")
-              erotica.pourOn(w.Joanna, p.substance, "groin")
-              if (p.item.hasBodyPart("cock")) erotica.pourOn(w.Joanna, p.substance, "cock")
-              if (p.item.hasBodyPart("pussy")) erotica.pourOn(w.Joanna, p.substance, "pussy")
+              erotica.pourOn(p.item, p.substance, "thigh")
+              erotica.pourOn(p.item, p.substance, "groin")
+              if (p.item.hasBodyPart("cock")) erotica.pourOn(p.item, p.substance, "cock")
+              if (p.item.hasBodyPart("pussy")) erotica.pourOn(p.item, p.substance, "pussy")
             },
           },
           {
@@ -1115,8 +1115,8 @@ erotica.defaultResponses = [
               p.char.arousal += 3
               p.item.arousal += 2
               p.source.volume -= 2
-              erotica.pourOn(w.Joanna, p.substance, "head")
-              erotica.pourOn(w.Joanna, p.substance, "mouth")
+              erotica.pourOn(p.item, p.substance, "head")
+              erotica.pourOn(p.item, p.substance, "mouth")
             },
           },
           {
@@ -1125,12 +1125,12 @@ erotica.defaultResponses = [
               p.char.arousal += 3
               p.item.arousal += 2
               p.source.volume -= 3
-              erotica.pourOn(w.Joanna, p.substance, "midriff")
-              erotica.pourOn(w.Joanna, p.substance, "chest")
-              erotica.pourOn(w.Joanna, p.substance, "groin")
-              if (p.item.hasBodyPart("tit")) erotica.pourOn(w.Joanna, p.substance, "tit")
-              if (p.item.hasBodyPart("cock")) erotica.pourOn(w.Joanna, p.substance, "cock")
-              if (p.item.hasBodyPart("pussy")) erotica.pourOn(w.Joanna, p.substance, "pussy")
+              erotica.pourOn(p.item, p.substance, "midriff")
+              erotica.pourOn(p.item, p.substance, "chest")
+              erotica.pourOn(p.item, p.substance, "groin")
+              if (p.item.hasBodyPart("tit")) erotica.pourOn(p.item, p.substance, "tit")
+              if (p.item.hasBodyPart("cock")) erotica.pourOn(p.item, p.substance, "cock")
+              if (p.item.hasBodyPart("pussy")) erotica.pourOn(p.item, p.substance, "pussy")
             },
           },
         ],
@@ -1139,7 +1139,7 @@ erotica.defaultResponses = [
         script:function(p) {
           p.char.arousal += p.item.getExposure() / 2
           p.item.arousal += p.item.getExposure() / 3
-              erotica.pourOn(w.Joanna, "honey", "thighs")
+              erotica.pourOn(p.item, "honey", "thighs")
         },
       },
       {
@@ -1151,7 +1151,7 @@ erotica.defaultResponses = [
             script:function(p) {
               p.char.arousal += p.item.getExposure() / 2
               p.item.arousal += p.item.getExposure() / 3
-              erotica.pourOn(w.Joanna, "honey", p.bodypart.name)
+              erotica.pourOn(p.item, "honey", p.bodypart.name)
             },
           },
           {

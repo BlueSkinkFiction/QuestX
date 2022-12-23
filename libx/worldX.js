@@ -4,72 +4,72 @@
 
 
 // This can be used in commands to catch when the bodypart is not specified.
-createItem("default", BODY_PART(0, false, /asdlj_khj__fgfghl_ljkhjhj/));
+createBodyPart("default", { intimateRating: 0, paired:false, regex:/asdlj_khj__fgfghl_ljkhjhj/});
 
 
-createItem("torso", AGREGATE_BODY_PART(3, false, /torso|body/));
+createBodyPart("torso", { intimateRating: 3, paired:false, regex:/torso|body/, aggregate:true});
 
-createItem("foot", BODY_PART(1, true, /foot|feet/), {pluralAlias:'feet'});
-createItem("calf", BODY_PART(1, true, /calf|calves|calfs/), {pluralAlias:'calves'});
-createItem("knee", BODY_PART(2, true, /knees?/));
-createItem("thigh", BODY_PART(4, true, /legs?|thighs?/));
-createItem("hip", BODY_PART(4, true, /hips?/), {modestyBoost:true});
-createItem("buttock", BODY_PART(7, true, /buttocks?|ass cheeks?/), {modestyBoost:true});
+createBodyPart("foot", { intimateRating: 1, paired:true, regex:/foot|feet/,pluralAlias:'feet'});
+createBodyPart("calf", { intimateRating: 1, paired:true, regex:/calf|calves|calfs/,pluralAlias:'calves'});
+createBodyPart("knee", { intimateRating: 2, paired:true, regex:/knees?/});
+createBodyPart("thigh", { intimateRating: 4, paired:true, regex:/legs?|thighs?/});
+createBodyPart("hip", { intimateRating: 4, paired:true, regex:/hips?/,modestyBoost:true});
+createBodyPart("buttock", { intimateRating: 7, paired:true, regex:/buttocks?|ass cheeks?/,modestyBoost:true});
 
-createItem("hand", BODY_PART(0, true, /hands?/));
-createItem("wrist", BODY_PART(0, true, /wrists?/));
-createItem("arm", BODY_PART(0, true, /arms?/));
-createItem("shoulder", BODY_PART(1, true, /shoulders?/));
+createBodyPart("hand", { intimateRating: 0, paired:true, regex:/hands?/});
+createBodyPart("wrist", { intimateRating: 0, paired:true, regex:/wrists?/});
+createBodyPart("arm", { intimateRating: 0, paired:true, regex:/arms?/});
+createBodyPart("shoulder", { intimateRating: 1, paired:true, regex:/shoulders?/})
 
-createItem("lowerback", BODY_PART(3, false, /lower back/));
-createItem("upperback", BODY_PART(2, false, /upper back|back/), {alias:"back"});
-createItem("midriff", BODY_PART(4, false, /midriff/), {modestyBoost:true});
+createBodyPart("lowerback", { intimateRating: 3, paired:false, regex:/lower back/})
+createBodyPart("upperback", { intimateRating: 2, paired:false, regex:/upper back|back/,alias:"back"});
+createBodyPart("midriff", { intimateRating: 4, paired:false, regex:/midriff/,modestyBoost:true});
 
 // These body parts are more intimate for characters with tits
-createItem("chest", BODY_PART(-1, false, /chest/), {
+createBodyPart("chest", {intimateRating:-1, paired:false, regex:/chest/,
   getIntimateRating:function(char) { return char.hasBodyPart("tit") ? 7 : 3; }
 });
-createItem("nipple", BODY_PART(-1, true, /nipples?/), {
+createBodyPart("nipple", {intimateRating:-1, paired:true, regex:/nipples?/,
   getIntimateRating:function(char) { return char.hasBodyPart("tit") ? 8 : 3; }
 });
-createItem("cleavage", BODY_PART(-1, false, /cleavage/), {
+createBodyPart("cleavage", {intimateRating:-1, paired:false, regex:/cleavage/,
   getIntimateRating:function(char) { return char.hasBodyPart("tit") ? 4 : 3; }
 });
 
 // For the head, it is moderately intimate to be touched, but generally people are happy to have it exposed
-createItem("neck", BODY_PART(4, false, /neck/), {
+createBodyPart("neck", { intimateRating: 4, paired:false, regex:/neck/,
   getExposureRating:function(char) { return 0; },
 });
-createItem("head", BODY_PART(3, false, /head/), {
+createBodyPart("head", { intimateRating: 3, paired:false, regex:/head/,
   getExposureRating:function(char) { return 0; },
 });
-createItem("nose", BODY_PART(3, false, /nose/), {
+createBodyPart("nose", { intimateRating: 3, paired:false, regex:/nose/,
   getExposureRating:function(char) { return 0; },
 });
-createItem("mouth", BODY_PART(3, false, /mouth|lips?/), {
+createBodyPart("mouth", { intimateRating: 3, paired:false, regex:/mouth|lips?/,
   getExposureRating:function(char) { return 0; },
   canBePenetrated:true,
 });
-createItem("face", BODY_PART(3, false, /face/), {
+createBodyPart("face", { intimateRating: 3, paired:false, regex:/face/,
   getExposureRating:function(char) { return 0; },
 });
 
 // These body parts are not in the garment slots, which use chest, buttock, groin, groin and crotch
-createItem("tit", BODY_PART(8, true, /tits?|boobs?|breasts?|gazongas?|mammary|mammaries|jugs?|hooters?|knockers?|melons?|baps?|rack/), {
+createBodyPart("tit", { intimateRating: 8, paired:true, regex:/tits?|boobs?|breasts?|gazongas?|mammary|mammaries|jugs?|hooters?|knockers?|melons?|baps?|rack/,
   modestyBoost:true,
   indirect:true,
   getSlot:function() { return "chest"; },
 });
-createItem("ass", BODY_PART(8, false, /ass|arse|backside|bottom|tush|rump|butt|booty|can|clacker|bum/), {
+createBodyPart("ass", { intimateRating: 8, paired:false, regex:/ass|arse|backside|bottom|tush|rump|butt|booty|can|clacker|bum/,
   getSlot:function() { return "buttock"; },
   indirect:true,
   canBePenetrated:true,
 });
-createItem("bollock", GENITALS(9, true, /bollocks?|balls?|testicles?|nadgers?|nuts?/), {
+createBodyPart("bollock", { intimateRating: 9, paired:true, regex:/bollocks?|balls?|testicles?|nadgers?|nuts?/, genitals:true,
   modestyBoost:true,
   getSlot:function(toHandle) { return toHandle ? "crotch" : "groin"; },
 });
-createItem("cock", GENITALS(10, false, /cock|dick|phallus|penis|willy|manhood|organ|tool|pecker|schlong|prick|member|wang|knob|dong/), {
+createBodyPart("cock", { intimateRating: 10, paired:false, regex:/cock|dick|phallus|penis|willy|manhood|organ|tool|pecker|schlong|prick|member|wang|knob|dong/, genitals:true,
   modestyBoost:true,
   response_suck:function(char, object) {
     msg("{nv:char:suck:true} {pa:char} {nms:npc:true} {cock:npc}.", {npc:object, char:char});
@@ -79,7 +79,7 @@ createItem("cock", GENITALS(10, false, /cock|dick|phallus|penis|willy|manhood|or
   },
   getSlot:function() { return "groin" },
 });
-createItem("pussy", GENITALS(10, false, /pussy|cunt|vagina|slit|putang|snatch|coochie/), {
+createBodyPart("pussy", { intimateRating: 10, paired:false, regex:/pussy|cunt|vagina|slit|putang|snatch|coochie/, genitals:true,
   response_suck:function(char, object) {
     msg("You can't suck off a pussy!");
   },
@@ -89,17 +89,15 @@ createItem("pussy", GENITALS(10, false, /pussy|cunt|vagina|slit|putang|snatch|co
 
 
 
-createItem("tail", BODY_PART(1, false, /tail/), {notStd:true});
-createItem("wing", BODY_PART(1, true, /wings?/), {notStd:true});
-createItem("horn", BODY_PART(1, true, /horns?/), {notStd:true});
+createBodyPart("tail", { intimateRating: 1, paired:false, regex:/tail/,notStd:true});
+createBodyPart("wing", { intimateRating: 1, paired:true, regex:/wings?/,notStd:true});
+createBodyPart("horn", { intimateRating: 1, paired:true, regex:/horns?/,notStd:true});
 
 
-erotica.slots = [];
-for (let key in w) {
-  if (w[key].isBodyPart && !w[key].nonStd) {
-    if (!erotica.slots.includes(w[key].getSlot())) {
-      erotica.slots.push(w[key].getSlot());
-    }
+erotica.slots = []
+for (const bp of bodyParts) {
+  if (!erotica.slots.includes(bp.getSlot())) {
+    erotica.slots.push(bp.getSlot())
   }
 }
 
@@ -146,8 +144,8 @@ erotica.verify = function() {
       }
       if (typeof w[key].ripOff !== "function") errormsg("No function 'ripOff' for garment " + w[key].name)
       if (typeof w[key].getSlots !== "function") errormsg("No function 'getSlots' for garment " + w[key].name)
-      if (typeof w[key].specialWearMsg !== "function" && typeof w[key].wearMsg !== "string") errormsg("No 'wearMsg' for garment " + w[key].name)
-      if (typeof w[key].specialRemoveMsg !== "function" && typeof w[key].removeMsg !== "string") errormsg("No 'wearMsg' for garment " + w[key].name)
+      if (typeof w[key].specialWearMsg !== "function" && typeof w[key].msgWear !== "string") errormsg("No 'msgWear' for garment " + w[key].name)
+      if (typeof w[key].specialRemoveMsg !== "function" && typeof w[key].msgRemove !== "string") errormsg("No 'msgRemove' for garment " + w[key].name)
       if (typeof w[key].strength !== "number") errormsg("No number'strength' for garment " + w[key].name);
     }
   }

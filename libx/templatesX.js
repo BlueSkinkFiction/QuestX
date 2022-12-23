@@ -5,89 +5,93 @@
 
 
 
-const BODY_PART = function(intimateRating, paired, regex) {
-  const res = {
-    isBodyPart:true,
-    intimateRating:intimateRating,
-    regex:regex,
-    paired:paired,
-    // string to use when saying the character does not have this body part
-    none:function() {
-      if (this.paired) return "any";
-      return "one of them";
-    },
-    getSlot:function() { return this.name; },
-    // is the body part covered by this garment?
-    isCoveredBy:function(garment) {
-      return garment.getSlots().include(this.getSlot());
-    },
-    // does the garment stop access to the body part?
-    //isProtectedBy:function(garment) {
-    //  return this.coveredBy(garment);
-    //},
-    // gets the outer garment that hides this body part, or false if nothing does
-    getCovering:function(char) {
-      return char.getOuterWearable(this.getSlot());
-    },
-    // gets all the garments that hides this body part
-    getAllCoverings:function(char) {
-      return char.getWearing().filter(el => el.getSlots().includes(this.getSlot()));
-    },
-    // returns false if there is a garment covering the bodypart with no getRevealing 
-    // i.e., the bodypart is concealed, otherwise returns a measure of how revealed
-    // Assumes at least one item on this bodypart is revealing!
-    // Unit tested
-    getReveal:function(char) {
-      const clothing = this.getAllCoverings(char);
-      let reveal = 5;
-      for (let garment of clothing) {
-        if (!garment.getRevealing) return false;
-        reveal = Math.min(reveal, garment.getRevealing());
-      }
-      return reveal;
-    },    
-    // gets the outer garment that protects this body part, or false if nothing does
-    getProtection:function(char, includeBondage) {
-      return char.getOuterWearable(this.getSlot(true), includeBondage);
-    },
-    // how sexual is it to touch the body part?
-    getIntimateRating:function(char) {
-      const x = char.getIntimateRating(this.getSlot());
-      if (x) return x;
-      return this.intimateRating;
-    },
-    // how daring is a character to expose this body part
-    getExposureRating:function(char) {
-      return this.getIntimateRating(char);
-    },
-    getName(side) {
-      if (!this.paired) return this.alias
-      return side ? side.trim() + " " + this.alias : this.pluralAlias
+const BODY_PART_TEMPLATE =  {
+  // string to use when saying the character does not have this body part
+  none:function() {
+    if (this.paired) return "any";
+    return "one of them";
+  },
+  getSlot:function() { return this.name; },
+  // is the body part covered by this garment?
+  isCoveredBy:function(garment) {
+    return garment.getSlots().include(this.getSlot());
+  },
+  // does the garment stop access to the body part?
+  //isProtectedBy:function(garment) {
+  //  return this.coveredBy(garment);
+  //},
+  // gets the outer garment that hides this body part, or false if nothing does
+  getCovering:function(char) {
+    return char.getOuterWearable(this.getSlot());
+  },
+  // gets all the garments that hides this body part
+  getAllCoverings:function(char) {
+    return char.getWearing().filter(el => el.getSlots().includes(this.getSlot()));
+  },
+  // returns false if there is a garment covering the bodypart with no getRevealing 
+  // i.e., the bodypart is concealed, otherwise returns a measure of how revealed
+  // Assumes at least one item on this bodypart is revealing!
+  // Unit tested
+  getReveal:function(char) {
+    const clothing = this.getAllCoverings(char);
+    let reveal = 5;
+    for (let garment of clothing) {
+      if (!garment.getRevealing) return false;
+      reveal = Math.min(reveal, garment.getRevealing());
+    }
+    return reveal;
+  },    
+  // gets the outer garment that protects this body part, or false if nothing does
+  getProtection:function(char, includeBondage) {
+    return char.getOuterWearable(this.getSlot(true), includeBondage);
+  },
+  // how sexual is it to touch the body part?
+  getIntimateRating:function(char) {
+    const x = char.getIntimateRating(this.getSlot());
+    if (x) return x;
+    return this.intimateRating;
+  },
+  // how daring is a character to expose this body part
+  getExposureRating:function(char) {
+    return this.getIntimateRating(char);
+  },
+  getName(side) {
+    if (!this.paired) return this.alias
+    return side ? side.trim() + " " + this.alias : this.pluralAlias
+  },
+  
+  examine:function() {
+    msg('{hereDesc}')
+    return true
+  },
+}
+ 
+
+const bodyParts = []
+
+const findBodyPart = function(s) {
+  const bp = bodyParts.find(el => s.match(el.regex))
+  return bp
+}
+const findBodyPartBySlot = function(s) {
+  return bodyParts.find(el => s === el.getSlot())
+}
+
+const createBodyPart = function(name, data) {
+  //const o = createItem(name, BODY_PART(), data)
+  const o = { name:name, pluralAlias:name + 's', alias:name }
+  if (data.genitals) {
+    o.indirect = true
+    o.getCovering = function(char) {
+      return char.getOuterWearable("groin")
     }
   }
-  return res;
-}  
- 
- 
-// Genitals are handled a little differently, as they are covered by "groin"
-// and protected by "crotch", rather than their own clothing slot
-const GENITALS = function(intimateRating, paired, regex) {
-  const res = BODY_PART(intimateRating, paired, regex);
-  res.indirect = true
-  res.getCovering = function(char) {
-    return char.getOuterWearable("groin");
-  };
-  return res;
-}  
-
-
-const AGREGATE_BODY_PART = function(intimateRating, paired, regex) {
-  const res = BODY_PART(intimateRating, paired, regex);
-  res.agregate = true
-  return res;
-}  
-
-
+  for (const key in BODY_PART_TEMPLATE) o[key] = BODY_PART_TEMPLATE[key]
+  for (const key in data) o[key] = data[key]
+  //log(o)
+  bodyParts.push(o)
+  return o
+}
 
 
 
@@ -158,7 +162,7 @@ const BONDAGE_DEVICE = function(testMove) {
   const res = {
     bondage:true,
     testMove:testMove,
-    canManipulate:false,
+    testManipulate:false,
     points:[],
     posture:'standing',
     getHides:function(char) { return [] },

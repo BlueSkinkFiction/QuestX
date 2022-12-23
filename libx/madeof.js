@@ -72,7 +72,7 @@ function haveFireSource() {
 
 
 
-commands.unshift(new Cmd('Burn', {
+new Cmd('Burn', {
   npcCmd:true,
   rules:[cmdRules.isHere],
   regex:/^(burn) (.+)$/,
@@ -90,9 +90,9 @@ commands.unshift(new Cmd('Burn', {
     }
     return cmdDamage("fire", char, objects[0], "#### will not burn.");
   },
-}));
+})
 
-commands.unshift(new Cmd('Smash', {
+new Cmd('Smash', {
   npcCmd:true,
   rules:[cmdRules.isHere],
   regex:/^(smash) (.+)$/,
@@ -106,9 +106,9 @@ commands.unshift(new Cmd('Smash', {
     if (!char) return world.FAILED;
     return cmdDamage("smash", char, objects[0], "#### cannot be smashed up.");
   },
-}));
+})
 
-commands.unshift(new Cmd('Shred', {
+new Cmd('Shred', {
   npcCmd:true,
   rules:[cmdRules.isHere],
   regex:/^(shred|rip up|rip) (.+)$/,
@@ -122,13 +122,13 @@ commands.unshift(new Cmd('Shred', {
     if (!char) return world.FAILED;
     return cmdDamage("rip", char, objects[0], "#### cannot be ripped.");
   },
-}));
+})
 
 
 function cmdDamage(damage, char, objects, nomsg) {
   let success = false;
   const multiple = objects.length > 1 || parser.currentCommand.all;
-  if (!char.canManipulate(objects[0], "damage")) {
+  if (!char.testManipulate(objects[0], "damage")) {
     return world.FAILED;
   }
   for (let i = 0; i < objects.length; i++) {

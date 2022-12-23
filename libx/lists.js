@@ -766,7 +766,6 @@ erotica.boysNames = [
   "Bob",
   "Bobby",
   "Booker",
-  "Boris",
   "Boyce",
   "Boyd",
   "Brad",

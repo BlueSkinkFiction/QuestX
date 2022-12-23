@@ -15,7 +15,8 @@ erotica.pullOffTexts = {
 
 const WEARABLE_X = function (layer, slots) {
   const res = Object.assign(WEARABLE(layer, slots), MADE_OF(materials.cloth))
-  
+  //const res = WEARABLE(layer, slots)
+  res.strength = 1
   
   res.examine = function() {
     if (!this.exam) {
@@ -25,20 +26,16 @@ const WEARABLE_X = function (layer, slots) {
     let s = this.exam
     
     if (this.substanceMess && this.substanceMess.length > 0) {
-      s += " {pv:item:be:true} covered in " + formatList(this.substanceMess, {lastJoiner:lang.list_and}) + "."
+      s += " {pv:item:be:true} covered in " + formatList(this.substanceMess, {lastSep:lang.list_and}) + "."
     }
     if (this.cumMess && this.cumMess.length > 0) {
       const list = this.cumMess.map(el => lang.getName(w[el], {article:DEFINITE, possessive:true}))
-      s += " {pv:item:have:true} " + formatList(list, {lastJoiner:lang.list_and}) + " cum on them."
+      s += " {pv:item:have:true} " + formatList(list, {lastSep:lang.list_and}) + " cum on them."
     }
     
     msg(s, {item:this})
-    return true
   }
   
-  //res.getNameModifier = function() {
-  //  return this.worn && this.isAtLoc(player.name) ? " (worn)" : ''
-  //}
   res.testRemove = function(char) {
     if (settings.testRemove) return settings.testRemove(this, char)
     return true
@@ -52,28 +49,28 @@ const WEARABLE_X = function (layer, slots) {
   res.wear = function(options) {
     options.item = this
     if (!this._canWearRemove(true, options)) return false
-    if (!options.char.canManipulate(this, "wear")) return false
+    if (!options.char.testManipulate(this, "wear")) return false
 
-    if (this.specialWearMsg) {
-      msg(this.specialWearMsg(options.char), options)
+    if (this.specialmsgWear) {
+      msg(this.specialmsgWear(options.char), options)
     }
     else {
-      msg(this.wearMsg, options)
+      msg(this.msgWear, options)
     }
     this.worn = true
     if (this.afterWear) this.afterWear(options)
     return true
-  };
+  }
 
   res.remove = function(options) {
     options.item = this
     if (!this.testRemove(options.char)) { return false; }
-    if (!options.char.canManipulate(this, "remove")) { return false; }
-    if (this.specialRemoveMsg) {
-      msg(this.specialRemoveMsg(options.char), options)
+    if (!options.char.testManipulate(this, "remove")) { return false; }
+    if (this.specialmsgRemove) {
+      msg(this.specialmsgRemove(options.char), options)
     }
     else {
-      msg(this.removeMsg, options)
+      msg(this.msgRemove, options)
     }
     const startExposure = options.char.getExposure()
     this.worn = false;
@@ -83,20 +80,21 @@ const WEARABLE_X = function (layer, slots) {
       npc.stripReaction(options.char, this, startExposure, options.char.getExposure())
     }
     return true;
-  };
+  }
   
   res.getPrice = function() {
+    const basePrice = (this.alias.length % 6) * 50 - 1
     if (this.price > 0) return price;
-    if (this.garmentType === "swimwear") return /swimsuit/.test(this.name) ? 3500 - 1 : 2500 - 1
-    if (this.garmentType === "showwear") return 3000 - 2
-    if (/leather/.test(this.name)) return 1000 + 700 * this.slots.length - 3
-    if (/dress/.test(this.name)) return 3000 + 200 * this.name.length - 4
-    if (this.wear_layer === 2) return 1000 - 5
+    if (this.garmentType === "swimwear") return basePrice + (/swimsuit/.test(this.name) ? 3500 : 2500)
+    if (this.garmentType === "showwear") return basePrice + 3000
+    if (/leather/.test(this.name)) return basePrice + 1000 + 700 * this.slots.length
+    if (/dress/.test(this.name)) return basePrice + 3000 + 200 * this.name.length
+    if (this.wear_layer === 2) return basePrice + 1000
     if (this.footwear) {
       console.log(this)
-      return 1000 + 1500 * this.slots.length - 6
+      return basePrice + 1000 + 1500 * this.slots.length
     }
-    return 1000 + 100 * this.name.length - 7
+    return basePrice + 1000 + 100 * this.name.length
   }
   
   res.pickupMsg = "'What are you doing with my {nm:garment}?' {nm:char:the} asks."
@@ -119,7 +117,7 @@ const WEARABLE_THAT_PULLS_DOWN = function (layer, slots) {
       else if (o.getWorn()) {
         if (!o.getWearRemoveBlocker(player, false)) {
           list.push("Remove")
-          list.push(o.pulledDown ? "Pull up" : "Pull down")
+          if (!settings.disablePartDressVerbs) list.push(o.pulledDown ? "Pull up" : "Pull down")
         }
       }
       else {
@@ -130,7 +128,7 @@ const WEARABLE_THAT_PULLS_DOWN = function (layer, slots) {
     o.nameModifierFunctions.push(function(o, list, options) {
       if (!o.worn) return
       if (options.noWorn && !o.pulledDown) return
-      list.push(o.pulledDown ? "around " + w[o.loc].pronouns.poss_adj + " ankles" : "worn")
+      list.push(o.pulledDown ? "around " + w[o.loc].pronouns.possAdj + " ankles" : "worn")
     })
   }
   res.pullDown = function(char) {
@@ -174,7 +172,7 @@ const WEARABLE_THAT_PULLS_UP = function (layer, slots, toDest) {
       else if (o.getWorn()) {
         if (!o.getWearRemoveBlocker(player, false)) {
           list.push("Remove")
-          list.push(o.pulledUp ? "Pull down" : "Pull up")
+          if (!settings.disablePartDressVerbs) list.push(o.pulledUp ? "Pull down" : "Pull up")
         }
       }
       else {
@@ -185,7 +183,7 @@ const WEARABLE_THAT_PULLS_UP = function (layer, slots, toDest) {
     o.nameModifierFunctions.push(function(o, list, options) {
       if (!o.worn) return
       if (options.noWorn && !o.pulledUp) return
-      list.push(o.pulledUp ? "pulled up around " + w[o.loc].pronouns.poss_adj + " " + o.toDest : "worn")
+      list.push(o.pulledUp ? "pulled up around " + w[o.loc].pronouns.possAdj + " " + o.toDest : "worn")
     })
   }
 
@@ -275,17 +273,15 @@ const WEARABLE_THAT_UNFASTENS = function (layer, slots, slots2) {
 
 // CASUAL
 
-const TEE_SHIRT = function(lowCut) {
-  const slots = ["chest", "nipple", "midriff", "upperback", "lowerback", "shoulder"];
-  if (!lowCut) slots.push("cleavage");
+const TOP_THAT_PULLS_UP = function(slots) {
   const res = WEARABLE_THAT_PULLS_UP(4, slots, "neck");
   res.pullsoff = "up";
   res.strength = 1
   res.garmentType = "casual"
   res.subtype = 'teeshirt'
   res.ripOff = erotica.ripOffTeeShirt
-  res.wearMsg = "{nv:char:pull:true} the tee-shirt over {pa:char} head, and down over {pa:char} torso."
-  res.removeMsg = "{nv:char:pull:true} the tee-shirt up and over {pa:char} head."
+  res.msgWear = "{nv:char:pull:true} {nm:item:the-pa::char} over {pa:char} head, and down over {pa:char} torso."
+  res.msgRemove = "{nv:char:pull:true} {nm:item:the-pa::char} up and over {pa:char} head."
   res.stripper = function(options) {
     if (!options.chest) {
       if (char.hasHugeBoobs) {
@@ -305,40 +301,32 @@ const TEE_SHIRT = function(lowCut) {
     }
   }
   return res;
-};
+}
+
+
+
+const PULLOVER_SHIRT = function(lowCut) {
+  const slots = ["chest", "nipple", "midriff", "upperback", "lowerback", "shoulder", "arm"]
+  if (!lowCut) slots.push("cleavage")
+  const res = TOP_THAT_PULLS_UP(slots)
+  return res;
+}
+
+const TEE_SHIRT = function(lowCut) {
+  const slots = ["chest", "nipple", "midriff", "upperback", "lowerback", "shoulder"]
+  if (!lowCut) slots.push("cleavage")
+  const res = TOP_THAT_PULLS_UP(slots)
+  return res;
+}
 
 
 const VEST_TOP = function(cropped) {
-  const slots = ["chest", "nipple", "midriff", "upperback"];
-  if (!cropped) slots.push("midriff", "lowerback");
-  const res = WEARABLE_THAT_PULLS_UP(3, slots, "neck");
-  res.pullsoff = "up";
-  res.strength = 1
-  res.garmentType = "casual"
+  const slots = ["chest", "nipple", "midriff", "upperback"]
+  if (!cropped) slots.push("midriff", "lowerback")
+  const res = TOP_THAT_PULLS_UP(slots)
   res.subtype = 'vesttop'
-  res.wearMsg = "{nv:char:pull:true} the tee-shirt over {pa:char} head, and down over {pa:char} torso."
-  res.removeMsg = "{nv:char:pull:true} the tee-shirt up and over {pa:char} head."
-  res.ripOff = erotica.ripOffTeeShirt
-  res.stripper = function(options) {
-    if (!options.chest) {
-      if (options.char.hasHugeBoobs) {
-        return "{nv:char:pull:true} her {nm:item} over her head, making her massive gazongas bounce. The men cheer to see them swinging free and bare."
-      }
-      else {
-        return "{nv:char:pull:true} her {nm:item} over her head. The men cheer at the sight of her tits."
-      }
-    }
-    else {
-      if (options.char.hasHugeBoobs) {
-        return "{nv:char:pull:true} her {nm:item} over her head, her massive gazongas, barely held by her {nm:chest}, bouncing up and down to the delight of the men watching."
-      }
-      else {
-        return "{nv:char:pull:true} her {nm:item} over her head. The men cheer, now her tits are only cover by a {nm:chest}."
-      }
-    }
-  }
-  return res;
-};
+  return res
+}
 
 
 const SHORTS = function(long) {
@@ -350,21 +338,22 @@ const SHORTS = function(long) {
   res.strength = 1
   res.garmentType = "casual"
   res.subtype = 'shorts'
-  res.wearMsg = "{nv:char:pull:true} the shorts up {pa:char} {bpAdjective:char:thigh} legs, pulling up the zip and fastening the button."
-  res.specialRemoveMsg = function(char) {
-    if (this.pulledDown) return "{nv:char:step:true} out of {nm:item:the} around {pa:char} ankles.";
+  res.msgWear = "{nv:char:pull:true} the shorts up {pa:char} {bpAdjective:char:thigh} legs, pulling up the zip and fastening the button."
+  res.specialmsgRemove = function(char) {
+    if (this.pulledDown) return "{nv:char:step:true} out of {nm:item:THE} around {pa:char} ankles.";
     return "{nv:char:pull:true} {pa:char} shorts down until they slid down {pa:char} {bpAdjective:char:thigh} legs, and {pv:char:step} out of them.";
   }
   res.ripOff = erotica.ripOffPants
   return res;
 };
 
+
 const DAISY_DUKES = function() {
   const res = SHORTS(false);
   res.strength = 2
-  res.wearMsg = "{nv:char:pull:true} the denim shorts up {pa:char} {bpAdjective:char:thigh} legs, pulling up the zip and fastening the button."
-  res.specialRemoveMsg = function(char) {
-    if (this.pulledDown) return "{nv:char:step:true} out of {nm:item:the} around {pa:char} ankles.";
+  res.msgWear = "{nv:char:pull:true} the denim shorts up {pa:char} {bpAdjective:char:thigh} legs, pulling up the zip and fastening the button."
+  res.specialmsgRemove = function(char) {
+    if (this.pulledDown) return "{nv:char:step:true} out of {nm:item:THE} around {pa:char} ankles.";
     return "{nv:char:unfasten:true} the button on {pa:char} denim shorts, and {cj:char:pull} down the zip. After a bit of a wriggle, they slid down {pa:char} {bpAdjective:char:thigh} legs, and {pv:char:step} out of them.";
   }
   return res;
@@ -372,7 +361,6 @@ const DAISY_DUKES = function() {
 
 
 // SMART
-
 const BUTTONED_SHIRT = function(cropped) {
   const slots = ["chest", "nipple", "midriff", "upperback", "shoulder", "arm"];
   if (!cropped) slots.push("midriff", "lowerback");
@@ -383,8 +371,8 @@ const BUTTONED_SHIRT = function(cropped) {
   res.strength = 1
   res.garmentType = "smart"
   res.subtype = 'shirt'
-  res.wearMsg = "{nv:char:pull:true} on the shirt and fastens the buttons."
-  res.removeMsg = "{nv:char:unfasten:true} the buttons on {pa:char} shirt, and shrugs it off."
+  res.msgWear = "{nv:char:pull:true} on the shirt and fastens the buttons."
+  res.msgRemove = "{nv:char:unfasten:true} the buttons on {pa:char} shirt, and shrugs it off."
   return res;
 };
 
@@ -406,8 +394,8 @@ const JACKET = function(slotCount) {
   res.strength = 4
   res.garmentType = "smart"
   res.subtype = 'jacket'
-  res.wearMsg = "{nv:char:pull:true} on {nm:item:the} and fastens the buttons."
-  res.removeMsg = "{nv:char:unfasten:true} the buttons on {nm:item:the} shirt, and shrugs it off."
+  res.msgWear = "{nv:char:pull:true} on {nm:item:the} and fastens the buttons."
+  res.msgRemove = "{nv:char:unfasten:true} the buttons on {nm:item:the-pa::char} shirt, and shrugs it off."
   return res;
 };
 
@@ -424,8 +412,8 @@ const SKIRT = function(slotCount) {
   res.strength = 1
   res.garmentType = "smart"
   res.subtype = 'skirt'
-  res.wearMsg = "{if:item:wrapSkirt:{nv:char:wrap:true} the skirt round {pa:char} waist, and fastens it at {pa:char} right hip.::{nv:char:pull:true} the skirt up round {pa:char} waist, and fastens it at the back.}"
-  res.removeMsg = "{nv:char:unfasten:true} {pa:char} skirt, and takes it off."
+  res.msgWear = "{if:item:wrapSkirt:{nv:char:wrap:true} the skirt round {pa:char} waist, and fastens it at {pa:char} right hip.::{nv:char:pull:true} the skirt up round {pa:char} waist, and fastens it at the back.}"
+  res.msgRemove = "{nv:char:unfasten:true} {pa:char} skirt, and takes it off."
   res.ripOff = erotica.ripOffPants
   res.stripper = function(options) {
     if (!options.groin) {
@@ -447,9 +435,9 @@ const PANTS = function(shortName) {
   res.subtype = 'pants'
   res.pronouns = lang.pronouns.plural;
   res.shortName = shortName || 'pants'
-  res.wearMsg = "{nv:char:pull:true} the {show:item:shortName} up {pa:char} {bpAdjective:char:thigh} legs and fastens them up."
-  res.specialRemoveMsg = function(char) {
-    if (this.pulledDown) return "{nv:char:step:true} out of {nm:item:the} around {pa:char} ankles.";
+  res.msgWear = "{nv:char:pull:true} the {show:item:shortName} up {pa:char} {bpAdjective:char:thigh} legs and fastens them up."
+  res.specialmsgRemove = function(char) {
+    if (this.pulledDown) return "{nv:char:step:true} out of {nm:item:THE} around {pa:char} ankles.";
     return "{nv:char:unfasten:true} {pa:char} {show:item:shortName}, and {cj:char:pull} them down {pa:char} {bpAdjective:char:thigh} legs, before stepping out of them.";
   }
   res.ripOff = erotica.ripOffPants
@@ -468,7 +456,7 @@ const DRESS = function(slots, overHead) {
   res.garmentType = "smart"
   res.subtype = 'dress'
   res.strength = 1
-  res.specialWearMsg = function(char) {
+  res.specialmsgWear = function(char) {
     if (this.overHead) {
       return "{nv:char:pull:true} the dress over {pa:char} head, and down {pa:char} torso, before fastening it at the back, and then straightening it out.";
     }
@@ -479,7 +467,7 @@ const DRESS = function(slots, overHead) {
       return "{nv:char:step:true} into the dress, pulling it over {pa:char} torso, the straps over {pa:char} shoulders, before fastening it at the back.";
     }
   }
-  res.specialRemoveMsg = function(char) {
+  res.specialmsgRemove = function(char) {
     if (this.overHead) {
       return "{nv:char:unfasten:true} {pa:char} dress, then {cj:char:pull} it up, over {pa:char} head."
     }
@@ -513,31 +501,31 @@ const DRESS = function(slots, overHead) {
 const JUMPSUIT = function(cleavageHidden) {
   const slots = ["chest", "nipple", "upperback", "lowerback", "midriff", "hip", "groin", "buttock", "crotch", "thigh", "knee", "calf", "shoulder", "arm"]
   if (cleavageHidden) slots.push("cleavage")
-  const res = WEARABLE(5, slots)
+  const res = WEARABLE_THAT_PULLS_DOWN(5, slots)
   //res.getSlots = function() { return this.pulledUp ? this.slotsUpper : this.slots; };
   res.fastenVerb = "zip"
   res.garmentType = "casual"
   res.subtype = 'jumpsuit'
-  res.specialWearMsg = function(char) {
+  res.specialmsgWear = function(char) {
     return "{nv:char:step:true} into {nm:item:the}, pulling it up {pa:char} legs and over her hips. She puts her arms into the sleeves, pulling it un to her shoulders, then {cj:char:" + this.fastenVerb + "} it up at the front."
   }
-  res.specialRemoveMsg = function(char) {
+  res.specialmsgRemove = function(char) {
     const s1 = erotica.exposeChest(p.target)
     const s2 = erotica.exposeGroin(p.target)
     return "{nv:char:un" + this.fastenVerb + ":true} {pa:char} {nm:item}, then {cj:char:pull} it off her shoulders" + s1 + ", and down her arms. She wriggles it over her hips, and it falls to her ankles" + s2 + ". She steps out if it."
   }
   res.stripper = function(options) {
     if (!options.chest && !options.groin) {
-      return "Slowly {nv:char:un" + this.fastenVerb + "} {nm:item:the}, conscious {nv:char:have} no underwear on. {nv:char:pull:true} it off, her body bare, her sex exposed; the men cheer and whistle."
+      return "Slowly {nv:char:un" + this.fastenVerb + "} {nm:item:the-pa::char}, conscious {nv:char:have} no underwear on. {nv:char:pull:true} it off, her body bare, her sex exposed; the men cheer and whistle."
     }
     else if (!options.chest) {
-      return "Slowly {nv:char:un" + this.fastenVerb + "} {nm:item:the}, glad {nv:char:be} at least wearing {nm:groin:a}. She pulls it off, her body almost bare, her {tits:char} exposed. The men cheer and whistle at her."
+      return "Slowly {nv:char:un" + this.fastenVerb + "} {nm:item:the-pa::char}, glad {nv:char:be} at least wearing {nm:groin:a}. She pulls it off, her body almost bare, her {tits:char} exposed. The men cheer and whistle at her."
     }
     else if (!options.groin) {
-      return "Slowly {nv:char:un" + this.fastenVerb + "} {nm:item:the}, conscious she had no panties on. She pulls it off, her body bare, apart from her " + lang.getName(chest, ) + ", her sex exposed; the men cheer and whistle."
+      return "Slowly {nv:char:un" + this.fastenVerb + "} {nm:item:the-pa::char}, conscious she had no panties on. She pulls it off, her body bare, apart from her " + lang.getName(chest, ) + ", her sex exposed; the men cheer and whistle."
     }
     else {
-      return "{nv:char:un" + this.fastenVerb + ":true} {nm:item:the}, glad {nv:char:be} wearing underwear on. She pulls it off, her body bare, her sex exposed; the men cheer and whistle."
+      return "{nv:char:un" + this.fastenVerb + ":true} {nm:item:the-pa::char}, glad {nv:char:be} wearing underwear on. She pulls it off, her body bare, her sex exposed; the men cheer and whistle."
     }
   }
   res.ripOff = erotica.ripOffDress
@@ -552,7 +540,7 @@ const THONG = function() {
   const res = WEARABLE_THAT_PULLS_DOWN(2, ["crotch", "groin"]);
   res.pullsoff = "down";
   res.strength = 1
-  res.specialWearMsg = function(char) {
+  res.specialmsgWear = function(char) {
     if (char.hasBodyPart("cock")) {
       if (char.getArousal() > 60) {
          return "{nv:char:pull:true} the thong up {pa:char} legs and over {pa:char} hips, struggling to tuck {pa:char} erect cock inside as best {pv:char:can}.";
@@ -571,7 +559,7 @@ const THONG = function() {
        return "{nv:char:pull:true} the tiny thong up {pa:char} legs and over {pa:char} hips.";
     }
   }
-  res.specialRemoveMsg = function(char) {
+  res.specialmsgRemove = function(char) {
     return "{nv:char:pull:true} down {pa:char} briefs, and steps out of them.";
 
     if (char.hasBodyPart("cock")) {
@@ -593,7 +581,7 @@ const THONG = function() {
 
 const THONG_M = function() {
   const res = THONG();
-  res.specialWearMsg = function(char) {
+  res.specialmsgWear = function(char) {
     if (char.hasBodyPart("cock")) {
       if (char.hasHugeCock) {
          return "{nv:char:pull:true} the thong up {pa:char} legs and over {pa:char} hips, struggling to tuck {pa:char} huge cock inside as best {pv:char:can}.";
@@ -658,6 +646,17 @@ const BOXERS = function() {
 };
 
 
+const UNDERPANTS = function() {
+  const res = WEARABLE_THAT_PULLS_DOWN(2, ["crotch", "groin", "buttock"]);
+  res.swimwear = false;
+  res.wear_layer = 2
+  res.garmentType = "underwear";
+  res.subtype = 'underwear'
+  res.strength = 1
+  return res;
+}
+
+
 const TIGHTS = function() {
   const res = WEARABLE_THAT_PULLS_DOWN(3, ["crotch", "groin", "buttock", "hip", "thigh", "knee", "calf", "foot"]);
   res.pullsoff = "down";
@@ -665,9 +664,29 @@ const TIGHTS = function() {
   res.strength = 1
   res.garmentType = "underwear";
   res.subtype = 'tights'
-  res.wearMsg = "{nv:char:pull:true} the tights up {pa:char} long, smooth legs."
-  res.removeMsg = "{if:item:pulledDown:{nv:char:step:true} out of {nm:item:the} around {pa:char} ankles.:{nv:char:unfasten:true} {cj:char:pull} down the tights. After a bit of a wriggle, they slid down {pa:char} smooth legs, and {pv:char:step} out of them.}"
+  res.msgWear = "{nv:char:pull:true} the tights up {pa:char} long, smooth legs."
+  res.msgRemove = "{if:item:pulledDown:{nv:char:step:true} out of {nm:item:THE} around {pa:char} ankles.:{nv:char:unfasten:true} {cj:char:pull} down the tights. After a bit of a wriggle, they slid down {pa:char} smooth legs, and {pv:char:step} out of them.}"
   res.ripOff = erotica.ripOffPants
+  return res;
+};
+
+
+const HOSE = function(slotCount) {
+  const bootSlots = [
+    ["foot"],
+    ["foot", "calf"],
+    ["foot", "calf", "knee"],
+    ["foot", "calf", "knee", "thigh"],
+  ];
+  const res = WEARABLE_X(8, bootSlots[slotCount]);
+  res.msgWear = "{nv:char:pull:true} on the left {nm:item}, then the right."
+  res.msgRemove = "{nv:char:pull:true} off {pa:char} left {nm:item}, then the right."
+  res.pronouns = lang.pronouns.plural
+  res.defArticle = "the pair of"
+  res.indefArticle = "a pair of"
+  res.ripOff = erotica.ripOffFootwear
+  res.subtype = 'shoe'
+  res.footwear =  true
   return res;
 };
 
@@ -687,18 +706,18 @@ const SWIMSUIT = function(backExposure) {
   res.subtype = 'swimsuit'
   res.ripOff = erotica.ripOffSwimsuit
   
-  res.specialWearMsg = function(char) {
+  res.specialmsgWear = function(char) {
     if (this.strapsBroken) {
       this.pulledDown = 1
       return "{nv:char:step:true} into the swimsuit, and {cj:char:pull} it up {pa:char} legs, then {cj:char:look} ruefully at the broken straps; {pv:char:shrug} and {cj:char:leave} the swimsuit round {pa:char} waist.";
     }
     else {
       this.pulledDown = 0
-      return "{nv:char:step:true} into the swimsuit, and {cj:char:pull} it up {pa:char} legs, then up, putting {pa:char} arms through the straps, which {nv:char:pull} up over {pa:char} shoulders.";
+      return "{nv:char:step:true} into the swimsuit, and {cj:char:pull} it up {pa:char} legs, then up, putting {pa:char} arms through the straps, which {pv:char:pull} up over {pa:char} shoulders.";
     }
   }
   
-  res.specialRemoveMsg = function(char) {
+  res.specialmsgRemove = function(char) {
     if (this.pulledDown === 0) {
       return "{nv:char:pull:true} the swimsuit straps off {pa:char} shoulders, letting it fall away to {pa:char} waist, baring {pa:char} breasts. {pv:char:slide:true} the swimsuit down {pa:char} legs, exposing her pussy and {cj:char:step} out of it.";
     }
@@ -725,8 +744,10 @@ const SWIMSUIT = function(backExposure) {
       else if (o.getWorn()) {
         if (!o.getWearRemoveBlocker(player, false)) {
           list.push("Remove")
-          if (o.pulledDown < 2) list.push("Pull down")
-          if (o.pulledDown > 0) list.push("Pull up")
+          if (!settings.disablePartDressVerbs) {
+            if (o.pulledDown < 2) list.push("Pull down")
+            if (o.pulledDown > 0) list.push("Pull up")
+          }
         }
       }
       else {
@@ -741,7 +762,7 @@ const SWIMSUIT = function(backExposure) {
         list.push("worn")
       }
       else {
-        list.push("around " + w[o.loc].pronouns.poss_adj + (o.pulledDown === 1 ? " waist" : " ankles"))
+        list.push("around " + w[o.loc].pronouns.possAdj + (o.pulledDown === 1 ? " waist" : " ankles"))
       }
     })
   }
@@ -749,10 +770,10 @@ const SWIMSUIT = function(backExposure) {
   res.getNameModifier = function(options) {
     if (!this.worn) return ''
     if (options.npc) {
-      return this.pulledDown === 2 ? " around " + w[this.loc].pronouns.poss_adj + " ankles" : (this.pulledDown === 1 ? " around " + w[this.loc].pronouns.poss_adj + " waist" : ""); 
+      return this.pulledDown === 2 ? " around " + w[this.loc].pronouns.possAdj + " ankles" : (this.pulledDown === 1 ? " around " + w[this.loc].pronouns.possAdj + " waist" : ""); 
     }
     else {
-      return this.pulledDown === 2 ? " (around " + player.pronouns.poss_adj + " ankles)" : (this.pulledDown === 1 ? " (around " + player.pronouns.poss_adj + " waist)" : " (worn)"); 
+      return this.pulledDown === 2 ? " (around " + player.pronouns.possAdj + " ankles)" : (this.pulledDown === 1 ? " (around " + player.pronouns.possAdj + " waist)" : " (worn)"); 
     }
   };
 
@@ -858,8 +879,8 @@ const SLING_BIKINI = function() {
   res.pullsoff = "swimsuit";
   res.strength = 2
   res.regex = /sling bikini/
-  res.wearMsg = "{nv:char:step:true} into the sling bikini, and {cj:char:pull} it up {pa:char} legs, and over {pa:char} shoulders. It does not cover much at all!"
-  res.specialRemoveMsg = function(char) {
+  res.msgWear = "{nv:char:step:true} into the sling bikini, and {cj:char:pull} it up {pa:char} legs, and over {pa:char} shoulders. It does not cover much at all!"
+  res.specialmsgRemove = function(char) {
     if (!this.pulledDown) {
       return "{nv:char:pull:true} the sling bikini straps off {pa:char} shoulders, letting it fall away to {pa:char} ankles; {pv:char:step}  out of it.";
     }
@@ -945,8 +966,8 @@ const SWIM_SHORTS = function(long) {
   res.pullsoff = "down"
   res.strength = 2
   res.pronouns = lang.pronouns.plural
-  res.wearMsg = "{nv:char:pull:true} the denim shorts up {pa:char} long, smooth legs, pulling up the zip and fastening the button."
-  res.removeMsg = "{if:item:pulledDown:{nv:char:step:true} out of {nm:item:the} around {pa:char} ankles.:{nv:char:unfasten:true} the button on {pa:char} denim shorts, and {cj:char:pull} down the zip. After a bit of a wriggle, they slid down {pa:char} smooth legs, and {pv:char:step} out of them.}"
+  res.msgWear = "{nv:char:pull:true} the denim shorts up {pa:char} long, smooth legs, pulling up the zip and fastening the button."
+  res.msgRemove = "{if:item:pulledDown:{nv:char:step:true} out of {nm:THE} around {pa:char} ankles.:{nv:char:unfasten:true} the button on {pa:char} denim shorts, and {cj:char:pull} down the zip. After a bit of a wriggle, they slid down {pa:char} smooth legs, and {pv:char:step} out of them.}"
   res.garmentType = "swimwear";
   res.subtype = 'underwear'
   res.ripOff = erotica.ripOffPants
@@ -959,23 +980,23 @@ const HALTER = function() {
   res.pullsoff = "halter";
   res.strength = 2
   res.fastenStyle = 'halter'
-  res.specialWearMsg = function(char) {
+  res.specialmsgWear = function(char) {
     if (char.hasBodyPart("tit")) {
       if (char.hasHugeBoobs) {
-        return "{nv:char:pull:true} on {nm:item:the} over {pa:char} huge tits, struggling to fastening it at the back, then adjusting the cups to hold {pa:char} boobs as best they can.";
+        return "{nv:char:pull:true} on {nm:item:THE} over {pa:char} huge tits, struggling to fastening it at the back, then adjusting the cups to hold {pa:char} boobs as best they can.";
       }
       else {
-        return "{nv:char:pull:true} on {nm:item:the}, fastening it at the back, then adjusting the cups to hold {pa:char} boobs comfortably.";
+        return "{nv:char:pull:true} on {nm:item:THE}, fastening it at the back, then adjusting the cups to hold {pa:char} boobs comfortably.";
       }
     }
     else if (char === player) {
-      return "{nv:char:pull:true} on {nm:item:the}, fastening it at the back as {pv:char:lament} that {pv:char:have} have no tits to fill it out.";
+      return "{nv:char:pull:true} on {nm:item:THE}, fastening it at the back as {pv:char:lament} that {pv:char:have} have no tits to fill it out.";
     }
     else {
-      return "{nv:char:pull:true} on {nm:item:the}, fastening it at the back.";
+      return "{nv:char:pull:true} on {nm:item:THE}, fastening it at the back.";
     }
   }
-  res.specialRemoveMsg = function(char) {
+  res.specialmsgRemove = function(char) {
     if (char.hasBodyPart("tit")) {
       if (char.hasHugeBoobs) {
         return "{nv:char:unfasten:true} {pa:char} {nm:item}, pulling it off to bare {pa:char} huge tits.";
@@ -989,7 +1010,7 @@ const HALTER = function() {
     }
   }
   res.stripper = function() {
-    return "Slowly {nv:char:unfasten} {nm:item:the}. She pulls it off, her breasts bare; the men cheer and whistle."
+    return "Slowly {nv:char:unfasten} {nm:item:the-pa::char}. She pulls it off, her breasts bare; the men cheer and whistle."
   }
   res.ripOff = erotica.ripOffHalter
   res.garmentType = "swimwear";
@@ -1001,7 +1022,7 @@ const HALTER = function() {
 const BRIEFS = function() {
   const res = WEARABLE_THAT_PULLS_DOWN(2, ["crotch", "groin", "buttock"]);
   res.parserPriority = 5 // for ensembles, so one garment gets priority
-  res.specialWearMsg = function(char) {
+  res.specialmsgWear = function(char) {
     if (char.hasBodyPart("cock")) {
       return "{nv:char:pull:true} the briefs up {pa:char} legs and over {pa:char} hips, covering {pa:char} {cock:char}.";
     }
@@ -1009,7 +1030,7 @@ const BRIEFS = function() {
       return "{nv:char:pull:true} the briefs up {pa:char} legs and over {pa:char} hips.";
     }
   }
-  res.specialRemoveMsg = function(char) {
+  res.specialmsgRemove = function(char) {
     if (this.pulledDown) return "{nv:char:step:true} out of {nm:item:the} around {pa:char} ankles.";
 
     if (char.hasBodyPart("cock")) {
@@ -1042,6 +1063,20 @@ const THONG_SW = function() {
 }
 
 
+const BRIEFS_M = function() {
+  const res = WEARABLE_THAT_PULLS_DOWN(2, ["crotch", "groin", "buttock"]);
+  res.pullsoff = "down";
+  res.pronouns = lang.pronouns.plural;
+  res.swimwear = true
+  res.wear_layer = 2
+  res.garmentType = "swimwear";
+  res.subtype = 'underwear'
+  res.strength = 1
+  return res;
+}
+
+
+
 // FOOTWEAR
 
 const BOOTS = function(slotCount) {
@@ -1051,8 +1086,8 @@ const BOOTS = function(slotCount) {
     ["foot", "calf", "knee"],
   ];
   const res = WEARABLE_X(8, bootSlots[slotCount]);
-  res.wearMsg = "{nv:char:pull:true} on the left boot, then the right."
-  res.removeMsg = "{nv:char:pull:true} off {pa:char} left boot, then the right."
+  res.msgWear = "{nv:char:pull:true} on the left boot, then the right."
+  res.msgRemove = "{nv:char:pull:true} off {pa:char} left boot, then the right."
   res.pronouns = lang.pronouns.plural
   res.defArticle = "the pair of"
   res.indefArticle = "a pair of"
@@ -1066,8 +1101,8 @@ const BOOTS = function(slotCount) {
 
 const SHOES = function(shortName) {
   const res = WEARABLE_X(8, ["foot"]);
-  res.wearMsg = "{nv:char:put:true} on the left {show:item:shortName}, then the right."
-  res.removeMsg = "{nv:char:pull:true} off {pa:char} left {show:item:shortName}, then the right."
+  res.msgWear = "{nv:char:put:true} on the left {show:item:shortName}, then the right."
+  res.msgRemove = "{nv:char:pull:true} off {pa:char} left {show:item:shortName}, then the right."
   res.pronouns = lang.pronouns.plural;
   res.shortName = shortName || 'shoe'
   res.defArticle = "the pair of"
@@ -1085,8 +1120,8 @@ const SHOES = function(shortName) {
 
 const PASTIES = function() {
   const res = WEARABLE_X(2, "nipple");
-  res.wearMsg = "{nv:char:stick:true} one pastie on {pa:char} left nipple, and then the other on the right. They do not leave much to the imagination."
-  res.removeMsg = "{nv:char:gasp:true} slightly as {pv:char:pull} the pastie off {pa:char} left nipple; then {pv:char:do} likewise for the right."
+  res.msgWear = "{nv:char:stick:true} one pastie on {pa:char} left nipple, and then the other on the right. They do not leave much to the imagination."
+  res.msgRemove = "{nv:char:gasp:true} slightly as {pv:char:pull} the pastie off {pa:char} left nipple; then {pv:char:do} likewise for the right."
   res.pronouns = lang.pronouns.plural;
   res.garmentType = "erotica"
   res.subtype = 'pasties'
@@ -1107,8 +1142,8 @@ const COLLAR = function() {
   const res = WEARABLE_X(2, "neck");
   res.garmentType = "erotica"
   res.subtype = 'collar'
-  res.wearMsg = "{nv:char:put:true} the collar round {pa:char} neck, and {cj:char:fasten} it."
-  res.removeMsg = "{nv:char:unfasten:true} the collar, and take it off."
+  res.msgWear = "{nv:char:put:true} the collar round {pa:char} neck, and {cj:char:fasten} it."
+  res.msgRemove = "{nv:char:unfasten:true} the collar, and take it off."
   res.ripOff = function(p) {
     this.loc = p.char.loc
     this.worn = false
@@ -1118,12 +1153,13 @@ const COLLAR = function() {
   return res;
 };
 
+
 const TIE = function() {
   const res = WEARABLE_X(5, "neck");
   res.garmentType = "smart"
   res.subtype = 'tie'
-  res.wearMsg = "{nv:char:put:true} {nm:item:the} round {pa:char} neck, and {cj:char:fasten} it."
-  res.removeMsg = "{nv:char:unfasten:true} {nm:item:the}, and take it off."
+  res.msgWear = "{nv:char:put:true} {nm:item:the} round {pa:char} neck, and {cj:char:fasten} it."
+  res.msgRemove = "{nv:char:unfasten:true} {nm:item:the}, and take it off."
   res.ripOff = function(p) {
     this.loc = p.char.loc
     this.worn = false
@@ -1138,8 +1174,8 @@ const LOIN_CLOTH = function(backToo) {
   const res = WEARABLE_X(2, backToo ? ["groin", "buttock"] : ["groin"]);
   res.garmentType = "erotica"
   res.subtype = 'loincloth'
-  res.wearMsg = "{nv:char:hold:true} the loin cloth around {pa:char} waist, and tie it at the side.{ifPlayer:char:{once: it feels like one gust of wind and everything is on display to the world.}}"
-  res.removeMsg = "{nv:char:untie:true} the loin cloth, and remove it."
+  res.msgWear = "{nv:char:hold:true} the loin cloth around {pa:char} waist, and tie it at the side.{ifPlayer:char:{once: it feels like one gust of wind and everything is on display to the world.}}"
+  res.msgRemove = "{nv:char:untie:true} the loin cloth, and remove it."
   res.ripOff = function(p) {
     this.loc = p.char.loc
     this.worn = false
@@ -1366,6 +1402,15 @@ erotica.ripOffFootwear = function(p) {
     this.worn = true
     this.loc = p.item.name
   }
+  return true
+}
+
+
+erotica.ripOffBelt = function(p) {
+  if (!p.strength) p.strength = 0
+  this.loc = p.char.loc
+  this.worn = false
+  p.char.msg("{nv:char:unfasten:true} {nms:item:the} {nm:garment}" + s + ", and {cj:char:pull} it off.", p)
   return true
 }
 

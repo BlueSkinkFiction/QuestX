@@ -4,8 +4,8 @@
 
 
 
-erotica.prototype_man = createItem('ProtoMan', ACTOR(false), {})
-erotica.prototype_woman = createItem('ProtoWoman', ACTOR(true), {})
+erotica.prototype_man = createItem('ProtoMan', ACTOR(false), { abstract:true })
+erotica.prototype_woman = createItem('ProtoWoman', ACTOR(true), { abstract:true })
 
 
 erotica.createMan = function(loc) {
@@ -233,5 +233,5 @@ erotica.appendAccumulatedToDescription = function(char, descDict) {
   else {
     descDict.s += " " + sentenceCase(char.pronouns.subjective) + " " + descDict.lastForm + " "
   }
-  descDict.s += formatList(descDict.list, {lastJoiner:lang.list_and, doNotSort:true}) + "."
+  descDict.s += formatList(descDict.list, {lastSep:lang.list_and, doNotSort:true}) + "."
 }
