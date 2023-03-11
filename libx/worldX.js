@@ -1,6 +1,17 @@
 "use strict";
 
 
+/*
+const libx = {
+  update:function() {
+  }
+}
+
+
+io.modulesToUpdate.push(libx)
+*/
+
+
 
 
 // This can be used in commands to catch when the bodypart is not specified.

@@ -1,13 +1,14 @@
 
 function createShop(shopName, salesmanName, isFemale, data) {
-  const salesman = createItem(salesmanName, ACTOR(isFemale))
-  salesman.properNoun = true
-  salesman.loc = shopName
-  salesman.examine = data.examine
-  salesman.isAtLoc = function(loc, situ) { return loc === this.loc && situ !== world.LOOK }
+  const salesman = createItem(salesmanName, ACTOR(isFemale), {
+    loc:shopName,
+    examine:data.examine,
+    isAtLoc:function(loc, situ) { return loc === this.loc && situ !== world.LOOK },
+    convTopics:data.convTopics,
+  })
+  
+  if (data.salesmanAlias) salesman.setAlias(data.salesmanAlias)
 
-  if (data.salesmanAlias) salesman.alias = data.salesmanAlias
-  salesman.convTopics = data.convTopics
   delete data.examine
   delete data.salesmanAlias
   delete data.convTopics

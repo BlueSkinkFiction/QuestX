@@ -32,9 +32,8 @@ erotica.createGarment = function(proto, loc, options = {}) {
     o.variFunc(options)
   }
   else if (options.color) {
-    o.alias = o.alias.replace("black", options.color.toLowerCase());
+    o.setAlias(o.alias.replace("black", options.color.toLowerCase()))
     if (o.image) o.image = o.image.replace("black", options.color.toLowerCase());
-    o.listAlias = sentenceCase(o.alias.replace("Black", sentenceCase(options.color)))
     if (o.exam) {
       o.exam = o.exam.replace("black", options.color.toLowerCase());
     }
@@ -286,60 +285,68 @@ erotica.canWearRemoveWithSize = function(char, toWear) {
 //---- FOOTWEAR ----
 
 
-createItem("boots_ankle", BOOTS(0), MADE_OF(materials.leather),
+createItem("boots_ankle", BOOTS(0),
   {
     alias:"ankle boots",
     exam:"A pair of black, ankle-length boots.",
+    material:materials.leather,
   }
 );
 
-createItem("boots_calf", BOOTS(1), MADE_OF(materials.leather),
+createItem("boots_calf", BOOTS(1),
   {
     alias:"boots",
     exam:"A pair of black, knee-length boots.",
+    material:materials.leather,
   }
 );
 
-createItem("boots_thigh", BOOTS(2), MADE_OF(materials.leather),
+createItem("boots_thigh", BOOTS(2),
   {
     alias:"thigh-length boots",
     exam:"A pair of black, knee-length boots, lacing up at the side.",
+    material:materials.leather,
   }
 );
 
-createItem("heels", SHOES(), MADE_OF(materials.leather),
+createItem("heels", SHOES(),
   {
     alias:"heels",
     exam:"A pair of black heels.",
+    material:materials.leather,
   }
 );
 
-createItem("sandals", SHOES('sandal'), MADE_OF(materials.plastic),
+createItem("sandals", SHOES('sandal'),
   {
     alias:"sandals",
     exam:"A pair of black sandals.",
+    material:materials.plastic,
   }
 );
 
-createItem("trainers", SHOES('trainer'), MADE_OF(materials.plastic),
+createItem("trainers", SHOES('trainer'),
   {
     alias:"trainers",
     exam:"A pair of black trainers.",
     garmentType:"casual",
+    material:materials.plastic,
   }
 );
 
-createItem("shoes", SHOES('shoe'), MADE_OF(materials.leather),
+createItem("shoes", SHOES('shoe'),
   {
     alias:"shoes",
     exam:"A pair of black shoes.",
+    material:materials.leather,
   }
 );
 
-createItem("pumps", SHOES('pump'), MADE_OF(materials.plastic),
+createItem("pumps", SHOES('pump'),
   {
     alias:"pumps",
     exam:"A pair of black pumps.",
+    material:materials.plastic,
   }
 );
 
@@ -894,15 +901,14 @@ createItem("swimsuit_black", SWIMSUIT(1),
 createItem("swimsuit_yellow_panel", SWIMSUIT(0),
   {
     alias:"yellow-panelled swimsuit",
-    exam:"The swimsuit is black with a yellow panel down the front; it had a scooped back and high legs.",
+    exam:"The swimsuit is black with a V-shaped yellow panel down the front; it had a scooped back and high legs.",
     variFunc:function(options) {
       let color = options.color ? options.color : random.fromArray(erotica.colorListSwimwearF)
       while (color === "black") {
         color = random.fromArray(erotica.colorListSwimwearF)
       }
-      this.alias = this.alias.replace("yellow", color.toLowerCase());
+      this.setAlias(this.alias.replace("yellow", color.toLowerCase()))
       if (this.image) this.image = this.image.replace("yellow", color.toLowerCase());
-      this.listAlias = this.alias.replace("Yellow", sentenceCase(color));
       this.exam = this.exam.replace("yellow", color.toLowerCase());
     },
   }
@@ -984,10 +990,11 @@ createItem("briefs_us", BRIEFS(),
 
 
 
-createItem("leather_corset", CORSET(), MADE_OF(materials.leather),
+createItem("leather_corset", CORSET(),
   {
     alias:"leather corset",
     garmentType:'leatherwear',
+    material:materials.leather,
     exam:"The corset is made of soft black leather, and is fastens at the back with a series of loops and hooks. While it offered good support for her bust, it is barely high enough to cover {pa:char} nipples.",
     msgWear:"{nv:char:pull:true} on the corset, fastening it at the back before getting {pa:char} breasts comfortable in the tight garment.",
     msgRemove:"{nv:char:unfasten:true} {pa:char} corset, and takes it off",
@@ -999,10 +1006,11 @@ createItem("leather_corset", CORSET(), MADE_OF(materials.leather),
   }
 )
 
-createItem("leather_belt_skirt", SKIRT(0), MADE_OF(materials.leather),
+createItem("leather_belt_skirt", SKIRT(0),
   {
     alias:"belt skirt",
     garmentType:'leatherwear',
+    material:materials.leather,
     slots:["groin", "buttock", "hip"],
     exam:"A wide leather belt that is just about thick enough to wear as a belt.",
     stripper:function(options) {
@@ -1017,10 +1025,11 @@ createItem("leather_belt_skirt", SKIRT(0), MADE_OF(materials.leather),
 );
 
 
-createItem("leather_thong_m", THONG(), MADE_OF(materials.leather),
+createItem("leather_thong_m", THONG(),
   {
     alias:"leather thong",
     garmentType:'leatherwear',
+    material:materials.leather,
     exam:"The thong is made of soft black black, and is shaped to cover a cock and balls.",
     image:"thong_leather",
     garmentType:'leatherwear',
@@ -1028,10 +1037,11 @@ createItem("leather_thong_m", THONG(), MADE_OF(materials.leather),
   }
 )
 
-createItem("leather_thong", THONG(), MADE_OF(materials.leather),
+createItem("leather_thong", THONG(),
   {
     alias:"leather thong",
     garmentType:'leatherwear',
+    material:materials.leather,
     exam:"The thong is made of soft black black, and where one might have expected a triangle of leather to preserve {pa:char} modesty at least a little there is merely two straps, with studs at each end.",
     image:"thong_leather",
     garmentType:'leatherwear',
@@ -1039,20 +1049,22 @@ createItem("leather_thong", THONG(), MADE_OF(materials.leather),
   }
 )
 
-createItem("leather_halter", BRA(), MADE_OF(materials.leather),
+createItem("leather_halter", BRA(),
   {
     alias:"leather halter",
     garmentType:'leatherwear',
+    material:materials.leather,
     exam:"The halter is made of soft black leather; three thin bands crossed each breast, offering minimal coverage.",
     msgWear: "{nv:char:pull:true} on the halter, fastening it at the back, then adjusting the bands to cover {pa:char} nipples.",
     image:"halter_leather",
   }
 );
 
-createItem("leather_dress", DRESS(["chest", "nipple", "upperback", "lowerback", "midriff", "hip", "groin", "buttock", "thigh"]), MADE_OF(materials.leather),
+createItem("leather_dress", DRESS(["chest", "nipple", "upperback", "lowerback", "midriff", "hip", "groin", "buttock", "thigh"]),
   {
     alias:"black leather dress",
     garmentType:'leatherwear',
+    material:materials.leather,
     examine:function(multiple) {
       if (this.worn) {
         msg("Now she has it on, Lucy realises the black leather dress is even shorter at the back, and does not actually reach her crotch. The six inch hole over her cleavage also makes her feel rather exposed.");
@@ -1067,18 +1079,20 @@ createItem("leather_dress", DRESS(["chest", "nipple", "upperback", "lowerback", 
   }
 );
 
-createItem("leather_mini_skirt", SKIRT(0), MADE_OF(materials.leather),
+createItem("leather_mini_skirt", SKIRT(0),
   {
     alias:"leather mini-skirt",
     garmentType:'leatherwear',
+    material:materials.leather,
     exam:"A tight black leather skirt, hardly covering the legs at all",
   }
 );
 
-createItem("leather_collar", COLLAR(), MADE_OF(materials.leather),
+createItem("leather_collar", COLLAR(),
   {
     alias:"leather collar",
     exam:"A studded leather collar.",
+    material:materials.leather,
   }
 );
 
@@ -1106,11 +1120,12 @@ createItem("halter_leopard", BRA(),
 
 
 
-createItem("catsuit", JUMPSUIT("zip", false), MADE_OF(materials.pvc),
+createItem("catsuit", JUMPSUIT("zip", false),
   {
     alias:"black PVC catsuit",
     exam:"A very tight black catsuit, that covers the entire body between ankle, wrist and neck - apart from the cleavage - but nevertheless leaves nothing to the imagination.",
     colors:["black", "black", "red", "metallic blue", "metallic red"],
+    material:materials.pvc,
   }
 );
 
@@ -1122,10 +1137,11 @@ createItem("loin_cloth", LOIN_CLOTH(),
   }
 );
 
-createItem("belt_black", WEARABLE_X(7, []), MADE_OF(materials.leather),
+createItem("belt_black", WEARABLE_X(7, []),
   {
     alias:"leather belt",
     exam:"A black leather belt with a simple metal buckle.",
+    material:materials.leather,
     ripOff:erotica.ripOffBelt,
     msgWear:"{nv:char:pull:true} on {nm:item:the} and fastens it.",
     msgRemove:"{nv:char:unfasten:true} the buckle on {nm:item:the}, and pulls it off.",

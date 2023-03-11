@@ -835,7 +835,7 @@ function cmdRemoveGarment(char, target, garment, strength) {
   if (!garment.getWorn() || !garment.isAtLoc(target.name)) return failedmsg("{nv:item:be:true} not wearing {nm:garment:a}.", options)
   if (strength > 2 && !options.cutter) return failedmsg("{nv:char:need:true} a knife or something to do that.", options)
   if (options.blocker) return failedmsg("{nv:char:can:true} not remove {nm:garment:the} whilst {nv:item:be} wearing {nm:blocker:a}.", options)
-  if (char === target && !char.getAgreement("Remove", garment)) return world.FAILED
+  if (char === target && !char.getAgreement("Remove", {item:garment})) return world.FAILED
 
   if (char === target) return garment.remove({char:char}) ? world.SUCCESS : world.FAILED
 
@@ -853,7 +853,7 @@ function cmdRemoveGarment(char, target, garment, strength) {
   //log("rating: " + rating)
 
   const targetNoChoice = target.restraint && !w[target.restraint].testManipulate
-  if (!char.getAgreement("RemoveOther", garment, target, rating, targetNoChoice)) return world.FAILED
+  if (!char.getAgreement("RemoveOther", {item:garment, target:target, rating:rating, targetNoChoice:targetNoChoice})) return world.FAILED
 
   // By now we have a character, char, willing to try to remove an item, garment, from a different character, target
   //console.log(char.name + ":remove:" + garment.name)

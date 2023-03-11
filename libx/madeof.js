@@ -132,7 +132,7 @@ function cmdDamage(damage, char, objects, nomsg) {
     return world.FAILED;
   }
   for (let i = 0; i < objects.length; i++) {
-    if (!char.getAgreement("Destroy", objects[i])) {
+    if (!char.getAgreement("Destroy", {item:objects[i]})) {
       // The getAgreement should give the response
       continue;
     }

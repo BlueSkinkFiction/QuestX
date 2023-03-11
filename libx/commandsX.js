@@ -391,7 +391,7 @@ new Cmd('Teabag', {
   if (!vessel.vessel) return failedmsg(lang.not_vessel, options);
   if (vessel.closed) return  failedmsg(lang.container_closed, options);
   if (!char.testManipulate(vessel, "fill")) return world.FAILED;
-  if (!char.getAgreement("Fill", vessel)) return world.FAILED;
+  if (!char.getAgreement("Fill", {item:vessel})) return world.FAILED;
   if (!vessel.isAtLoc(char.name)) return failedmsg(lang.not_carrying, {char:char, item:sink});
   return vessel.doEmpty(options) ? world.SUCCESS: world.FAILED;
 }
@@ -874,7 +874,7 @@ function cmdInteract(verb, char, object, options) {
 
   if (verb.extraTests && !verb.extraTests(options)) return world.FAILED;
   if (!char.testManipulate(object, verb.name)) return world.FAILED;
-  if (!char.getAgreement("Interact", object, verb, bodypart, options.altName ? options.altName : verb.name)) return world.FAILED;
+  if (!char.getAgreement("Interact", {item:object, action:verb, bodypart:bodypart, altName:options.altName ? options.altName : verb.name})) return world.FAILED;
 
   options.garment = bodypart.getProtection(object);
   if (verb.mustBeBare && options.garment) return failedmsg("{nv:char:can't:true} do that when {nm:item:the} is wearing {nm:garment:the}.", options);
@@ -1129,7 +1129,7 @@ new Cmd('NpcRollOver1', {
 
 erotica.POSTURES_LIST = [
   {
-    cmd:'stand', desc:'standing', ignore:true, pattern:'stand|stand up|get up',
+    cmd:'stand', desc:'standing', posture:'standing', ignore:true, pattern:'stand|stand up|get up',
     canComeOver:function(char, target, bp) {
       if (!["foot", "calf", "thigh"].includes(bp) && char.posture === "kneeling") return falsemsg("{nv:char:would:true} have to get up to do that.", {char:char})
       if (["head", "face", "neck", "upperback", "chest", "cleavage", "arm", "hand", "mouth", "tit", "nipple"].includes(bp)) return falsemsg(lang.getName(char, {article:DEFINITE, capital:true}) + " would need " + lang.getName(target, {article:DEFINITE}) + " to get lower to do that.")
@@ -1141,7 +1141,7 @@ erotica.POSTURES_LIST = [
   },
   
   {
-    cmd:'kneel', desc:'kneeling', 
+    cmd:'kneel', desc:'kneeling', posture:'kneeling', 
     canComeOver:function(char, target, bp) {
       if (["head", "face", "neck", "mouth"].includes(bp) && char.posture === "kneeling") return falsemsg("{nv:char:would:true} have to get up to do that.", {char:char})
       if (!["head", "face", "upperback", "lowerback", "buttock", "ass", "thigh"].includes(bp)) return false
@@ -1154,7 +1154,7 @@ erotica.POSTURES_LIST = [
   },
   
   {
-    cmd:'bendover', desc:'bending over', pattern:'bend over', 
+    cmd:'bendover', desc:'bending over', posture:'bending over', pattern:'bend over', 
     canComeOver:function(char, target, bp) {
       if (!["foot", "calf"].includes(bp) && char.posture === "kneeling") return falsemsg("{nv:char:would:true} have to get up to do that.", {char:char})
       if (["head", "face", "upperback", "lowerback", "buttock", "ass", "thigh"].includes(bp)) return true
@@ -1166,7 +1166,7 @@ erotica.POSTURES_LIST = [
   },
   
   {
-    cmd:'sit', desc:'sitting', addFloor:true, 
+    cmd:'sit', desc:'sitting', posture:'sitting', addFloor:true, 
     canComeOver:function(char, target, bp) {
       if (!["foot", "calf"].includes(bp) && char.posture === "kneeling") return falsemsg("{nv:char:would:true} have to get up to do that.", {char:char})
       if (!["buttock", "ass"].includes(bp)) return true
@@ -1179,7 +1179,7 @@ erotica.POSTURES_LIST = [
   },
   
   {
-    cmd:'liefacedown', desc:'facedown', addFloor:true, pattern:'lie face down', 
+    cmd:'liefacedown', desc:'facedown', posture:'facedown', addFloor:true, pattern:'lie face down', 
     canComeOver:function(char, target, bp) {
       if (!char.posture || char.posture === "standing") return falsemsg("{nv:char:need:true} to get lower for any decent aim.", {char:char})
       if (!["head", "face", "upperback", "lowerback", "buttock", "ass", "thigh", "calf", "foot", "arm", "hand"].includes(bp)) return true
@@ -1196,7 +1196,7 @@ erotica.POSTURES_LIST = [
   },
   
   {
-    cmd:'lieback', desc:'reclining', addFloor:true, pattern:'lie down|lie back|recline', 
+    cmd:'lieback', desc:'reclining', posture:'reclining', addFloor:true, pattern:'lie down|lie back|recline', 
     canComeOver:function(char, target, bp) {
       if (!char.posture || char.posture === "standing") return falsemsg("{nv:char:need:true} to get lower for any decent aim.", {char:char})
       if (!["head", "face", "mouth", "chest", "tit", "nipple", "midriff", "groin", "thigh", "calf", "foot", "arm", "hand"].includes(bp)) return true
@@ -1214,7 +1214,7 @@ erotica.POSTURES_LIST = [
   },
   
   {
-    cmd:'crawl', desc:'on # hands and knees', pattern:'crawl|get on hands and knees', 
+    cmd:'crawl', desc:'on # hands and knees', posture:'on hands and knees', pattern:'crawl|get on hands and knees', 
     canComeOver:function(char, target, bp) {
       if (["head", "face", "upperback", "lowerback", "buttock", "ass", "thigh"].includes(bp)) return true
       return falsemsg("{nv:char:can't:true} while {nv:item:be} on {pa:item} hands and knees.", {char:char, item:target})
@@ -1334,7 +1334,7 @@ function cmdUndress(char) {
   if (char.isNaked()) return failedmsg("{nv:char:be:true} already naked.");
   const garment = char.firstToRemove();
   if (!char.testManipulate(garment, "Remove")) return world.FAILED
-  if (!char.getAgreement("Remove", garment)) return world.FAILED
+  if (!char.getAgreement("Remove", {item:garment})) return world.FAILED
 
   return garment.remove({char:char}) ? world.SUCCESS : world.FAILED;
 }
@@ -1605,7 +1605,7 @@ function cmdRemoveGarment(char, target, garment, strength) {
   if (!garment.getWorn() || !garment.isAtLoc(target.name)) return failedmsg("{nv:item:be:true} not wearing {nm:garment:a}.", options)
   if (strength > 2 && !options.cutter) return failedmsg("{nv:char:need:true} a knife or something to do that.", options)
   if (options.blocker) return failedmsg("{nv:char:can:true} not remove {nm:garment:the} whilst {nv:item:be} wearing {nm:blocker:a}.", options)
-  if (char === target && !char.getAgreement("Remove", garment)) return world.FAILED
+  if (char === target && !char.getAgreement("Remove", {item:garment})) return world.FAILED
 
   if (char === target) return garment.remove({char:char}) ? world.SUCCESS : world.FAILED
 
@@ -1623,7 +1623,7 @@ function cmdRemoveGarment(char, target, garment, strength) {
   //log("rating: " + rating)
 
   const targetNoChoice = target.restraint && !w[target.restraint].testManipulate
-  if (!char.getAgreement("RemoveOther", garment, target, rating, targetNoChoice)) return world.FAILED
+  if (!char.getAgreement("RemoveOther", {item:garment, target:target, rating:rating, targetNoChoice:targetNoChoice})) return world.FAILED
 
   // By now we have a character, char, willing to try to remove an item, garment, from a different character, target
   //console.log(char.name + ":remove:" + garment.name)

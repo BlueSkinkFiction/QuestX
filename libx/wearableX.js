@@ -14,7 +14,7 @@ erotica.pullOffTexts = {
 }
 
 const WEARABLE_X = function (layer, slots) {
-  const res = Object.assign(WEARABLE(layer, slots), MADE_OF(materials.cloth))
+  const res = Object.assign({}, MADE_OF(materials.cloth), WEARABLE(layer, slots))
   //const res = WEARABLE(layer, slots)
   res.strength = 1
   
@@ -281,7 +281,7 @@ const TOP_THAT_PULLS_UP = function(slots) {
   res.subtype = 'teeshirt'
   res.ripOff = erotica.ripOffTeeShirt
   res.msgWear = "{nv:char:pull:true} {nm:item:the-pa::char} over {pa:char} head, and down over {pa:char} torso."
-  res.msgRemove = "{nv:char:pull:true} {nm:item:the-pa::char} up and over {pa:char} head."
+  res.msgRemove = "{nv:char:pull:true} {pa:char} {nm:item} up and over {pa:char} head."
   res.stripper = function(options) {
     if (!options.chest) {
       if (char.hasHugeBoobs) {

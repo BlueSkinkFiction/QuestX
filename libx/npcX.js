@@ -736,21 +736,19 @@ const ACTOR = function(isFemale, isPlayer) {
 
   // --------------  AGREEMENT ---------------------------
 
-  res.getAgreement = function(...args) {
-    if (args.length === 0) {
+  res.getAgreement = function(name, options) {
+    if (!name) {
       errormsg("getAgreement has no parameters");
     }
-    let name = sentenceCase(args.shift())
     if (["SitOn", "StandOn", "ReclineOn", "Straddle", "BendOverFurniture"].includes(name)) {
-      args.unshift(name.toLowerCase())
+      options.posture = name.toLowerCase()
       name = "Posture"
     }
-    //console.log(name + ": " + args);
     if (this["getAgreement" + name]) {
-      return this["getAgreement" + name](...args);
+      return this["getAgreement" + name](options)
     }
     if (this.getAgreementOther) {
-      return this.getAgreementOther(name, ...args);
+      return this.getAgreementOther(name, options)
     }
     return true;
   }
@@ -758,15 +756,15 @@ const ACTOR = function(isFemale, isPlayer) {
 
   // Should be overriden for every character to give their own responses.
   // Should also bail if the character is not happy about taking orders too.
-  res.getAgreementPosture = function(name, object) {
+  res.getAgreementPosture = function(options) {
     return true;
   }
 
 
   // Should be overriden for every character to give their own responses.
   // Should also bail if the character is not happy about taking orders too.
-  res.getAgreementInteract = function(target, action, bodypart, actionName) {
-    //console.log("* Interact: " + target.name + ", " + action.name + ", " + bodypart.name);
+  res.getAgreementInteract = function(options) {
+    //console.log("* Interact: " + options.target.name + ", " + options.action.name + ", " + options.bodypart.name);
     return true;
   }
 
@@ -775,12 +773,12 @@ const ACTOR = function(isFemale, isPlayer) {
   // Should be overriden for every character to give their own responses.
   // Should also bail if the character is not happy about taking orders too.
   // Whether erotica.RELUCTANT returns true or false is up to you.
-  res.getAgreementRemove = function(obj) {
+  res.getAgreementRemove = function(options) {
     if (this === player) return true;
     
     if (this.restraint && w[this.restraint].testManipulate) return failedmsg(this.responseNotWhileTiedUp)
    
-    const agreement = this.getWillingToRemove(obj);
+    const agreement = this.getWillingToRemove(options.item);
     if (agreement === erotica.HAPPY) {
       msg("'Sure thing!'");
       return true;
@@ -797,15 +795,15 @@ const ACTOR = function(isFemale, isPlayer) {
   // Should be overriden for every character to give their own responses.
   // Should also bail if the character is not happy about taking orders too.
   // Whether erotica.RELUCTANT returns true or false is up to you.
-  res.getAgreementRemoveOther = function(garment, target, targetWilling, targetNoChoice) {
+  res.getAgreementRemoveOther = function(options) {
     return true;
   }
 
   // Should be overriden for every character to give their own responses.
   // Should also bail if the character is not happy about taking orders too.
   // Whether erotica.RELUCTANT returns true or false is up to you.
-  res.getAgreementGo = function(dir) {
-    const agreement = this.getWillingToGo(dir);
+  res.getAgreementGo = function(options) {
+    const agreement = this.getWillingToGo(options.exit.dir);
     if (agreement === erotica.HAPPY) {
       msg("'Sure thing!'");
       return true;
